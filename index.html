@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta property="og:title" content="Gautam | Unity Game Developer">
+<meta property="og:description" content="Unity game developer. 3.5+ years of production C# across mobile and Windows.">
+<title>Gautam | Unity Game Developer</title>
+<meta name="description" content="Gautam, Unity game developer. 3.5+ years of production C# across mobile and Windows. Pongz – SG Mahjong, Character Creator, Movie Studio 3D.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a Mahjong table. Felt background, projects are tiles you pick from a "level select",
+   a HUD carries the real numbers, and three hidden tiles make a pong. One deliberate dark look. */
+:root {
+  --felt: #0f3d33;
+  --felt-deep: #0a2a23;
+  --felt-line: #1f5c4c;
+  --ivory: #f4ecd8;
+  --ivory-edge: #d9ccab;
+  --ink: #1d1b16;
+  --ink-soft: #5a5446;
+  --jade: #2e8a57;
+  --red: #d23a2c;
+  --gold: #f4b93a;
+  --text: #eaf2ed;
+  --muted: #a3c2b5;
+  --f-display: "Bungee", "Arial Black", Impact, sans-serif;
+  --f-body: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --f-cjk: "Noto Serif SC", "Songti SC", "SimSun", "Noto Serif CJK SC", serif;
+  --step--1: .85rem; --step-0: 1rem; --step-1: 1.25rem; --step-2: 1.6rem; --step-3: 2.2rem; --step-4: clamp(2.2rem, 6vw, 3.9rem);
+  --radius: 10px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body {
+  margin: 0;
+  background-color: var(--felt);
+  background-image:
+    radial-gradient(ellipse at 50% -10%, rgba(255,255,255,.08), transparent 60%),
+    repeating-linear-gradient(45deg, rgba(0,0,0,.035) 0 2px, transparent 2px 6px);
+  color: var(--text);
+  font-family: var(--f-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--felt-deep); }
+a { color: var(--gold); }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+p { margin: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: var(--step--1); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+
+/* ---------- top bar ---------- */
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: rgba(10,42,35,.92); backdrop-filter: blur(6px); border-bottom: 2px solid var(--felt-line); }
+.topbar .wrap { display: flex; align-items: center; gap: 16px; padding-block: 10px; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-family: var(--f-display); font-size: 1.05rem; }
+.logo .mini-tile { width: 28px; height: 36px; font-size: 1.1rem; }
+.nav { display: flex; gap: 4px; margin-left: auto; flex-wrap: wrap; }
+.nav a { color: var(--muted); text-decoration: none; font-family: var(--f-mono); font-size: var(--step--1); padding: 6px 10px; border-radius: 6px; }
+.nav a:hover { color: var(--text); background: var(--felt-line); }
+.counter { font-family: var(--f-mono); font-size: var(--step--1); color: var(--gold); border: 1px dashed var(--gold); padding: 4px 8px; border-radius: 6px; white-space: nowrap; }
+
+/* ---------- tiles (the core motif) ---------- */
+.mini-tile, .tile {
+  display: inline-grid; place-items: center;
+  background: linear-gradient(180deg, #fffaf0, var(--ivory));
+  color: var(--ink);
+  border-radius: 6px;
+  box-shadow: 0 4px 0 var(--jade), 0 6px 0 #1b5a39, 0 10px 18px rgba(0,0,0,.35);
+  font-family: var(--f-cjk); font-weight: 700; line-height: 1;
+}
+.c-red { color: var(--red); }
+.c-jade { color: var(--jade); }
+.dots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.dots i { width: 16px; height: 16px; border-radius: 50%; border: 3px solid var(--jade); box-shadow: inset 0 0 0 3px var(--ivory), inset 0 0 0 8px var(--red); }
+
+/* ---------- hero ---------- */
+.hero .wrap { display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: center; padding-block: 64px 48px; }
+.hero h1 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-4); line-height: 1.05; margin-block: 14px 18px; }
+.hero h1 .hl { color: var(--gold); }
+.hero .sub { font-size: var(--step-1); color: var(--muted); max-width: 52ch; }
+.btns { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.btn { font-family: var(--f-display); font-size: .95rem; letter-spacing: .03em; text-decoration: none; padding: 14px 20px; border-radius: 8px; border: 0; cursor: pointer; transition: transform .12s ease, box-shadow .12s ease; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary { background: var(--gold); color: var(--ink); box-shadow: 0 5px 0 #a87412; }
+.btn-ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 2px var(--muted); }
+.btn:hover { transform: translateY(-2px); }
+.btn-primary:active { transform: translateY(4px); box-shadow: 0 1px 0 #a87412; }
+.press { font-family: var(--f-mono); font-size: var(--step--1); color: var(--muted); margin-top: 22px; }
+.press b { color: var(--gold); animation: blink 1.2s steps(2, start) infinite; }
+@keyframes blink { to { visibility: hidden; } }
+
+.hand { position: relative; height: 300px; }
+.hand .tile { position: absolute; width: 112px; height: 148px; font-size: 4.2rem; transition: transform .25s ease; }
+.hand .t1 { left: 4%; top: 40px; transform: rotate(-10deg); }
+.hand .t2 { left: 34%; top: 10px; transform: rotate(3deg); z-index: 2; }
+.hand .t3 { left: 64%; top: 52px; transform: rotate(12deg); }
+.hand .tile:hover { transform: translateY(-14px) rotate(0); }
+@media (prefers-reduced-motion: no-preference) {
+  .hand .t2 { animation: bob 3.2s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translateY(-10px) rotate(3deg); } }
+}
+
+/* ---------- HUD ---------- */
+.hud { background: var(--felt-deep); border-block: 2px solid var(--felt-line); }
+.hud .wrap { display: grid; grid-template-columns: repeat(4, 1fr); padding-block: 0; }
+.stat { padding: 20px 18px; border-right: 1px solid var(--felt-line); min-width: 0; }
+.stat:last-child { border-right: 0; }
+.stat .v { font-family: var(--f-display); font-size: var(--step-3); color: var(--gold); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat .k { font-family: var(--f-mono); font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+
+/* ---------- sections ---------- */
+section { padding-block: 72px; }
+.sec-head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
+.sec-head h2 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-3); line-height: 1.1; }
+
+/* level select */
+.levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.level {
+  display: flex; flex-direction: column; gap: 14px; text-decoration: none;
+  background: linear-gradient(180deg, #fffaf0, var(--ivory)); color: var(--ink);
+  border-radius: 14px; padding: 22px 20px 24px;
+  box-shadow: 0 6px 0 var(--jade), 0 10px 0 #1b5a39, 0 18px 28px rgba(0,0,0,.35);
+  transition: transform .18s ease, box-shadow .18s ease; min-width: 0;
+}
+.level:hover { transform: translateY(-8px) rotate(-1deg); box-shadow: 0 6px 0 var(--jade), 0 10px 0 #1b5a39, 0 28px 36px rgba(0,0,0,.4); }
+.level .art { height: 120px; display: grid; place-items: center; background: #ebe0c4; border-radius: 10px; }
+.level .art svg { width: 84px; height: 84px; }
+.level h3 { font-family: var(--f-display); font-weight: 400; font-size: 1.2rem; line-height: 1.15; }
+.level p { color: var(--ink-soft); font-size: .95rem; }
+.level .go { margin-top: auto; font-family: var(--f-mono); font-size: var(--step--1); font-weight: 700; color: var(--jade); }
+.chip { align-self: flex-start; font-family: var(--f-mono); font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; }
+.chip.live { background: var(--jade); color: #fff; }
+.chip.live::before { content: "● "; }
+.chip.locked { background: var(--ink); color: var(--ivory); }
+
+/* case studies */
+.case { border-top: 2px dashed var(--felt-line); }
+.case-head { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center; margin-bottom: 28px; }
+.case-head .badge { width: 92px; height: 120px; font-size: 3.4rem; }
+.case-head .badge svg { width: 60px; height: 60px; }
+.case-head h2 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-3); line-height: 1.1; }
+.case-head .lede { color: var(--muted); font-size: var(--step-1); margin-top: 10px; max-width: 62ch; }
+.case-body { display: grid; grid-template-columns: 300px 1fr; gap: 32px; align-items: start; }
+.sheet { background: var(--felt-deep); border: 2px solid var(--felt-line); border-radius: var(--radius); padding: 18px; position: sticky; top: 90px; min-width: 0; }
+.sheet h3 { font-family: var(--f-mono); font-size: var(--step--1); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+.sheet dl { display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; margin: 0; font-size: .92rem; }
+.sheet dt { font-family: var(--f-mono); color: var(--muted); font-size: .8rem; text-transform: uppercase; padding-top: 2px; }
+.sheet dd { margin: 0; min-width: 0; }
+.sheet .stores { display: grid; gap: 10px; margin-top: 18px; }
+.store { display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; font-family: var(--f-display); font-size: .85rem; padding: 12px; border-radius: 8px; background: var(--gold); color: var(--ink); box-shadow: 0 4px 0 #a87412; }
+.store:hover { transform: translateY(-2px); }
+.store svg { width: 18px; height: 18px; }
+.content { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+.abilities { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.ability { background: rgba(244,236,216,.06); border: 1px solid var(--felt-line); border-radius: var(--radius); padding: 18px 18px 20px; min-width: 0; }
+.ability h3 { font-family: var(--f-body); font-weight: 800; font-size: 1.08rem; color: var(--text); margin-bottom: 6px; display: flex; gap: 10px; align-items: baseline; }
+.ability h3 .k { font-family: var(--f-mono); font-size: .72rem; color: var(--ink); background: var(--gold); padding: 1px 6px; border-radius: 3px; flex: none; }
+.ability p { color: var(--muted); font-size: .96rem; }
+.ability.wide { grid-column: 1 / -1; }
+
+.media { margin: 0; border-radius: var(--radius); background: repeating-linear-gradient(-45deg, var(--felt-deep) 0 14px, #0d332b 14px 28px); border: 2px dashed var(--felt-line); aspect-ratio: 16 / 9; max-width: 100%; display: grid; place-items: center; text-align: center; color: var(--muted); font-family: var(--f-mono); font-size: var(--step--1); overflow: hidden; }
+.media img, .media video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.media.has-src { border-style: solid; background: #000; }
+.media-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.media .ph span { display: block; font-family: var(--f-display); font-size: 1rem; color: var(--text); margin-bottom: 4px; }
+
+.credits { border-left: 4px solid var(--gold); background: rgba(244,185,58,.08); padding: 16px 18px; border-radius: 0 var(--radius) var(--radius) 0; color: var(--text); }
+.credits b { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 4px; }
+
+.classified { position: relative; border: 2px dashed var(--muted); border-radius: var(--radius); padding: 16px 18px; color: var(--muted); font-size: .96rem; }
+.stamp { display: inline-block; font-family: var(--f-display); color: var(--red); border: 3px solid var(--red); padding: 2px 10px; border-radius: 6px; transform: rotate(-4deg); font-size: .9rem; letter-spacing: .05em; margin-bottom: 10px; background: rgba(210,58,44,.08); }
+
+/* side quests */
+.quests { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.quest { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start; background: var(--felt-deep); border: 2px solid var(--felt-line); border-radius: var(--radius); padding: 18px; min-width: 0; }
+.quest .mini-tile { width: 40px; height: 52px; font-size: 1.4rem; }
+.quest h3 { font-weight: 800; font-size: 1.05rem; margin-bottom: 4px; }
+.quest p { color: var(--muted); font-size: .95rem; }
+
+/* about + inventory */
+.about .wrap { display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items: start; position: relative; }
+.about .bio { display: flex; flex-direction: column; gap: 16px; font-size: 1.08rem; max-width: 62ch; }
+.about .bio p:first-of-type::first-letter { font-family: var(--f-display); color: var(--gold); font-size: 2.6em; float: left; line-height: .9; margin: 6px 8px 0 0; }
+.inventory { display: flex; flex-wrap: wrap; gap: 10px; }
+.slot { font-family: var(--f-mono); font-size: .82rem; padding: 8px 12px; border-radius: 6px; background: var(--felt-deep); border: 2px solid var(--felt-line); color: var(--text); }
+.slot.rare { border-color: var(--gold); color: var(--gold); }
+
+/* contact */
+.contact { text-align: center; }
+.contact .wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.contact h2 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-4); line-height: 1.05; max-width: 18ch; }
+.contact .cont { font-family: var(--f-display); color: var(--gold); font-size: var(--step-2); }
+.contact-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.email-box { display: inline-flex; align-items: center; gap: 0; border-radius: 8px; overflow: hidden; box-shadow: inset 0 0 0 2px var(--felt-line); max-width: 100%; }
+.email-box code { font-family: var(--f-mono); padding: 12px 14px; user-select: all; overflow-wrap: anywhere; }
+.email-box button { font: inherit; font-family: var(--f-mono); font-size: var(--step--1); border: 0; background: var(--felt-line); color: var(--text); padding: 12px 14px; cursor: pointer; align-self: stretch; }
+.email-box button:hover { background: var(--jade); }
+.meta { font-family: var(--f-mono); font-size: var(--step--1); color: var(--muted); }
+
+footer { border-top: 2px solid var(--felt-line); background: var(--felt-deep); }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding-block: 22px; font-family: var(--f-mono); font-size: var(--step--1); color: var(--muted); }
+
+/* easter egg tiles */
+.egg { position: absolute; width: 30px; height: 40px; font-size: 1.1rem; cursor: pointer; border: 0; padding: 0; opacity: .55; transition: opacity .2s, transform .2s; }
+.egg:hover, .egg:focus-visible { opacity: 1; transform: translateY(-4px) rotate(-6deg); }
+.egg.found { opacity: 1; box-shadow: 0 4px 0 var(--gold), 0 6px 0 #a87412; pointer-events: none; }
+.egg-about { right: 16px; bottom: -40px; }
+.egg-foot { position: static; }
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(140%); background: var(--ivory); color: var(--ink); font-family: var(--f-body); font-weight: 600; padding: 14px 18px; border-radius: 10px; box-shadow: 0 5px 0 var(--jade), 0 16px 30px rgba(0,0,0,.45); z-index: 50; transition: transform .3s ease, visibility .3s; max-width: calc(100vw - 32px); visibility: hidden; }
+.toast.show { transform: translateX(-50%) translateY(0); visibility: visible; }
+.toast.pong { background: var(--gold); box-shadow: 0 5px 0 #a87412, 0 16px 30px rgba(0,0,0,.45); }
+
+/* ---------- responsive ---------- */
+@media (max-width: 900px) {
+  .hero .wrap { grid-template-columns: 1fr; padding-block: 40px 32px; }
+  .hand { height: 190px; max-width: 360px; }
+  .hand .tile { width: 82px; height: 108px; font-size: 3rem; }
+  .hud .wrap { grid-template-columns: repeat(2, 1fr); }
+  .stat:nth-child(2) { border-right: 0; }
+  .stat:nth-child(-n+2) { border-bottom: 1px solid var(--felt-line); }
+  .levels { grid-template-columns: 1fr; max-width: 520px; }
+  .case-body { grid-template-columns: 1fr; }
+  .sheet { position: static; }
+  .about .wrap { grid-template-columns: 1fr; gap: 28px; }
+}
+@media (max-width: 640px) {
+  .nav { display: none; }
+  .counter { margin-left: auto; }
+  section { padding-block: 52px; }
+  .abilities, .media-row, .quests { grid-template-columns: 1fr; }
+  .case-head { grid-template-columns: 1fr; gap: 14px; }
+  .case-head .badge { width: 64px; height: 84px; font-size: 2.4rem; }
+  .case-head .badge svg { width: 42px; height: 42px; }
+  .stat { padding: 16px 12px; }
+  .egg-about { bottom: -48px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <a class="logo" href="#top"><span class="mini-tile c-red" aria-hidden="true">中</span>Gautam</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#levels">Levels</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <span class="counter" id="counter" title="There are three tiles hidden on this page">Tiles 0/3</span>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" aria-labelledby="hero-title" style="padding-block:0">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">Player 1 · Unity Game Developer</p>
+        <h1 id="hero-title">I make tiles <span class="hl">click</span>, bots <span class="hl">think</span>, and frame rates <span class="hl">behave</span>.</h1>
+        <p class="sub">Unity game developer with 3.5+ years of production C# across mobile and Windows. Based in Mumbai. Available immediately.</p>
+        <div class="btns">
+          <a class="btn btn-primary" href="#pongz">See Pongz ▸</a>
+          <a class="btn btn-ghost" href="#contact">Get in touch</a>
+        </div>
+        <p class="press">Press <b>ENTER</b> to start. Or just scroll, that works too.</p>
+      </div>
+      <div class="hand">
+        <span class="tile t1 c-jade" aria-hidden="true">發</span>
+        <span class="tile t2" aria-hidden="true"><span class="dots"><i></i><i></i><i></i><i></i></span></span>
+        <button class="tile t3 c-red egg-hero" data-egg="1" aria-label="A hidden tile" style="cursor:pointer;border:0;padding:0;font-family:var(--f-cjk);font-weight:700">中</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="hud" role="list" aria-label="Key numbers">
+    <div class="wrap">
+      <div class="stat" role="listitem"><div class="v">3.5+</div><div class="k">Years of production C#</div></div>
+      <div class="stat" role="listitem"><div class="v">40K+</div><div class="k">Pongz downloads</div></div>
+      <div class="stat" role="listitem"><div class="v">~3.4K</div><div class="k">Pongz daily players</div></div>
+      <div class="stat" role="listitem"><div class="v">50x</div><div class="k">Faster exports, Character Creator</div></div>
+    </div>
+  </div>
+
+  <section id="levels" aria-labelledby="levels-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Level select</p>
+        <h2 id="levels-title">Pick a project</h2>
+      </div>
+      <div class="levels">
+        <a class="level" href="#pongz">
+          <span class="chip live">Live on both stores</span>
+          <div class="art" aria-hidden="true"><span class="mini-tile c-red" style="width:62px;height:82px;font-size:2.6rem">中</span></div>
+          <h3>Pongz – SG Mahjong</h3>
+          <p>Real-time multiplayer Mahjong for iOS and Android. Client architecture, bot AI, all of the UI.</p>
+          <span class="go">Play level ▸</span>
+        </a>
+        <a class="level" href="#character-creator">
+          <span class="chip locked">Classified · Unreleased</span>
+          <div class="art" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="#1d1b16" stroke-width="3.5" stroke-linecap="round"><circle cx="20" cy="20" r="9" fill="#f4ecd8"/><path d="M6 50c2-10 8-15 14-15s12 5 14 15" fill="#f4ecd8"/><line x1="40" y1="16" x2="58" y2="16"/><line x1="40" y1="32" x2="58" y2="32"/><line x1="40" y1="48" x2="58" y2="48"/><circle cx="46" cy="16" r="3.5" fill="#d23a2c" stroke="none"/><circle cx="53" cy="32" r="3.5" fill="#2e8a57" stroke="none"/><circle cx="44" cy="48" r="3.5" fill="#d23a2c" stroke="none"/></svg>
+          </div>
+          <h3>Character Creator</h3>
+          <p>A photorealistic character creation tool for Windows. I led development and the architecture.</p>
+          <span class="go">Read the briefing ▸</span>
+        </a>
+        <a class="level" href="#movie-studio">
+          <span class="chip locked">Classified · Unreleased</span>
+          <div class="art" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="#1d1b16" stroke-width="3.5" stroke-linejoin="round"><rect x="6" y="24" width="52" height="32" rx="3" fill="#f4ecd8"/><path d="M6 24 L10 10 L58 10 L58 24" fill="#1d1b16"/><path d="M18 10 L14 24 M30 10 L26 24 M42 10 L38 24 M54 10 L50 24" stroke="#f4ecd8" stroke-width="3"/><path d="M27 33 L40 40 L27 47 Z" fill="#d23a2c" stroke="none"/></svg>
+          </div>
+          <h3>Movie Studio 3D</h3>
+          <p>A Windows tool for composing 3D scenes. I solved a problem that was open for over a year.</p>
+          <span class="go">Read the briefing ▸</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PONGZ ===================== -->
+  <section id="pongz" class="case" aria-labelledby="pongz-title">
+    <div class="wrap">
+      <div class="case-head">
+        <span class="tile badge c-red" aria-hidden="true">中</span>
+        <div>
+          <p class="eyebrow">Level 1 · The live one</p>
+          <h2 id="pongz-title">Pongz – SG Mahjong: live on both stores, and on about 3,400 phones a day.</h2>
+          <p class="lede">A live, real-time multiplayer Mahjong game for iOS and Android. I designed and built its core client-side architecture and its entire UI.</p>
+        </div>
+      </div>
+      <div class="case-body">
+        <aside class="sheet" aria-label="Pongz stats">
+          <h3>Stat sheet</h3>
+          <dl>
+            <dt>Role</dt><dd>Unity Game Developer</dd>
+            <dt>When</dt><dd>Mar 2025 – Jun 2026</dd>
+            <dt>Platforms</dt><dd>iOS, Android</dd>
+            <dt>Status</dt><dd>Live</dd>
+            <dt>Players</dt><dd>40K+ downloads<br>~3.4K daily active</dd>
+            <dt>Stack</dt><dd>Unity, C#, Socket.IO, Spine, Addressables, UGUI, TextMeshPro</dd>
+          </dl>
+          <div class="stores">
+            <a class="store" href="https://play.google.com/store/apps/details?id=com.pixelstackstudios.pongz" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 2.5v19l10-9.5L4 2.5zm11.4 10.8 2.6 2.5-11 6.2 8.4-8.7zm0-2.6L7 2l11 6.2-2.6 2.5zm4.7.2L22 12l-2 1.1-2.8-2.6 2.9-.6z"/></svg>
+              Google Play
+            </a>
+            <a class="store" href="https://apps.apple.com/in/app/pongz-sg-mahjong/id6755418562" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.7-1-2.7-4.1zM13.9 5c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.3 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5z"/></svg>
+              App Store
+            </a>
+          </div>
+        </aside>
+
+        <div class="content">
+          <figure class="media" data-media="pongz-hero">
+            <figcaption class="ph"><span>Gameplay clip</span>Shuffling the tiles…</figcaption>
+          </figure>
+
+          <div class="abilities">
+            <article class="ability wide">
+              <h3><span class="k">CORE</span>The foundation</h3>
+              <p>Designed and built the core client-side architecture from the ground up, plus the gameplay systems behind the rules, player interaction, and game flow.</p>
+            </article>
+            <article class="ability">
+              <h3><span class="k">AI</span>AI Practice Mode: opponents who never rage-quit</h3>
+              <p>Designed and built an offline bot-opponent mode end to end, covering turn-based decision logic and the full gameplay flow.</p>
+            </article>
+            <article class="ability">
+              <h3><span class="k">NET</span>Multiplayer, client side</h3>
+              <p>Implemented the client-side multiplayer layer over Socket.IO, synchronizing against an authoritative server.</p>
+            </article>
+            <article class="ability wide">
+              <h3><span class="k">UI</span>Every screen you tap</h3>
+              <p>Built the complete UI layer: screens, HUD, in-game flow, and the integration between UI and game systems. Also built the interactive tutorial and onboarding flow, the localization system for multi-language support, and the presentation layer for rank and progression.</p>
+            </article>
+          </div>
+
+          <div class="media-row">
+            <figure class="media" data-media="pongz-practice"><figcaption class="ph"><span>AI Practice Mode</span>Screenshot incoming</figcaption></figure>
+            <figure class="media" data-media="pongz-tutorial"><figcaption class="ph"><span>Tutorial</span>Screenshot incoming</figcaption></figure>
+          </div>
+
+          <div class="abilities">
+            <article class="ability">
+              <h3><span class="k">ANIM</span>Tiles with personality</h3>
+              <p>Designed and built the 2D and 3D animation systems, including Spine skeletal animation and gameplay-animation integration.</p>
+            </article>
+            <article class="ability">
+              <h3><span class="k">PERF</span>Running smoothly on real phones</h3>
+              <p>Optimized mobile performance across live releases, reducing draw calls and SetPass calls with LOD groups and texture atlasing, profiled with the Unity Profiler. Managed asset delivery through an Addressables / AssetBundle build pipeline.</p>
+            </article>
+          </div>
+
+          <p class="credits"><b>Credits, honestly</b>Built at Roothoot Private Limited as client work for Pixel Stack Studios, who own the game. Server-side netcode and the rank-point calculation were my teammates' work; I built the client that talks to them.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CHARACTER CREATOR ===================== -->
+  <section id="character-creator" class="case" aria-labelledby="cc-title">
+    <div class="wrap">
+      <div class="case-head">
+        <span class="tile badge" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none" stroke="#1d1b16" stroke-width="3.5" stroke-linecap="round"><circle cx="20" cy="20" r="9"/><path d="M6 50c2-10 8-15 14-15s12 5 14 15"/><line x1="40" y1="16" x2="58" y2="16"/><line x1="40" y1="32" x2="58" y2="32"/><line x1="40" y1="48" x2="58" y2="48"/><circle cx="46" cy="16" r="3.5" fill="#d23a2c" stroke="none"/><circle cx="53" cy="32" r="3.5" fill="#2e8a57" stroke="none"/><circle cx="44" cy="48" r="3.5" fill="#d23a2c" stroke="none"/></svg>
+        </span>
+        <div>
+          <p class="eyebrow">Level 2 · Classified</p>
+          <h2 id="cc-title">Character Creator: faces, bodies, and an export button that got 50x faster.</h2>
+          <p class="lede">A photorealistic character creation tool for Windows, built in Unity. I led development and designed its core architecture.</p>
+        </div>
+      </div>
+      <div class="case-body">
+        <aside class="sheet" aria-label="Character Creator stats">
+          <h3>Stat sheet</h3>
+          <dl>
+            <dt>Role</dt><dd>Unity Developer (led development)</dd>
+            <dt>When</dt><dd>2022 – 2024</dd>
+            <dt>Platform</dt><dd>Windows</dd>
+            <dt>Status</dt><dd>Unreleased, confidential</dd>
+            <dt>Stack</dt><dd>Unity, C#, Unity Jobs System, multithreading, 3D math</dd>
+          </dl>
+        </aside>
+        <div class="content">
+          <div class="abilities">
+            <article class="ability">
+              <h3><span class="k">ARCH</span>The blueprint</h3>
+              <p>Led development of the tool and designed its core architecture.</p>
+            </article>
+            <article class="ability">
+              <h3><span class="k">PERF</span>50x faster exports</h3>
+              <p>Rebuilt the texture merging pipeline on the Unity Jobs System, raising character export throughput 50x.</p>
+            </article>
+            <article class="ability wide">
+              <h3><span class="k">3D</span>Sliders for every cheekbone</h3>
+              <p>Built the customizable facial and body structure systems behind photorealistic character generation.</p>
+            </article>
+          </div>
+          <div class="classified">
+            <span class="stamp">CONFIDENTIAL</span>
+            <p>No screenshots here, on purpose: this project is unreleased and confidential, so it gets words instead of pictures. The words are accurate.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== MOVIE STUDIO 3D ===================== -->
+  <section id="movie-studio" class="case" aria-labelledby="ms-title">
+    <div class="wrap">
+      <div class="case-head">
+        <span class="tile badge" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none" stroke="#1d1b16" stroke-width="3.5" stroke-linejoin="round"><rect x="6" y="24" width="52" height="32" rx="3"/><path d="M6 24 L10 10 L58 10 L58 24" fill="#1d1b16"/><path d="M18 10 L14 24 M30 10 L26 24 M42 10 L38 24 M54 10 L50 24" stroke="#f4ecd8" stroke-width="3"/><path d="M27 33 L40 40 L27 47 Z" fill="#d23a2c" stroke="none"/></svg>
+        </span>
+        <div>
+          <p class="eyebrow">Level 3 · Classified</p>
+          <h2 id="ms-title">Movie Studio 3D: I taught imported characters where their fingers go.</h2>
+          <p class="lede">A Windows tool for composing and previewing 3D scenes, built in Unity. I built several of its core modules and cracked a problem that had been open on the project for over a year.</p>
+        </div>
+      </div>
+      <div class="case-body">
+        <aside class="sheet" aria-label="Movie Studio 3D stats">
+          <h3>Stat sheet</h3>
+          <dl>
+            <dt>Role</dt><dd>Unity Developer</dd>
+            <dt>When</dt><dd>2022 – 2024</dd>
+            <dt>Platform</dt><dd>Windows</dd>
+            <dt>Status</dt><dd>Unreleased; development halted in 2024</dd>
+            <dt>Stack</dt><dd>Unity, C#, 3D math, UGUI</dd>
+          </dl>
+        </aside>
+        <div class="content">
+          <div class="abilities">
+            <article class="ability wide">
+              <h3><span class="k">BOSS</span>The year-old problem</h3>
+              <p>Implemented automatic real-time finger and hand placement for imported rigged characters, resolving a problem that had been open on the project for over a year.</p>
+            </article>
+            <article class="ability">
+              <h3><span class="k">TOOL</span>A better timeline</h3>
+              <p>Rebuilt the Timeline system with a horizontal layout, finer timestep control, and a more stable sequencing model.</p>
+            </article>
+            <article class="ability">
+              <h3><span class="k">SYS</span>The modules underneath</h3>
+              <p>Built the Asset Manager, UI, and Graphics modules.</p>
+            </article>
+            <article class="ability wide">
+              <h3><span class="k">C#</span>Properties, editable</h3>
+              <p>Built custom C# property attributes that expose object properties as editable fields in the application's UI.</p>
+            </article>
+          </div>
+          <div class="classified">
+            <span class="stamp">CONFIDENTIAL</span>
+            <p>Same deal as Character Creator: unreleased and confidential, so it's text only.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SIDE QUESTS ===================== -->
+  <section id="tools" class="case" aria-labelledby="tools-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Side quests</p>
+        <h2 id="tools-title">Small tools, big relief</h2>
+      </div>
+      <div class="quests">
+        <article class="quest">
+          <span class="mini-tile c-jade" aria-hidden="true">發</span>
+          <div><h3>Passthrough raycaster</h3><p>An invisible UI element that registers input without blocking raycasts to the 3D objects behind it.</p></div>
+        </article>
+        <article class="quest">
+          <span class="mini-tile" aria-hidden="true" style="font-family:var(--f-mono);font-size:1rem">Aa</span>
+          <div><h3>UI text extractor</h3><p>A Unity editor tool to extract and manage in-project UI text.</p></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ABOUT ===================== -->
+  <section id="about" class="about case" aria-labelledby="about-title">
+    <div class="wrap">
+      <div>
+        <div class="sec-head">
+          <p class="eyebrow">Character bio</p>
+          <h2 id="about-title">About Gautam</h2>
+        </div>
+        <div class="bio">
+          <p>I'm Gautam, a Unity game developer who likes the unglamorous middle of a game: the architecture, the systems, and the glue that makes them talk to each other. Over 3.5+ years I've worked across gameplay, bot AI, client-side multiplayer, UI, animation, and performance on Android, iOS, and Windows.</p>
+          <p>My latest work, Pongz – SG Mahjong, is live on both app stores. Before that I spent two years building Windows 3D tools in Unity, including a character creator I led development on. I work directly with artists, animators, sound engineers, and clients, and I'm happiest when a feature feels obvious to the player because the hard part is hidden.</p>
+        </div>
+      </div>
+      <div>
+        <div class="sec-head">
+          <p class="eyebrow">Inventory</p>
+          <h2 style="font-size:var(--step-2)">Equipped skills</h2>
+        </div>
+        <ul class="inventory" style="list-style:none;padding:0;margin:0">
+          <li class="slot rare">Unity</li>
+          <li class="slot rare">C#</li>
+          <li class="slot">Client architecture</li>
+          <li class="slot">Gameplay systems</li>
+          <li class="slot">Bot AI</li>
+          <li class="slot">Socket.IO (client)</li>
+          <li class="slot">UGUI / TextMeshPro</li>
+          <li class="slot">Spine 2D</li>
+          <li class="slot">Unity Jobs System</li>
+          <li class="slot">Addressables</li>
+          <li class="slot">Unity Profiler</li>
+          <li class="slot">URP / HDRP</li>
+          <li class="slot">Android</li>
+          <li class="slot">iOS</li>
+          <li class="slot">Windows</li>
+        </ul>
+      </div>
+      <button class="mini-tile egg egg-about c-jade" data-egg="2" aria-label="A hidden tile">發</button>
+    </div>
+  </section>
+
+  <!-- ===================== CONTACT ===================== -->
+  <section id="contact" class="contact case" aria-labelledby="contact-title">
+    <div class="wrap">
+      <p class="cont">Continue?</p>
+      <h2 id="contact-title">Need someone to make your tiles click? Let's talk.</h2>
+      <div class="contact-row">
+        <span class="email-box"><code id="email">gautamc3080@gmail.com</code><button type="button" id="copy-email">Copy</button></span>
+        <a class="btn btn-primary" href="mailto:gautamc3080@gmail.com">Email me</a>
+        <a class="btn btn-ghost" href="https://linkedin.com/in/gautam-chaudhary-g3080" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+      <p class="meta">Mumbai, India · Available immediately</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Built by Gautam. No tiles were harmed.</span>
+    <button class="mini-tile egg egg-foot" data-egg="3" aria-label="A hidden tile"><span class="dots" style="gap:2px"><i style="width:7px;height:7px;border-width:2px;box-shadow:none;background:var(--red)"></i><i style="width:7px;height:7px;border-width:2px;box-shadow:none;background:var(--red)"></i></span></button>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  // Media slots: drop files into assets/ and list them here, e.g. "pongz-hero": "assets/pongz-hero.mp4"
+  var MEDIA = {};
+  document.querySelectorAll(".media[data-media]").forEach(function (fig) {
+    var src = MEDIA[fig.dataset.media];
+    if (!src) return;
+    var el;
+    if (/\.(mp4|webm)$/i.test(src)) {
+      el = document.createElement("video");
+      el.muted = true; el.autoplay = true; el.loop = true; el.playsInline = true;
+    } else {
+      el = document.createElement("img");
+      el.loading = "lazy";
+      el.alt = fig.querySelector(".ph span") ? fig.querySelector(".ph span").textContent : "";
+    }
+    el.src = src;
+    fig.innerHTML = "";
+    fig.appendChild(el);
+    fig.classList.add("has-src");
+  });
+
+  // Easter egg: three hidden tiles make a pong.
+  var found = {};
+  var toast = document.getElementById("toast");
+  var counter = document.getElementById("counter");
+  var timer;
+  function say(msg, pong) {
+    toast.textContent = msg;
+    toast.classList.toggle("pong", !!pong);
+    toast.classList.add("show");
+    clearTimeout(timer);
+    timer = setTimeout(function () { toast.classList.remove("show"); }, pong ? 4200 : 2600);
+  }
+  document.querySelectorAll("[data-egg]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var id = btn.dataset.egg;
+      if (found[id]) return;
+      found[id] = true;
+      btn.classList.add("found");
+      var n = Object.keys(found).length;
+      counter.textContent = "Tiles " + n + "/3";
+      if (n === 3) say("PONG! Three of a kind. You clearly read portfolios properly.", true);
+      else if (n === 1) say("You found a tile. Two more and it's a pong.");
+      else say("Two tiles. One more and it's a pong.");
+    });
+  });
+
+  // "Press START": Enter or Space on the page body jumps to the levels.
+  document.addEventListener("keydown", function (e) {
+    if (e.target !== document.body) return;
+    if (e.key === "Enter") { e.preventDefault(); document.getElementById("levels").scrollIntoView(); }
+  });
+
+  // Copy email
+  var copyBtn = document.getElementById("copy-email");
+  copyBtn.addEventListener("click", function () {
+    var text = document.getElementById("email").textContent;
+    function selectIt() {
+      var r = document.createRange(); r.selectNodeContents(document.getElementById("email"));
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    }
+    try {
+      navigator.clipboard.writeText(text).then(function () {
+        copyBtn.textContent = "Copied";
+        setTimeout(function () { copyBtn.textContent = "Copy"; }, 1800);
+      }, selectIt);
+    } catch (err) { selectIt(); }
+  });
+})();
+</script>
+</body>
+</html>
