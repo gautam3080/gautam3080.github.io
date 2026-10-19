@@ -67,6 +67,8 @@ ul { margin: 0; padding: 0; list-style: none; }
 .nav { display: flex; gap: 2px; margin-left: auto; flex-wrap: wrap; }
 .nav a { color: var(--muted); text-decoration: none; font-family: var(--f-mono); font-size: var(--step--1); padding: 6px 10px; border-radius: 6px; }
 .nav a:hover { color: var(--text); background: var(--panel-2); }
+.resume-btn { font-family: var(--f-mono); font-size: var(--step--1); font-weight: 700; text-decoration: none; color: var(--ink); background: var(--amber); padding: 6px 12px; border-radius: 6px; white-space: nowrap; box-shadow: 0 3px 0 #a87412; }
+.resume-btn:hover { transform: translateY(-1px); }
 .counter { font-family: var(--f-mono); font-size: var(--step--1); color: var(--amber); border: 1px dashed var(--amber); padding: 4px 8px; border-radius: 6px; white-space: nowrap; }
 
 /* ---------- hero ---------- */
@@ -261,7 +263,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
 }
 @media (max-width: 640px) {
   .nav { display: none; }
-  .counter { margin-left: auto; }
+  .resume-btn { margin-left: auto; }
   section { padding-block: 54px; }
   .abilities, .quests, .gallery { grid-template-columns: 1fr; }
   .job { grid-template-columns: 1fr; gap: 10px; }
@@ -293,6 +295,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
       <a href="#about">About</a>
       <a href="#contact">Contact</a>
     </nav>
+    <a class="resume-btn" href="assets/Gautam_Resume.pdf" target="_blank" rel="noopener">Resume PDF</a>
     <span class="counter" id="counter" title="One collectible is hidden in each project">★ 0/3</span>
   </div>
 </header>
@@ -306,7 +309,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
         <p class="sub">I'm Gautam, a Unity developer with <b>3.5+ years of production C#</b>. I designed and built the client architecture of a live multiplayer game, led development of a photorealistic character creator, and solved real-time hand placement for a 3D scene tool. Based in Mumbai. Available immediately.</p>
         <div class="btns">
           <a class="btn btn-primary" href="#projects">Pick a project ▸</a>
-          <a class="btn btn-ghost" href="#contact">Get in touch</a>
+          <a class="btn btn-ghost" href="assets/Gautam_Resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
         </div>
       </div>
       <div class="carts" aria-label="Projects">
@@ -714,6 +717,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
         <span class="email-box"><code id="email">gautamc3080@gmail.com</code><button type="button" id="copy-email">Copy</button></span>
         <a class="btn btn-primary" href="mailto:gautamc3080@gmail.com">Email me</a>
         <a class="btn btn-ghost" href="https://linkedin.com/in/gautam-chaudhary-g3080" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="btn btn-ghost" href="assets/Gautam_Resume.pdf" download="Gautam_Resume.pdf">Download resume</a>
       </div>
       <p class="meta">Mumbai, India · Available immediately</p>
     </div>
