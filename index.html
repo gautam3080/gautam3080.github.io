@@ -7,273 +7,334 @@
 <meta name="description" content="Gautam, Unity game developer. 3.5+ years of production C#: a live multiplayer Mahjong game, a photorealistic character creator, and a 3D scene composition tool.">
 <meta property="og:title" content="Gautam | Unity Game Developer">
 <meta property="og:description" content="Mahjong bots. Photoreal humans. Movie sets in a box. 3.5+ years of production Unity and C#.">
+<meta name="theme-color" content="#efe6d2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: a game-engine viewport. Grid-lined scene background, three project "cartridges" of equal
-   weight, each with its own color, a stat sheet, a boss fight, and a schematic where screenshots can't go. */
+/* Layout: an inked paper world map. The hero is a level select over a low-poly island map
+   (Three.js, with a static SVG map as fallback); every project below is a "level page". */
 :root {
-  --bg: #12141c;
-  --panel: #1a1d29;
-  --panel-2: #222637;
-  --line: #2e3348;
-  --text: #ecebf3;
-  --muted: #a3a7c2;
-  --jade: #3cc58e;
-  --coral: #ff7a5c;
-  --amber: #ffc145;
-  --ink: #12141c;
-  --c: var(--coral);
-  --f-display: "Bungee", "Arial Black", Impact, sans-serif;
-  --f-body: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
-  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
-  --f-cjk: "Noto Serif SC", "Songti SC", "SimSun", "Noto Serif CJK SC", serif;
-  --step--1: .85rem; --step-0: 1rem; --step-1: 1.22rem; --step-2: 1.55rem; --step-3: clamp(1.7rem, 3.4vw, 2.3rem); --step-4: clamp(2.2rem, 6vw, 4rem);
-  --radius: 12px;
-  color-scheme: dark;
+  --paper: #efe6d2;
+  --paper-2: #f7f1e3;
+  --paper-3: #e6dcc3;
+  --sea: #dfe8e2;
+  --ink: #1f1b16;
+  --ink-2: #4f473c;
+  --verm: #c8402a;
+  --verm-t: #a8331f;
+  --teal: #1d6a66;
+  --waves: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='26'%3E%3Cpath d='M2 8 q5 -6 10 0 t10 0 M24 21 q5 -6 10 0 t10 0' fill='none' stroke='%23b6cac2' stroke-width='1.6'/%3E%3C/svg%3E");
+  --f-display: "Archivo Black", "Arial Black", Impact, sans-serif;
+  --f-body: "Archivo", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "DM Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --step--1: .84rem; --step-0: 1rem; --step-1: 1.18rem; --step-2: 1.5rem; --step-3: clamp(1.8rem, 3.6vw, 2.6rem); --step-4: clamp(2.3rem, 5.4vw, 4.1rem);
+  --sh: 8px;
+  color-scheme: light;
 }
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+html { scroll-behavior: smooth; scroll-padding-top: 76px; }
 body {
-  margin: 0;
-  background-color: var(--bg);
-  background-image:
-    radial-gradient(ellipse at 70% -10%, rgba(255,122,92,.10), transparent 55%),
-    radial-gradient(ellipse at 0% 30%, rgba(60,197,142,.07), transparent 50%),
-    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
-  background-size: auto, auto, 40px 40px, 40px 40px;
-  color: var(--text);
-  font-family: var(--f-body);
-  font-size: var(--step-0);
-  line-height: 1.6;
+  margin: 0; color: var(--ink); font-family: var(--f-body); font-size: var(--step-0); line-height: 1.6;
+  background-color: var(--paper);
+  background-image: linear-gradient(rgba(31,27,22,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(31,27,22,.045) 1px, transparent 1px);
+  background-size: 96px 96px;
 }
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
-a { color: var(--c); }
-:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; border-radius: 4px; }
-.wrap { max-width: 1160px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--paper); }
+a { color: var(--verm-t); text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 h1, h2, h3 { text-wrap: balance; margin: 0; }
 p { margin: 0; }
-ul { margin: 0; padding: 0; list-style: none; }
-.eyebrow { font-family: var(--f-mono); font-size: var(--step--1); letter-spacing: .14em; text-transform: uppercase; color: var(--c); }
-.jade { --c: var(--jade); } .coral { --c: var(--coral); } .amber { --c: var(--amber); }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+.eyebrow { font-family: var(--f-mono); font-size: var(--step--1); letter-spacing: .12em; text-transform: uppercase; color: var(--verm-t); font-weight: 500; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- buttons, panels, chips ---------- */
+.btn { font-family: var(--f-display); font-size: .95rem; letter-spacing: .02em; text-decoration: none; min-height: 48px; padding: 12px 20px; border: 2px solid var(--ink); border-radius: 0; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--paper-2); color: var(--ink); box-shadow: 4px 4px 0 var(--ink); transition: transform .1s ease, box-shadow .1s ease; }
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); }
+.btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+.btn-primary { background: var(--verm); color: #fff; }
+.btn-teal { background: var(--teal); color: #fff; }
+.panel { background: var(--paper-2); border: 2px solid var(--ink); box-shadow: var(--sh) var(--sh) 0 var(--ink); }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--f-mono); font-size: .74rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; padding: 3px 8px; border: 2px solid var(--ink); background: var(--paper-2); color: var(--ink); white-space: nowrap; }
+.chip.live { background: var(--teal); color: #fff; border-color: var(--ink); }
+.chip.live::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+.chip.nda { background: var(--ink); color: var(--paper); }
+.chip.locked { border-style: dashed; }
+.stamp { display: inline-block; font-family: var(--f-display); color: var(--verm-t); border: 3px solid var(--verm-t); padding: 2px 10px; transform: rotate(-3deg); font-size: .85rem; letter-spacing: .06em; }
 
 /* ---------- top bar ---------- */
-.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: rgba(18,20,28,.9); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
-.topbar .wrap { display: flex; align-items: center; gap: 16px; padding-block: 10px; }
-.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-family: var(--f-display); font-size: 1.05rem; }
-.logo b { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: var(--coral); color: var(--ink); box-shadow: 3px 3px 0 var(--amber); font-weight: 400; }
-.nav { display: flex; gap: 2px; margin-left: auto; flex-wrap: wrap; }
-.nav a { color: var(--muted); text-decoration: none; font-family: var(--f-mono); font-size: var(--step--1); padding: 6px 10px; border-radius: 6px; }
-.nav a:hover { color: var(--text); background: var(--panel-2); }
-.resume-btn { font-family: var(--f-mono); font-size: var(--step--1); font-weight: 700; text-decoration: none; color: var(--ink); background: var(--amber); padding: 6px 12px; border-radius: 6px; white-space: nowrap; box-shadow: 0 3px 0 #a87412; }
-.resume-btn:hover { transform: translateY(-1px); }
-.counter { font-family: var(--f-mono); font-size: var(--step--1); color: var(--amber); border: 1px dashed var(--amber); padding: 4px 8px; border-radius: 6px; white-space: nowrap; }
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--paper); border-bottom: 2px solid var(--ink); }
+.topbar .wrap { display: flex; align-items: center; gap: 16px; min-height: 60px; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-family: var(--f-display); font-size: 1.1rem; min-height: 44px; }
+.logo b { display: grid; place-items: center; width: 34px; height: 34px; background: var(--ink); color: var(--paper); font-weight: 400; box-shadow: 3px 3px 0 var(--verm); }
+.nav { display: flex; gap: 2px; margin-left: auto; }
+.nav a { color: var(--ink); text-decoration: none; font-family: var(--f-mono); font-size: var(--step--1); padding: 10px 10px; min-height: 44px; display: inline-flex; align-items: center; }
+.nav a:hover { color: var(--verm-t); text-decoration: underline; }
+.resume-btn { font-size: .82rem; min-height: 44px; padding: 8px 14px; box-shadow: 3px 3px 0 var(--ink); }
 
 /* ---------- hero ---------- */
-.hero .wrap { display: grid; grid-template-columns: 1.25fr 1fr; gap: 40px; align-items: center; padding-block: 64px 52px; }
-.hero h1 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-4); line-height: 1.04; margin-block: 14px 20px; }
-.hero h1 span { display: block; }
-.hero h1 .w1 { color: var(--jade); } .hero h1 .w2 { color: var(--coral); } .hero h1 .w3 { color: var(--amber); }
-.hero .sub { font-size: var(--step-1); color: var(--muted); max-width: 54ch; }
-.hero .sub b { color: var(--text); font-weight: 600; }
-.btns { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-.btn { font-family: var(--f-display); font-size: .95rem; letter-spacing: .03em; text-decoration: none; padding: 14px 20px; border-radius: 10px; border: 0; cursor: pointer; transition: transform .12s ease, box-shadow .12s ease; display: inline-flex; align-items: center; gap: 8px; }
-.btn-primary { background: var(--coral); color: var(--ink); box-shadow: 0 5px 0 #b44a31; }
-.btn-ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 2px var(--line); }
-.btn:hover { transform: translateY(-2px); }
-.btn-primary:active { transform: translateY(4px); box-shadow: 0 1px 0 #b44a31; }
+.hero { padding-block: 40px 56px; }
+.intro { display: grid; grid-template-columns: 1.05fr 1fr; gap: 20px 48px; align-items: end; margin-bottom: 28px; }
+.intro h1 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-4); line-height: 1.02; letter-spacing: -.01em; margin-top: 10px; }
+.intro h1 em { font-style: normal; color: var(--verm-t); }
+.intro .sub { font-size: var(--step-1); color: var(--ink-2); max-width: 56ch; }
+.intro .sub b { color: var(--ink); font-weight: 700; }
+.btns { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 20px; }
 
-.carts { position: relative; height: 340px; }
-.cart {
-  position: absolute; width: 190px; height: 250px; border-radius: 16px 16px 10px 10px;
-  background: var(--panel); border: 2px solid var(--c); color: var(--text); text-decoration: none;
-  display: flex; flex-direction: column; overflow: hidden;
-  box-shadow: 0 10px 0 color-mix(in srgb, var(--c) 45%, #000), 0 22px 40px rgba(0,0,0,.45);
-  transition: transform .25s ease;
-}
-.cart .label { flex: 1; display: grid; place-items: center; background: linear-gradient(160deg, color-mix(in srgb, var(--c) 30%, var(--panel)), var(--panel)); }
-.cart .label svg { width: 92px; height: 92px; }
-.cart .name { font-family: var(--f-display); font-size: .82rem; padding: 10px 12px 2px; line-height: 1.2; }
-.cart .kind { font-family: var(--f-mono); font-size: .7rem; color: var(--muted); padding: 0 12px 12px; text-transform: uppercase; letter-spacing: .08em; }
-.cart .notch { height: 12px; background: repeating-linear-gradient(90deg, var(--c) 0 10px, transparent 10px 16px); opacity: .7; }
-.cart.k1 { left: 0; top: 50px; transform: rotate(-9deg); }
-.cart.k2 { left: 30%; top: 0; transform: rotate(2deg); z-index: 2; }
-.cart.k3 { left: 60%; top: 62px; transform: rotate(10deg); }
-.cart:hover, .cart:focus-visible { transform: translateY(-16px) rotate(0); z-index: 3; }
+/* the board: map + level card + level list */
+.board { display: grid; grid-template-columns: minmax(0, 1fr) 360px; grid-template-areas: "map card" "list card"; }
+.map { grid-area: map; position: relative; height: clamp(400px, 54vh, 580px); background: var(--sea) var(--waves); border-right: 2px solid var(--ink); overflow: hidden; }
+.map:focus-visible { outline: 3px solid var(--teal); outline-offset: -5px; }
+.stage { position: absolute; inset: 0; }
+.stage canvas { display: block; width: 100%; height: 100%; touch-action: manipulation; }
+.map-fallback { position: absolute; inset: 0; }
+.map-fallback .fb { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.fb-port { display: none !important; }
+.map[data-state="loading"] .map-fallback { visibility: hidden; }
+.map[data-state="3d"] .map-fallback { display: none; }
+.map[data-state="fallback"] .stage { display: none; }
+.map .loading { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-family: var(--f-mono); font-size: var(--step--1); color: var(--ink-2); display: none; }
+.map[data-state="loading"] .loading { display: block; }
+.fb-node { cursor: pointer; }
+.fb-node:focus { outline: none; }
+.fb-node:focus-visible .fb-stop, .fb-node:hover .fb-stop { stroke: var(--verm); stroke-width: 5; }
+.fb-node.is-current .fb-stop { fill: #fff; stroke-width: 5; }
+.fb-num { font-family: var(--f-display); fill: var(--ink); }
+.fb-name { font-family: var(--f-display); fill: var(--ink); paint-order: stroke; stroke: var(--sea); stroke-width: 5px; }
+.fb-sub { font-family: var(--f-mono); fill: var(--ink-2); paint-order: stroke; stroke: var(--sea); stroke-width: 5px; }
+.fb-pin { transition: transform .6s cubic-bezier(.5,-0.3,.4,1.4); }
 
-/* ---------- HUD ---------- */
-.hud { background: var(--panel); border-block: 1px solid var(--line); }
-.hud .wrap { display: grid; grid-template-columns: repeat(4, 1fr); }
-.stat { padding: 20px 18px; border-right: 1px solid var(--line); min-width: 0; }
-.stat:last-child { border-right: 0; }
-.stat .v { font-family: var(--f-display); font-size: var(--step-3); color: var(--c); line-height: 1.1; font-variant-numeric: tabular-nums; }
-.stat .k { font-family: var(--f-mono); font-size: .76rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+/* 3D labels */
+.node-label { position: absolute; left: 0; top: 0; transform: translate(-50%, -100%); display: none; align-items: center; gap: 8px; min-height: 44px; padding: 4px 10px 4px 4px; border: 2px solid var(--ink); background: var(--paper-2); color: var(--ink); font: 600 .86rem/1.15 var(--f-body); text-align: left; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); white-space: nowrap; }
+.map[data-state="3d"] .node-label { display: inline-flex; }
+.node-label b { display: grid; place-items: center; width: 32px; height: 32px; flex: none; border-radius: 50%; border: 2px solid var(--ink); font: 400 .95rem var(--f-display); background: var(--paper); }
+.node-label small { display: block; font-family: var(--f-mono); font-size: .7rem; font-weight: 400; color: var(--ink-2); letter-spacing: .04em; }
+.node-label:hover { background: #fff; }
+.node-label.is-current { background: var(--ink); color: var(--paper); }
+.node-label.is-current small { color: var(--paper-3); }
+.node-label.is-current b { background: var(--verm); color: #fff; border-color: var(--paper); }
+.node-label.locked b { border-style: dashed; }
+.compass { position: absolute; right: 14px; bottom: 12px; width: 64px; height: 64px; pointer-events: none; }
+.map-hint { position: absolute; left: 12px; top: 12px; font-family: var(--f-mono); font-size: .74rem; color: var(--ink-2); background: var(--paper-2); border: 2px solid var(--ink); padding: 3px 8px; pointer-events: none; }
 
-/* ---------- sections ---------- */
-section { padding-block: 76px; }
-.sec-head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
-.sec-head h2 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-3); line-height: 1.1; }
-.sec-head p.note { color: var(--muted); max-width: 64ch; }
+.card { grid-area: card; padding: 24px 24px 26px; display: flex; flex-direction: column; gap: 14px; min-width: 0; background: var(--paper-2); }
+.card .meta-line { font-family: var(--f-mono); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.card h2 { font-family: var(--f-display); font-weight: 400; font-size: 1.75rem; line-height: 1.08; }
+.card .lvl { display: flex; align-items: center; gap: 12px; }
+.card .lvl-n { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; border: 3px solid var(--ink); background: var(--verm); color: #fff; font: 400 1.5rem var(--f-display); flex: none; }
+.card.is-locked .lvl-n { background: var(--paper-3); color: var(--ink); border-style: dashed; }
+.card p.desc { color: var(--ink-2); }
+.boss-line { border: 2px solid var(--ink); background: var(--paper); padding: 10px 12px; }
+.boss-line b { display: block; font-family: var(--f-mono); font-size: .74rem; letter-spacing: .12em; color: var(--verm-t); font-weight: 500; }
+.boss-line span { font-weight: 700; }
+.card .btn { margin-top: 4px; align-self: flex-start; }
 
-/* project select */
-.select { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-.pick { display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-top: 6px solid var(--c); border-radius: var(--radius); padding: 22px 20px; transition: transform .18s ease, border-color .18s ease; min-width: 0; }
-.pick:hover { transform: translateY(-6px); border-color: var(--c); }
-.pick h3 { font-family: var(--f-display); font-weight: 400; font-size: 1.15rem; line-height: 1.2; }
-.pick p { color: var(--muted); font-size: .96rem; }
-.pick .boss { font-size: .92rem; color: var(--text); }
-.pick .boss b { font-family: var(--f-mono); font-size: .72rem; color: var(--c); letter-spacing: .1em; margin-right: 6px; }
-.pick .go { margin-top: auto; font-family: var(--f-mono); font-size: var(--step--1); font-weight: 700; color: var(--c); }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { font-family: var(--f-mono); font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 4px 8px; border-radius: 5px; background: var(--panel-2); color: var(--muted); }
-.chip.on { background: var(--c); color: var(--ink); }
+.level-list { grid-area: list; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) auto; border-top: 2px solid var(--ink); border-right: 2px solid var(--ink); }
+.level-list button { font: inherit; text-align: left; border: 0; border-right: 2px solid var(--ink); background: var(--paper-2); color: var(--ink); padding: 10px 12px; min-height: 60px; cursor: pointer; display: grid; grid-template-columns: auto 1fr; gap: 0 10px; align-items: center; min-width: 0; }
+.level-list button .n { grid-row: span 2; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--ink); font: 400 .9rem var(--f-display); background: var(--paper); }
+.level-list button .t { font-weight: 700; font-size: .9rem; line-height: 1.2; min-width: 0; }
+.level-list button small { font-family: var(--f-mono); font-size: .68rem; color: var(--ink-2); letter-spacing: .04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.level-list button:hover { background: #fff; }
+.level-list button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.level-list button[aria-pressed="true"] small { color: var(--paper-3); }
+.level-list button[aria-pressed="true"] .n { background: var(--verm); color: #fff; border-color: var(--paper); }
+.level-list .step { display: flex; }
+.level-list .step button { display: grid; place-items: center; grid-template-columns: 1fr; min-width: 56px; padding: 0 12px; font-family: var(--f-display); font-size: 1.15rem; }
+.level-list .step button:last-child { border-right: 0; }
+.board-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 20px; margin-top: 18px; font-family: var(--f-mono); font-size: .76rem; color: var(--ink-2); }
 
-/* case studies */
-.case { border-top: 1px solid var(--line); }
-.case-head { margin-bottom: 30px; display: flex; flex-direction: column; gap: 10px; }
-.case-head h2 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-3); line-height: 1.1; }
-.case-head .tag { font-size: var(--step-2); font-weight: 800; line-height: 1.25; color: var(--text); max-width: 34ch; }
-.case-head .lede { color: var(--muted); font-size: var(--step-1); max-width: 64ch; }
-.case-body { display: grid; grid-template-columns: 290px 1fr; gap: 32px; align-items: start; }
-.sheet { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: var(--radius); padding: 18px; position: sticky; top: 90px; min-width: 0; }
-.sheet h3 { font-family: var(--f-mono); font-size: var(--step--1); letter-spacing: .14em; text-transform: uppercase; color: var(--c); margin-bottom: 10px; }
-.sheet dl { display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; margin: 0; font-size: .92rem; }
-.sheet dt { font-family: var(--f-mono); color: var(--muted); font-size: .76rem; text-transform: uppercase; padding-top: 2px; }
+/* key numbers */
+.legend { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 30px; }
+.legend > div { border: 2px solid var(--ink); background: var(--paper-2); padding: 14px 16px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.legend .v { font-family: var(--f-display); font-size: var(--step-3); line-height: 1.05; color: var(--verm-t); font-variant-numeric: tabular-nums; }
+.legend .k { font-family: var(--f-mono); font-size: .74rem; color: var(--ink-2); text-transform: uppercase; letter-spacing: .06em; }
+
+/* ---------- level pages ---------- */
+section { padding-block: 72px; }
+.level-page { border-top: 2px solid var(--ink); }
+.lp-head { display: grid; grid-template-columns: auto 1fr; gap: 10px 26px; align-items: start; margin-bottom: 34px; }
+.lp-num { grid-row: span 3; display: grid; place-items: center; width: 96px; height: 96px; border-radius: 50%; border: 3px solid var(--ink); background: var(--verm); color: #fff; font: 400 2.6rem var(--f-display); box-shadow: 5px 5px 0 var(--ink); }
+.lp-head h2 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-3); line-height: 1.06; }
+.lp-head .tag { font-size: var(--step-2); font-weight: 700; line-height: 1.25; max-width: 36ch; }
+.lp-head .lede { color: var(--ink-2); font-size: var(--step-1); max-width: 66ch; }
+.lp-body { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 36px; align-items: start; }
+.sheet { padding: 18px; position: sticky; top: 86px; min-width: 0; }
+.sheet h3 { font-family: var(--f-mono); font-size: var(--step--1); letter-spacing: .12em; text-transform: uppercase; color: var(--verm-t); font-weight: 500; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px dashed var(--ink); }
+.sheet dl { display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; margin: 0; font-size: .93rem; }
+.sheet dt { font-family: var(--f-mono); color: var(--ink-2); font-size: .74rem; text-transform: uppercase; padding-top: 3px; }
 .sheet dd { margin: 0; min-width: 0; }
-.stores { display: grid; gap: 10px; margin-top: 18px; }
-.store { display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; font-family: var(--f-display); font-size: .85rem; padding: 12px; border-radius: 8px; background: var(--c); color: var(--ink); box-shadow: 0 4px 0 color-mix(in srgb, var(--c) 50%, #000); }
-.store:hover { transform: translateY(-2px); }
-.store svg { width: 18px; height: 18px; }
-.content { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.stores { display: grid; gap: 12px; margin-top: 18px; }
+.stores .btn { width: 100%; font-size: .9rem; }
+.stores svg { width: 18px; height: 18px; }
+.content { display: flex; flex-direction: column; gap: 26px; min-width: 0; }
 
-.frame { margin: 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); background: #000; }
-.frame video, .frame img { display: block; width: 100%; height: auto; }
-.frame figcaption, .shot figcaption, .schematic figcaption { font-family: var(--f-mono); font-size: .78rem; color: var(--muted); padding: 10px 12px; background: var(--panel); }
-.gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.shot { margin: 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: var(--panel); min-width: 0; }
-.shot button { display: block; padding: 0; border: 0; background: none; cursor: zoom-in; width: 100%; }
+.frame { margin: 0; border: 2px solid var(--ink); background: var(--ink); box-shadow: var(--sh) var(--sh) 0 var(--ink); }
+.frame video { display: block; width: 100%; height: auto; }
+figcaption { font-family: var(--f-mono); font-size: .78rem; color: var(--ink-2); padding: 10px 12px; background: var(--paper-2); }
+.frame figcaption { border-top: 2px solid var(--ink); }
+.gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.shot { margin: 0; border: 2px solid var(--ink); background: var(--paper-2); min-width: 0; box-shadow: 4px 4px 0 var(--ink); }
+.shot button { display: block; padding: 0; border: 0; border-bottom: 2px solid var(--ink); background: none; cursor: zoom-in; width: 100%; }
 .shot img { display: block; width: 100%; aspect-ratio: 2000 / 923; object-fit: cover; }
 
-.boss-fight { position: relative; background: linear-gradient(135deg, color-mix(in srgb, var(--c) 18%, var(--panel)), var(--panel) 70%); border: 2px solid var(--c); border-radius: var(--radius); padding: 22px 22px 22px; }
-.boss-fight .hp { display: flex; align-items: center; gap: 10px; font-family: var(--f-mono); font-size: .76rem; letter-spacing: .1em; text-transform: uppercase; color: var(--c); margin-bottom: 8px; }
-.boss-fight .hp i { flex: 1; max-width: 160px; height: 8px; border-radius: 4px; background: var(--panel-2); position: relative; overflow: hidden; }
-.boss-fight .hp i::after { content: ""; position: absolute; inset: 0 100% 0 0; background: var(--c); }
-.boss-fight .hp em { font-style: normal; color: var(--text); }
-.boss-fight h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
-.boss-fight p { color: var(--muted); }
-.boss-fight p strong { color: var(--text); }
+.boss { position: relative; border: 3px solid var(--verm); background: var(--paper-2); padding: 22px; box-shadow: var(--sh) var(--sh) 0 var(--ink); }
+.boss .hp { display: flex; align-items: center; gap: 10px; font-family: var(--f-mono); font-size: .76rem; letter-spacing: .12em; text-transform: uppercase; color: var(--verm-t); margin-bottom: 8px; font-weight: 500; }
+.boss .hp i { flex: 1; max-width: 170px; height: 12px; border: 2px solid var(--ink); background: var(--paper); position: relative; overflow: hidden; }
+.boss .hp i::after { content: ""; position: absolute; inset: 0 100% 0 0; background: var(--verm); }
+.boss .hp em { font-style: normal; color: var(--ink); }
+.boss h3 { font-size: 1.35rem; font-weight: 700; margin-bottom: 8px; line-height: 1.25; }
+.boss p { color: var(--ink-2); }
+.boss p + p { margin-top: 10px; }
+.boss p strong { color: var(--ink); }
 
-.abilities { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-.ability { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 18px 20px; min-width: 0; }
-.ability h3 { font-weight: 800; font-size: 1.05rem; color: var(--text); margin-bottom: 6px; display: flex; gap: 10px; align-items: baseline; }
-.ability h3 .k { font-family: var(--f-mono); font-size: .7rem; color: var(--ink); background: var(--c); padding: 1px 6px; border-radius: 3px; flex: none; }
-.ability p { color: var(--muted); font-size: .96rem; }
+.abilities { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.ability { border: 2px solid var(--ink); background: var(--paper-2); padding: 18px 18px 20px; min-width: 0; }
+.ability h3 { font-weight: 700; font-size: 1.06rem; margin-bottom: 6px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.ability h3 .k { font-family: var(--f-mono); font-size: .7rem; font-weight: 500; color: #fff; background: var(--teal); padding: 1px 6px; letter-spacing: .06em; flex: none; }
+.ability p { color: var(--ink-2); font-size: .97rem; }
 .ability.wide { grid-column: 1 / -1; }
 
-.credits { border-left: 4px solid var(--c); background: var(--panel); padding: 16px 18px; border-radius: 0 var(--radius) var(--radius) 0; }
-.credits b { font-family: var(--f-mono); font-size: .76rem; letter-spacing: .1em; text-transform: uppercase; color: var(--c); display: block; margin-bottom: 4px; }
-.credits p { color: var(--muted); }
-
-.schematic { margin: 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); background: #0e1017; }
-.schematic svg { display: block; width: 100%; height: auto; }
-.schematic .lbl { font-family: var(--f-mono); font-size: 13px; fill: var(--muted); }
-.schematic .lblc { font-family: var(--f-mono); font-size: 13px; font-weight: 700; fill: var(--c); }
-.schematic .ttl { font-family: var(--f-mono); font-size: 12px; fill: #6d728f; letter-spacing: .08em; }
-.stamp { display: inline-block; font-family: var(--f-display); color: var(--c); border: 3px solid var(--c); padding: 2px 10px; border-radius: 6px; transform: rotate(-3deg); font-size: .82rem; letter-spacing: .05em; }
-.confidential { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; color: var(--muted); font-size: .94rem; border: 1px dashed var(--line); border-radius: var(--radius); padding: 14px 16px; }
+.credits { border: 2px dashed var(--ink); padding: 16px 18px; }
+.credits b { font-family: var(--f-mono); font-size: .76rem; letter-spacing: .12em; text-transform: uppercase; color: var(--verm-t); display: block; margin-bottom: 4px; font-weight: 500; }
+.credits p { color: var(--ink-2); }
+.confidential { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; color: var(--ink-2); border: 2px dashed var(--ink); padding: 14px 16px; }
 .confidential p { flex: 1 1 260px; }
 
-.speed { display: grid; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
-.speed .row { display: grid; grid-template-columns: 74px 1fr 52px; gap: 12px; align-items: center; font-family: var(--f-mono); font-size: .8rem; color: var(--muted); }
-.speed .bar { height: 16px; border-radius: 4px; background: var(--panel-2); position: relative; overflow: hidden; }
-.speed .bar i { position: absolute; inset: 0 auto 0 0; background: var(--c); border-radius: 4px; }
-.speed .row b { color: var(--text); text-align: right; font-variant-numeric: tabular-nums; }
-.speed small { font-family: var(--f-mono); font-size: .74rem; color: #6d728f; }
+.schematic { margin: 0; border: 2px solid var(--ink); background: var(--paper-2); box-shadow: var(--sh) var(--sh) 0 var(--ink); }
+.schematic svg { display: block; width: 100%; height: auto; }
+.schematic figcaption { border-top: 2px solid var(--ink); }
+.schematic .lbl { font-family: var(--f-mono); font-size: 13px; fill: var(--ink-2); }
+.schematic .lblc { font-family: var(--f-mono); font-size: 13px; font-weight: 500; fill: var(--verm-t); }
+.schematic .ttl { font-family: var(--f-mono); font-size: 12px; fill: var(--ink-2); letter-spacing: .08em; }
+
+.speed { display: grid; gap: 10px; border: 2px solid var(--ink); background: var(--paper-2); padding: 18px; }
+.speed .row { display: grid; grid-template-columns: 90px minmax(0, 1fr) 48px; gap: 12px; align-items: center; font-family: var(--f-mono); font-size: .8rem; color: var(--ink-2); }
+.speed .bar { height: 18px; border: 2px solid var(--ink); background: var(--paper); position: relative; overflow: hidden; }
+.speed .bar i { position: absolute; inset: 0 auto 0 0; background: var(--verm); }
+.speed .row b { color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+.speed small { font-family: var(--f-mono); font-size: .74rem; color: var(--ink-2); }
+
+.onward { display: flex; align-items: center; gap: 14px; margin-top: 44px; font-family: var(--f-mono); font-size: var(--step--1); color: var(--ink-2); }
+.onward::before { content: ""; flex: 1; border-top: 3px dashed var(--verm); }
+.onward a { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink); font-weight: 500; }
 
 /* side quests */
-.quests { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-.quest { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; min-width: 0; }
-.quest .ico { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; background: var(--panel-2); color: var(--amber); font-family: var(--f-mono); font-weight: 700; }
-.quest h3 { font-weight: 800; font-size: 1.05rem; margin-bottom: 4px; }
-.quest p { color: var(--muted); font-size: .95rem; }
+.sec-head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
+.sec-head h2 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-3); line-height: 1.08; }
+.quests { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.scroll { position: relative; background: var(--paper-2); border: 2px solid var(--ink); border-radius: 0; padding: 24px 22px; display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start; min-width: 0; margin-inline: 10px; }
+.scroll::before, .scroll::after { content: ""; position: absolute; left: -12px; right: -12px; height: 14px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper-3); }
+.scroll::before { top: -9px; }
+.scroll::after { bottom: -9px; }
+.scroll .ico { width: 46px; height: 46px; display: grid; place-items: center; border: 2px solid var(--ink); background: var(--paper); font-family: var(--f-mono); font-weight: 500; }
+.scroll .ico svg { width: 26px; height: 26px; }
+.scroll .q { font-family: var(--f-mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--verm-t); }
+.scroll h3 { font-weight: 700; font-size: 1.08rem; margin-bottom: 4px; }
+.scroll p { color: var(--ink-2); font-size: .97rem; }
 
-/* experience */
-.timeline { display: grid; gap: 16px; }
-.job { display: grid; grid-template-columns: 220px 1fr; gap: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
-.job .when { font-family: var(--f-mono); font-size: .82rem; color: var(--muted); }
-.job .when b { display: block; font-family: var(--f-display); font-weight: 400; font-size: 1.4rem; color: var(--c); }
-.job h3 { font-weight: 800; font-size: 1.12rem; }
-.job .co { color: var(--muted); font-size: .95rem; margin-bottom: 10px; }
-.dur { height: 10px; border-radius: 5px; background: var(--panel-2); margin-top: 12px; position: relative; max-width: 100%; }
-.dur i { position: absolute; inset: 0 auto 0 0; border-radius: 5px; background: var(--c); }
+/* experience: the route */
+.route { position: relative; display: grid; gap: 28px; padding-left: 70px; }
+.route::before { content: ""; position: absolute; left: 25px; top: 26px; bottom: 26px; border-left: 3px dashed var(--verm); }
+.stop { position: relative; display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 20px; padding: 20px; }
+.stop::before { content: attr(data-n); position: absolute; left: -70px; top: 14px; width: 52px; height: 52px; border-radius: 50%; border: 3px solid var(--ink); background: var(--paper-2); display: grid; place-items: center; font: 400 1.3rem var(--f-display); }
+.stop .when { font-family: var(--f-mono); font-size: .82rem; color: var(--ink-2); }
+.stop .when b { display: block; font-family: var(--f-display); font-weight: 400; font-size: 1.45rem; color: var(--verm-t); }
+.stop h3 { font-weight: 700; font-size: 1.15rem; }
+.stop .co { color: var(--ink-2); font-size: .95rem; margin-bottom: 8px; }
+.stop .levels { font-family: var(--f-mono); font-size: .76rem; color: var(--teal); margin-top: 10px; letter-spacing: .04em; }
+.dur { display: block; height: 12px; border: 2px solid var(--ink); background: var(--paper); margin-top: 12px; max-width: 100%; }
+.dur i { display: block; height: 100%; background: var(--teal); }
 
 /* about + inventory */
-.about .wrap { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: start; }
+.about .wrap { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: start; }
 .bio { display: flex; flex-direction: column; gap: 16px; font-size: 1.08rem; max-width: 62ch; }
-.inv { display: grid; gap: 16px; }
-.inv h3 { font-family: var(--f-mono); font-size: .76rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.inv { padding: 22px; display: grid; gap: 18px; }
+.inv > h3 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-2); }
+.inv h4 { margin: 0 0 8px; font-family: var(--f-mono); font-size: .74rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); font-weight: 500; }
 .slots { display: flex; flex-wrap: wrap; gap: 8px; }
-.slot { font-family: var(--f-mono); font-size: .8rem; padding: 7px 11px; border-radius: 6px; background: var(--panel); border: 1px solid var(--line); color: var(--text); }
-.slot.rare { border-color: var(--amber); color: var(--amber); }
+.slot { font-family: var(--f-mono); font-size: .8rem; padding: 7px 10px; border: 2px solid var(--ink); background: var(--paper); box-shadow: 2px 2px 0 var(--ink); }
+.slot.rare { background: var(--teal); color: #fff; }
 
-/* contact */
+/* contact: level 4 */
 .contact { text-align: center; }
-.contact .wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
-.contact h2 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-4); line-height: 1.05; max-width: 17ch; }
-.contact .cont { font-family: var(--f-display); color: var(--amber); font-size: var(--step-2); }
-.contact-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
-.email-box { display: inline-flex; align-items: stretch; border-radius: 10px; overflow: hidden; box-shadow: inset 0 0 0 2px var(--line); max-width: 100%; }
-.email-box code { font-family: var(--f-mono); padding: 12px 14px; user-select: all; overflow-wrap: anywhere; }
-.email-box button { font-family: var(--f-mono); font-size: var(--step--1); border: 0; background: var(--panel-2); color: var(--text); padding: 12px 14px; cursor: pointer; }
-.email-box button:hover { background: var(--line); }
-.meta { font-family: var(--f-mono); font-size: var(--step--1); color: var(--muted); }
+.contact .lock-panel { position: relative; padding: 48px 24px 40px; display: flex; flex-direction: column; align-items: center; gap: 18px; background: var(--sea) var(--waves); }
+.contact .lvl-n { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; border: 3px dashed var(--ink); background: var(--paper-2); }
+.contact .lvl-n svg { width: 30px; height: 30px; }
+.contact h2 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-4); line-height: 1.04; max-width: 17ch; }
+.contact .unlock { font-size: var(--step-1); color: var(--ink-2); }
+.contact-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+.email-box { display: inline-flex; align-items: stretch; border: 2px solid var(--ink); background: var(--paper-2); max-width: 100%; box-shadow: 4px 4px 0 var(--ink); }
+.email-box code { font-family: var(--f-mono); padding: 12px 14px; user-select: all; overflow-wrap: anywhere; align-self: center; }
+.email-box button { font-family: var(--f-mono); font-size: var(--step--1); border: 0; border-left: 2px solid var(--ink); background: var(--paper-3); color: var(--ink); padding: 0 16px; min-height: 48px; cursor: pointer; }
+.email-box button:hover { background: #fff; }
+.contact .meta { font-family: var(--f-mono); font-size: var(--step--1); color: var(--ink-2); }
 
-footer { border-top: 1px solid var(--line); background: var(--panel); }
-footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding-block: 22px; font-family: var(--f-mono); font-size: var(--step--1); color: var(--muted); }
-
-/* collectibles */
-.egg { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; border: 1px dashed var(--line); background: transparent; color: var(--muted); cursor: pointer; padding: 0; opacity: .6; transition: opacity .2s, transform .2s, color .2s; font-family: var(--f-cjk); font-size: 1rem; }
-.egg:hover, .egg:focus-visible { opacity: 1; transform: rotate(-10deg) scale(1.1); color: var(--c); }
-.egg.found { opacity: 1; color: var(--ink); background: var(--c); border-color: var(--c); pointer-events: none; }
-.egg svg { width: 16px; height: 16px; }
-.egg-slot { display: flex; justify-content: flex-end; margin-top: -8px; }
-.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(150%); visibility: hidden; background: var(--text); color: var(--ink); font-weight: 600; padding: 14px 18px; border-radius: 10px; box-shadow: 0 5px 0 var(--coral), 0 16px 30px rgba(0,0,0,.45); z-index: 50; transition: transform .3s ease, visibility .3s; max-width: calc(100vw - 32px); }
-.toast.show { transform: translateX(-50%) translateY(0); visibility: visible; }
-.toast.win { background: var(--amber); box-shadow: 0 5px 0 #a87412, 0 16px 30px rgba(0,0,0,.45); }
+footer { border-top: 2px solid var(--ink); }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding-block: 22px; font-family: var(--f-mono); font-size: var(--step--1); color: var(--ink-2); }
 
 /* lightbox */
-.lightbox { position: fixed; inset: 0; z-index: 60; background: rgba(8,9,13,.92); display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); cursor: zoom-out; }
-.lightbox img { max-width: 100%; max-height: 100%; border-radius: 10px; }
+.lightbox { position: fixed; inset: 0; z-index: 60; background: rgba(31,27,22,.92); display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); cursor: zoom-out; }
+.lightbox img { max-width: 100%; max-height: 100%; border: 3px solid var(--paper); }
 
 /* ---------- responsive ---------- */
-@media (max-width: 960px) {
-  .hero .wrap { grid-template-columns: 1fr; padding-block: 40px 36px; }
-  .carts { height: 250px; max-width: 420px; }
-  .cart { width: 140px; height: 186px; }
-  .cart .label svg { width: 64px; height: 64px; }
-  .hud .wrap { grid-template-columns: repeat(2, 1fr); }
-  .stat:nth-child(2) { border-right: 0; }
-  .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
-  .select { grid-template-columns: 1fr; max-width: 560px; }
-  .case-body { grid-template-columns: 1fr; }
+@media (max-width: 1080px) {
+  .board { grid-template-columns: minmax(0, 1fr) 320px; }
+  .level-list { grid-template-columns: repeat(2, minmax(0, 1fr)) auto; }
+  .level-list > button:nth-child(-n+2) { border-bottom: 2px solid var(--ink); }
+  .level-list .step { grid-row: 1 / span 2; grid-column: 3; flex-direction: column; }
+  .level-list .step button { flex: 1; border-right: 0; }
+  .level-list .step button:first-child { border-bottom: 2px solid var(--ink); }
+}
+@media (max-width: 900px) {
+  :root { --sh: 6px; }
+  .intro { grid-template-columns: 1fr; }
+  .board { grid-template-columns: minmax(0, 1fr); grid-template-areas: "map" "list" "card"; }
+  .map { height: 60vh; height: 60svh; min-height: 380px; border-right: 0; border-bottom: 2px solid var(--ink); }
+  .level-list { border-right: 0; }
+  .card { border-top: 2px solid var(--ink); }
+  .legend { grid-template-columns: repeat(2, 1fr); }
+  .lp-body { grid-template-columns: minmax(0, 1fr); }
   .sheet { position: static; }
-  .about .wrap { grid-template-columns: 1fr; gap: 32px; }
+  .about .wrap { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+}
+@media (max-width: 760px) {
+  .fb-land { display: none !important; }
+  .fb-port { display: block !important; }
 }
 @media (max-width: 640px) {
   .nav { display: none; }
   .resume-btn { margin-left: auto; }
-  section { padding-block: 54px; }
-  .abilities, .quests, .gallery { grid-template-columns: 1fr; }
-  .job { grid-template-columns: 1fr; gap: 10px; }
-  .cart .name { font-size: .7rem; }
-  .stat { padding: 16px 12px; }
+  section { padding-block: 52px; }
+  .hero { padding-block: 24px 44px; }
+  .intro { margin-bottom: 22px; }
+  .intro h1 { font-size: 2.15rem; }
+  .intro .sub { font-size: 1.04rem; }
+  .intro .btns { display: none; }
+  .level-list { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .level-list > button { border-bottom: 2px solid var(--ink); }
+  .level-list > button:nth-child(2n) { border-right: 0; }
+  .level-list .step { grid-row: auto; grid-column: 1 / -1; flex-direction: row; }
+  .level-list .step button { border-bottom: 0; min-height: 48px; }
+  .level-list .step button:first-child { border-bottom: 0; border-right: 2px solid var(--ink); }
+  .card { padding: 20px 16px 22px; }
+  .abilities, .quests, .gallery { grid-template-columns: minmax(0, 1fr); }
+  .lp-head { grid-template-columns: 1fr; }
+  .lp-num { grid-row: auto; width: 64px; height: 64px; font-size: 1.8rem; }
+  .stop { grid-template-columns: 1fr; gap: 8px; }
+  .route { padding-left: 46px; }
+  .route::before { left: 17px; }
+  .stop::before { left: -46px; width: 36px; height: 36px; font-size: 1rem; }
+  .legend { gap: 12px; }
+  .legend > div { padding: 12px; }
+  .map-hint { display: none; }
+  .compass { width: 48px; height: 48px; right: auto; left: 12px; }
+  .contact .lock-panel { padding: 36px 16px 32px; }
+  .email-box { flex-wrap: wrap; justify-content: center; }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .cart.k2 { animation: bob 3.4s ease-in-out infinite; }
-  @keyframes bob { 50% { transform: translateY(-10px) rotate(2deg); } }
-  .boss-fight .hp i::after { animation: hp 2.4s ease-out .3s both; }
+  .boss .hp i::after { animation: hp 2.4s ease-out .3s both; }
   @keyframes hp { from { inset: 0 0 0 0; } to { inset: 0 100% 0 0; } }
   .hand-anim .j { animation: settle 3s ease-in-out infinite alternate; }
   @keyframes settle { from { transform: translate(var(--dx), var(--dy)); } to { transform: none; } }
@@ -283,6 +344,12 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 </style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
 </head>
 <body>
 
@@ -290,99 +357,363 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
   <div class="wrap">
     <a class="logo" href="#top"><b aria-hidden="true">G</b>Gautam</a>
     <nav class="nav" aria-label="Sections">
-      <a href="#projects">Projects</a>
-      <a href="#experience">Experience</a>
-      <a href="#about">About</a>
+      <a href="#levels">Levels</a>
+      <a href="#experience">Route</a>
+      <a href="#about">Inventory</a>
       <a href="#contact">Contact</a>
     </nav>
-    <a class="resume-btn" href="assets/Gautam_Resume.pdf" target="_blank" rel="noopener">Resume PDF</a>
-    <span class="counter" id="counter" title="One collectible is hidden in each project">★ 0/3</span>
+    <a class="btn btn-primary resume-btn" href="assets/Gautam_Resume.pdf" target="_blank" rel="noopener">Resume PDF</a>
   </div>
 </header>
 
 <main id="top">
-  <section class="hero" aria-labelledby="hero-title" style="padding-block:0">
+  <!-- ===================== HERO: WORLD MAP ===================== -->
+  <section class="hero" aria-labelledby="hero-title">
     <div class="wrap">
-      <div>
-        <p class="eyebrow">Player 1 · Unity Game Developer</p>
-        <h1 id="hero-title"><span class="w1">Mahjong bots.</span> <span class="w2">Photoreal humans.</span> <span class="w3">Movie sets in a box.</span></h1>
-        <p class="sub">I'm Gautam, a Unity developer with <b>3.5+ years of production C#</b>. I designed and built the client architecture of a live multiplayer game, led development of a photorealistic character creator, and solved real-time hand placement for a 3D scene tool. Based in Mumbai. Available immediately.</p>
-        <div class="btns">
-          <a class="btn btn-primary" href="#projects">Pick a project ▸</a>
-          <a class="btn btn-ghost" href="assets/Gautam_Resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
+      <div class="intro">
+        <div>
+          <p class="eyebrow">Gautam · Unity Game Developer · World map</p>
+          <h1 id="hero-title">Three levels cleared. <em>Level 4 is your studio.</em></h1>
+        </div>
+        <div>
+          <p class="sub"><b>3.5+ years of production C#.</b> I designed and built the client architecture of a live multiplayer game, led development of a photorealistic character creator, and solved real-time hand placement for a 3D scene tool. Based in Mumbai. Available immediately.</p>
+          <div class="btns">
+            <a class="btn btn-primary" href="#levels">See the levels</a>
+            <a class="btn" href="assets/Gautam_Resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
+          </div>
         </div>
       </div>
-      <div class="carts" aria-label="Projects">
-        <a class="cart k1 jade" href="#pongz">
-          <span class="label" aria-hidden="true"><svg viewBox="0 0 64 64"><rect x="14" y="6" width="36" height="50" rx="5" fill="#f4ecd8"/><rect x="14" y="52" width="36" height="6" rx="3" fill="#3cc58e"/><text x="32" y="42" text-anchor="middle" font-size="28" font-weight="700" fill="#d23a2c" font-family="serif">中</text></svg></span>
-          <span class="notch"></span><span class="name">Pongz – SG Mahjong</span><span class="kind">Live mobile game</span>
-        </a>
-        <a class="cart k2 coral" href="#character-creator">
-          <span class="label" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="#ecebf3" stroke-width="3" stroke-linecap="round"><ellipse cx="22" cy="24" rx="10" ry="12"/><path d="M8 56c2-10 7-15 14-15s12 5 14 15"/><line x1="42" y1="16" x2="58" y2="16"/><line x1="42" y1="32" x2="58" y2="32"/><line x1="42" y1="48" x2="58" y2="48"/><circle cx="47" cy="16" r="3.5" fill="#ff7a5c" stroke="none"/><circle cx="54" cy="32" r="3.5" fill="#ffc145" stroke="none"/><circle cx="46" cy="48" r="3.5" fill="#3cc58e" stroke="none"/></svg></span>
-          <span class="notch"></span><span class="name">Character Creator</span><span class="kind">Windows 3D tool</span>
-        </a>
-        <a class="cart k3 amber" href="#movie-studio">
-          <span class="label" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="#ecebf3" stroke-width="3" stroke-linejoin="round"><rect x="6" y="24" width="52" height="32" rx="3"/><path d="M6 24 L10 10 L58 10 L58 24" fill="#ecebf3"/><path d="M18 10 L14 24 M30 10 L26 24 M42 10 L38 24 M54 10 L50 24" stroke="#1a1d29" stroke-width="3"/><path d="M27 33 L40 40 L27 47 Z" fill="#ffc145" stroke="none"/></svg></span>
-          <span class="notch"></span><span class="name">Movie Studio 3D</span><span class="kind">Windows 3D tool</span>
-        </a>
+
+      <div class="board panel" id="map-board">
+        <div class="map" id="map" data-state="fallback" tabindex="0" role="group" aria-roledescription="level select map" aria-label="World map of Gautam's projects. Use the arrow keys to move between levels, Enter to open one." aria-describedby="map-help">
+          <script>document.getElementById("map").dataset.state = "loading";</script>
+          <div class="stage" id="stage" aria-hidden="false"></div>
+          <div class="map-fallback">
+<svg class="fb fb-land" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet" role="group" aria-label="World map: four levels joined by a dotted route">
+<defs><pattern id="fbl-w" width="44" height="26" patternUnits="userSpaceOnUse"><path d="M2 8 q5 -6 10 0 t10 0 M24 21 q5 -6 10 0 t10 0" fill="none" stroke="#b6cac2" stroke-width="1.6"/></pattern></defs>
+<rect width="1000" height="620" fill="#dfe8e2"/><rect width="1000" height="620" fill="url(#fbl-w)"/>
+<path d="M174.6 261 Q248.4 410.7 414.6 426 Q484.2 268.8 654.6 246" fill="none" stroke="#c8402a" stroke-width="4" stroke-dasharray="11 8" stroke-linecap="round"/>
+<path d="M654.6 246 Q708.9 401.2 869.6 436" fill="none" stroke="#1f1b16" stroke-width="3" stroke-dasharray="4 9" stroke-linecap="round" opacity=".7"/>
+<a class="fb-node" href="#character-creator" data-level="0" aria-label="Level 1: Character Creator">
+<path d="M274.6 215L261.4 241.8L243.4 262.2L230.7 285L206.7 295.3L181.2 293L157.2 304.1L126.5 310.2L102.8 292.6L89.9 266.4L87.7 239.2L90.6 215L84.8 190L88.6 162.7L110.2 146L130.2 127.9L155 110.9L183.4 122L202.9 142.9L223.3 153.5L244.7 167L264.2 187.3Z" transform="translate(8 8)" fill="#1f1b16"/>
+<path d="M274.6 215L261.4 241.8L243.4 262.2L230.7 285L206.7 295.3L181.2 293L157.2 304.1L126.5 310.2L102.8 292.6L89.9 266.4L87.7 239.2L90.6 215L84.8 190L88.6 162.7L110.2 146L130.2 127.9L155 110.9L183.4 122L202.9 142.9L223.3 153.5L244.7 167L264.2 187.3Z" fill="#f4ecd9" stroke="#1f1b16" stroke-width="3" />
+<g transform="translate(165.4 194.8) scale(1.5)" class="fb-lm"><rect x="-16" y="10" width="32" height="10" fill="#1d6a66" stroke="#1f1b16" stroke-width="2.5"/><path d="M-20 10 C-18 -2 -8 -4 0 -4 C8 -4 18 -2 20 10Z" fill="#f7f1e3" stroke="#1f1b16" stroke-width="2.5"/><ellipse cx="0" cy="-16" rx="10" ry="12" fill="#f7f1e3" stroke="#1f1b16" stroke-width="2.5"/></g>
+<circle class="fb-stop" cx="174.6" cy="261" r="18.4" fill="#f7f1e3" stroke="#1f1b16" stroke-width="3"/>
+<text class="fb-num" x="174.6" y="268.2" text-anchor="middle" font-size="20">1</text>
+<text class="fb-name" x="170" y="343.6" text-anchor="middle" font-size="20">Character Creator</text>
+<text class="fb-sub" x="170" y="365.6" text-anchor="middle" font-size="15.6">Deftsoft · 2022–24</text>
+</a>
+<a class="fb-node" href="#movie-studio" data-level="1" aria-label="Level 2: Movie Studio 3D">
+<path d="M509.6 380L495.6 405.1L478.4 424L464.6 443.1L447.1 461.2L424.6 481.5L394.7 486.1L372.2 462.7L356 442.4L334 428.8L325.1 404.9L325.6 380L319 353.3L323.7 324.5L344.1 304L370.7 293.9L398.4 299.4L420.9 304L448.6 295.4L476.4 303.3L488.8 329.3L501.7 353.1Z" transform="translate(8 8)" fill="#1f1b16"/>
+<path d="M509.6 380L495.6 405.1L478.4 424L464.6 443.1L447.1 461.2L424.6 481.5L394.7 486.1L372.2 462.7L356 442.4L334 428.8L325.1 404.9L325.6 380L319 353.3L323.7 324.5L344.1 304L370.7 293.9L398.4 299.4L420.9 304L448.6 295.4L476.4 303.3L488.8 329.3L501.7 353.1Z" fill="#f4ecd9" stroke="#1f1b16" stroke-width="3" />
+<g transform="translate(405.4 359.8) scale(1.5)" class="fb-lm"><rect x="-20" y="-6" width="40" height="28" fill="#1f1b16"/><path d="M-20 -8 L-18 -20 L22 -14 L20 -4Z" fill="#f7f1e3" stroke="#1f1b16" stroke-width="2.5"/><path d="M-10 -18 L-14 -7 M2 -16 L-2 -6 M14 -15 L10 -5" stroke="#1f1b16" stroke-width="4"/><path d="M-12 4 H12 M-12 12 H6" stroke="#efe6d2" stroke-width="2"/></g>
+<circle class="fb-stop" cx="414.6" cy="426" r="18.4" fill="#f7f1e3" stroke="#1f1b16" stroke-width="3"/>
+<text class="fb-num" x="414.6" y="433.2" text-anchor="middle" font-size="20">2</text>
+<text class="fb-name" x="410" y="508.6" text-anchor="middle" font-size="20">Movie Studio 3D</text>
+<text class="fb-sub" x="410" y="530.6" text-anchor="middle" font-size="15.6">Deftsoft · 2022–24</text>
+</a>
+<a class="fb-node" href="#pongz" data-level="2" aria-label="Level 3: Pongz – SG Mahjong">
+<path d="M735.4 200L721 220.8L724.3 247.8L717.1 277.4L691.6 291L663.8 295.8L636.9 291.3L614.3 278.1L592.5 266.4L576.4 247.3L568.8 223.9L551.4 200L544.4 169L569.5 148.3L596.6 138.4L615.1 123.6L637.6 113.7L663.1 109.2L690.7 110.8L713 127.3L731.2 147.8L745.3 172Z" transform="translate(8 8)" fill="#1f1b16"/>
+<path d="M735.4 200L721 220.8L724.3 247.8L717.1 277.4L691.6 291L663.8 295.8L636.9 291.3L614.3 278.1L592.5 266.4L576.4 247.3L568.8 223.9L551.4 200L544.4 169L569.5 148.3L596.6 138.4L615.1 123.6L637.6 113.7L663.1 109.2L690.7 110.8L713 127.3L731.2 147.8L745.3 172Z" fill="#f4ecd9" stroke="#1f1b16" stroke-width="3" />
+<g transform="translate(645.4 179.8) scale(1.5)" class="fb-lm"><rect x="-18" y="8" width="36" height="12" fill="#1d6a66" stroke="#1f1b16" stroke-width="2.5"/><rect x="-16" y="-2" width="36" height="12" fill="#f7f1e3" stroke="#1f1b16" stroke-width="2.5"/><rect x="-19" y="-12" width="36" height="12" fill="#1d6a66" stroke="#1f1b16" stroke-width="2.5"/><rect x="-17" y="-24" width="36" height="13" fill="#f7f1e3" stroke="#1f1b16" stroke-width="2.5"/><g fill="#c8402a"><circle cx="-9" cy="-17.5" r="2.4"/><circle cx="1" cy="-17.5" r="2.4"/><circle cx="11" cy="-17.5" r="2.4"/></g></g>
+<circle class="fb-stop" cx="654.6" cy="246" r="18.4" fill="#f7f1e3" stroke="#1f1b16" stroke-width="3"/>
+<text class="fb-num" x="654.6" y="253.2" text-anchor="middle" font-size="20">3</text>
+<text class="fb-name" x="650" y="328.6" text-anchor="middle" font-size="20">Pongz – SG Mahjong</text>
+<text class="fb-sub" x="650" y="350.6" text-anchor="middle" font-size="15.6">Roothoot · 2025–26</text>
+</a>
+<a class="fb-node" href="#contact" data-level="3" aria-label="Level 4: Level 4: your studio">
+<path d="M952 390L959.5 417.8L951.3 445.4L925.9 460.3L903.4 474.2L878.7 485.2L853.1 472.8L832.9 460.2L804.7 459.6L778.4 445.7L767.1 418.7L768 390L783 365.9L796.5 346L805.4 321.2L827 306.8L852.5 303.1L879.3 290.6L909.4 292.9L925.2 320.6L933.2 346.2L943.6 366.9Z" transform="translate(8 8)" fill="#1f1b16"/>
+<path d="M952 390L959.5 417.8L951.3 445.4L925.9 460.3L903.4 474.2L878.7 485.2L853.1 472.8L832.9 460.2L804.7 459.6L778.4 445.7L767.1 418.7L768 390L783 365.9L796.5 346L805.4 321.2L827 306.8L852.5 303.1L879.3 290.6L909.4 292.9L925.2 320.6L933.2 346.2L943.6 366.9Z" fill="#e6e1d3" stroke="#1f1b16" stroke-width="3" stroke-dasharray="9 6"/>
+<g transform="translate(860.4 369.8) scale(1.5)" class="fb-lm"><ellipse cx="-14" cy="0" rx="16" ry="10" fill="#f7f1e3" stroke="#1f1b16" stroke-width="2"/><ellipse cx="12" cy="-4" rx="18" ry="12" fill="#f7f1e3" stroke="#1f1b16" stroke-width="2"/><path d="M-6 -8 v-6 a6 6 0 0 1 12 0 v6" fill="none" stroke="#1f1b16" stroke-width="3"/><rect x="-10" y="-9" width="20" height="16" rx="2" fill="#c8402a" stroke="#1f1b16" stroke-width="2.5"/></g>
+<circle class="fb-stop" cx="869.6" cy="436" r="18.4" fill="#f7f1e3" stroke="#1f1b16" stroke-width="3"/>
+<text class="fb-num" x="869.6" y="443.2" text-anchor="middle" font-size="20">4</text>
+<text class="fb-name" x="865" y="518.6" text-anchor="middle" font-size="20">Level 4: your studio</text>
+<text class="fb-sub" x="865" y="540.6" text-anchor="middle" font-size="15.6">Locked</text>
+</a>
+<g class="fb-pin" data-stops='[[174.6,261],[414.6,426],[654.6,246],[869.6,436]]' transform="translate(654.6 246)" aria-hidden="true"><g transform="scale(1.5)"><path d="M0 0 C-4 -10 -13 -16 -13 -27 a13 13 0 0 1 26 0 C13 -16 4 -10 0 0Z" fill="#c8402a" stroke="#1f1b16" stroke-width="3"/><circle cx="0" cy="-27" r="5" fill="#f7f1e3" stroke="#1f1b16" stroke-width="2"/></g></g>
+</svg>
+<svg class="fb fb-port" viewBox="0 0 400 700" preserveAspectRatio="xMidYMid meet" role="group" aria-label="World map: four levels joined by a dotted route">
+<defs><pattern id="fbp-w" width="44" height="26" patternUnits="userSpaceOnUse"><path d="M2 8 q5 -6 10 0 t10 0 M24 21 q5 -6 10 0 t10 0" fill="none" stroke="#b6cac2" stroke-width="1.6"/></pattern></defs>
+<rect width="400" height="700" fill="#dfe8e2"/><rect width="400" height="700" fill="url(#fbp-w)"/>
+<path d="M121.1 139 Q160 261.9 285.1 293 Q247.3 417.9 121.1 451" fill="none" stroke="#c8402a" stroke-width="4" stroke-dasharray="11 8" stroke-linecap="round"/>
+<path d="M121.1 451 Q159.7 574.4 285.1 606" fill="none" stroke="#1f1b16" stroke-width="3" stroke-dasharray="4 9" stroke-linecap="round" opacity=".7"/>
+<a class="fb-node" href="#character-creator" data-level="0" aria-label="Level 1: Character Creator">
+<path d="M188.5 108L179.6 126.1L167.5 139.8L158.9 155.2L142.7 162.1L125.6 160.6L109.4 168L88.7 172.2L72.7 160.3L64.1 142.7L62.5 124.3L64.5 108L60.6 91.1L63.1 72.7L77.7 61.5L91.2 49.3L107.9 37.8L127 45.3L140.2 59.4L153.9 66.6L168.4 75.6L181.5 89.4Z" transform="translate(8 8)" fill="#1f1b16"/>
+<path d="M188.5 108L179.6 126.1L167.5 139.8L158.9 155.2L142.7 162.1L125.6 160.6L109.4 168L88.7 172.2L72.7 160.3L64.1 142.7L62.5 124.3L64.5 108L60.6 91.1L63.1 72.7L77.7 61.5L91.2 49.3L107.9 37.8L127 45.3L140.2 59.4L153.9 66.6L168.4 75.6L181.5 89.4Z" fill="#f4ecd9" stroke="#1f1b16" stroke-width="3" />
+<g transform="translate(114.9 94.4) scale(1.05)" class="fb-lm"><rect x="-16" y="10" width="32" height="10" fill="#1d6a66" stroke="#1f1b16" stroke-width="2.5"/><path d="M-20 10 C-18 -2 -8 -4 0 -4 C8 -4 18 -2 20 10Z" fill="#f7f1e3" stroke="#1f1b16" stroke-width="2.5"/><ellipse cx="0" cy="-16" rx="10" ry="12" fill="#f7f1e3" stroke="#1f1b16" stroke-width="2.5"/></g>
+<circle class="fb-stop" cx="121.1" cy="139" r="12.4" fill="#f7f1e3" stroke="#1f1b16" stroke-width="3"/>
+<text class="fb-num" x="121.1" y="144.4" text-anchor="middle" font-size="15">1</text>
+<text class="fb-name" x="118" y="196.2" text-anchor="middle" font-size="15">Character Creator</text>
+<text class="fb-sub" x="118" y="212.7" text-anchor="middle" font-size="11.7">Deftsoft · 2022–24</text>
+</a>
+<a class="fb-node" href="#movie-studio" data-level="1" aria-label="Level 2: Movie Studio 3D">
+<path d="M349.1 262L339.7 278.9L328.1 291.6L318.8 304.5L307 316.7L291.8 330.4L271.7 333.5L256.5 317.8L245.6 304L230.8 294.9L224.8 278.8L225.1 262L220.7 244L223.8 224.6L237.6 210.8L255.5 204L274.2 207.7L289.4 210.8L308 205L326.8 210.3L335.1 227.9L343.8 243.9Z" transform="translate(8 8)" fill="#1f1b16"/>
+<path d="M349.1 262L339.7 278.9L328.1 291.6L318.8 304.5L307 316.7L291.8 330.4L271.7 333.5L256.5 317.8L245.6 304L230.8 294.9L224.8 278.8L225.1 262L220.7 244L223.8 224.6L237.6 210.8L255.5 204L274.2 207.7L289.4 210.8L308 205L326.8 210.3L335.1 227.9L343.8 243.9Z" fill="#f4ecd9" stroke="#1f1b16" stroke-width="3" />
+<g transform="translate(278.9 248.4) scale(1.05)" class="fb-lm"><rect x="-20" y="-6" width="40" height="28" fill="#1f1b16"/><path d="M-20 -8 L-18 -20 L22 -14 L20 -4Z" fill="#f7f1e3" stroke="#1f1b16" stroke-width="2.5"/><path d="M-10 -18 L-14 -7 M2 -16 L-2 -6 M14 -15 L10 -5" stroke="#1f1b16" stroke-width="4"/><path d="M-12 4 H12 M-12 12 H6" stroke="#efe6d2" stroke-width="2"/></g>
+<circle class="fb-stop" cx="285.1" cy="293" r="12.4" fill="#f7f1e3" stroke="#1f1b16" stroke-width="3"/>
+<text class="fb-num" x="285.1" y="298.4" text-anchor="middle" font-size="15">2</text>
+<text class="fb-name" x="282" y="350.2" text-anchor="middle" font-size="15">Movie Studio 3D</text>
+<text class="fb-sub" x="282" y="366.7" text-anchor="middle" font-size="11.7">Deftsoft · 2022–24</text>
+</a>
+<a class="fb-node" href="#pongz" data-level="2" aria-label="Level 3: Pongz – SG Mahjong">
+<path d="M175.6 420L165.8 434L168.1 452.2L163.2 472.2L146 481.3L127.3 484.6L109.1 481.6L94 472.7L79.2 464.8L68.4 451.9L63.3 436.1L51.6 420L46.9 399.1L63.8 385.1L82 378.5L94.5 368.5L109.6 361.9L126.8 358.8L145.5 359.9L160.4 371L172.7 384.8L182.2 401.1Z" transform="translate(8 8)" fill="#1f1b16"/>
+<path d="M175.6 420L165.8 434L168.1 452.2L163.2 472.2L146 481.3L127.3 484.6L109.1 481.6L94 472.7L79.2 464.8L68.4 451.9L63.3 436.1L51.6 420L46.9 399.1L63.8 385.1L82 378.5L94.5 368.5L109.6 361.9L126.8 358.8L145.5 359.9L160.4 371L172.7 384.8L182.2 401.1Z" fill="#f4ecd9" stroke="#1f1b16" stroke-width="3" />
+<g transform="translate(114.9 406.4) scale(1.05)" class="fb-lm"><rect x="-18" y="8" width="36" height="12" fill="#1d6a66" stroke="#1f1b16" stroke-width="2.5"/><rect x="-16" y="-2" width="36" height="12" fill="#f7f1e3" stroke="#1f1b16" stroke-width="2.5"/><rect x="-19" y="-12" width="36" height="12" fill="#1d6a66" stroke="#1f1b16" stroke-width="2.5"/><rect x="-17" y="-24" width="36" height="13" fill="#f7f1e3" stroke="#1f1b16" stroke-width="2.5"/><g fill="#c8402a"><circle cx="-9" cy="-17.5" r="2.4"/><circle cx="1" cy="-17.5" r="2.4"/><circle cx="11" cy="-17.5" r="2.4"/></g></g>
+<circle class="fb-stop" cx="121.1" cy="451" r="12.4" fill="#f7f1e3" stroke="#1f1b16" stroke-width="3"/>
+<text class="fb-num" x="121.1" y="456.4" text-anchor="middle" font-size="15">3</text>
+<text class="fb-name" x="118" y="508.2" text-anchor="middle" font-size="15">Pongz – SG Mahjong</text>
+<text class="fb-sub" x="118" y="524.7" text-anchor="middle" font-size="11.7">Roothoot · 2025–26</text>
+</a>
+<a class="fb-node" href="#contact" data-level="3" aria-label="Level 4: Level 4: your studio">
+<path d="M340.6 575L345.7 593.7L340.1 612.4L323 622.3L307.9 631.7L291.2 639.2L274 630.8L260.4 622.3L241.3 621.9L223.6 612.5L216 594.4L216.6 575L226.7 558.8L235.8 545.3L241.8 528.6L256.4 518.9L273.6 516.4L291.6 508L311.9 509.5L322.6 528.2L327.9 545.5L335 559.4Z" transform="translate(8 8)" fill="#1f1b16"/>
+<path d="M340.6 575L345.7 593.7L340.1 612.4L323 622.3L307.9 631.7L291.2 639.2L274 630.8L260.4 622.3L241.3 621.9L223.6 612.5L216 594.4L216.6 575L226.7 558.8L235.8 545.3L241.8 528.6L256.4 518.9L273.6 516.4L291.6 508L311.9 509.5L322.6 528.2L327.9 545.5L335 559.4Z" fill="#e6e1d3" stroke="#1f1b16" stroke-width="3" stroke-dasharray="9 6"/>
+<g transform="translate(278.9 561.4) scale(1.05)" class="fb-lm"><ellipse cx="-14" cy="0" rx="16" ry="10" fill="#f7f1e3" stroke="#1f1b16" stroke-width="2"/><ellipse cx="12" cy="-4" rx="18" ry="12" fill="#f7f1e3" stroke="#1f1b16" stroke-width="2"/><path d="M-6 -8 v-6 a6 6 0 0 1 12 0 v6" fill="none" stroke="#1f1b16" stroke-width="3"/><rect x="-10" y="-9" width="20" height="16" rx="2" fill="#c8402a" stroke="#1f1b16" stroke-width="2.5"/></g>
+<circle class="fb-stop" cx="285.1" cy="606" r="12.4" fill="#f7f1e3" stroke="#1f1b16" stroke-width="3"/>
+<text class="fb-num" x="285.1" y="611.4" text-anchor="middle" font-size="15">4</text>
+<text class="fb-name" x="282" y="663.2" text-anchor="middle" font-size="15">Level 4: your studio</text>
+<text class="fb-sub" x="282" y="679.7" text-anchor="middle" font-size="11.7">Locked</text>
+</a>
+<g class="fb-pin" data-stops='[[121.1,139],[285.1,293],[121.1,451],[285.1,606]]' transform="translate(121.1 451)" aria-hidden="true"><g transform="scale(1.05)"><path d="M0 0 C-4 -10 -13 -16 -13 -27 a13 13 0 0 1 26 0 C13 -16 4 -10 0 0Z" fill="#c8402a" stroke="#1f1b16" stroke-width="3"/><circle cx="0" cy="-27" r="5" fill="#f7f1e3" stroke="#1f1b16" stroke-width="2"/></g></g>
+</svg>
+          </div>
+          <p class="loading" aria-hidden="true">Inking the map…</p>
+          <p class="map-hint" aria-hidden="true">Pick a level · arrow keys move the pin</p>
+          <svg class="compass" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="22" fill="#f7f1e3" stroke="#1f1b16" stroke-width="2"/><path d="M32 6 L37 32 L32 58 L27 32Z" fill="#1f1b16"/><path d="M32 6 L37 32 L27 32Z" fill="#c8402a"/><path d="M6 32 L32 28 L58 32 L32 36Z" fill="none" stroke="#1f1b16" stroke-width="1.5"/><text x="32" y="5" text-anchor="middle" font-family="DM Mono, monospace" font-size="8" fill="#1f1b16" dy="-1">N</text></svg>
+          <p class="sr" id="map-help">Each level is a project. Selecting one moves the map pin and updates the level card.</p>
+        </div>
+
+        <div class="level-list" role="group" aria-label="Level select">
+          <button type="button" data-level="0" aria-pressed="false"><span class="n">1</span><span class="t">Character Creator</span><small>Cleared · NDA</small></button>
+          <button type="button" data-level="1" aria-pressed="false"><span class="n">2</span><span class="t">Movie Studio 3D</span><small>Cleared · NDA</small></button>
+          <button type="button" data-level="2" aria-pressed="true"><span class="n">3</span><span class="t">Pongz – SG Mahjong</span><small>Live · 40K+</small></button>
+          <button type="button" data-level="3" aria-pressed="false"><span class="n">4</span><span class="t">Your studio</span><small>Locked</small></button>
+          <div class="step"><button type="button" id="prev" aria-label="Previous level">←</button><button type="button" id="next" aria-label="Next level">→</button></div>
+        </div>
+
+        <article class="card" id="level-card" aria-live="polite">
+          <div class="lvl"><span class="lvl-n" id="lc-n">3</span><p class="meta-line" id="lc-meta">Level 3 · Roothoot · 2025–26</p></div>
+          <h2 id="lc-title">Pongz – SG Mahjong</h2>
+          <p id="lc-status"><span class="chip live">Live · 40K+ downloads</span></p>
+          <p class="desc" id="lc-desc">Real-time multiplayer Mahjong for iOS and Android. Client architecture, bot opponents, the full UI.</p>
+          <p class="boss-line"><b>BOSS FIGHT</b><span id="lc-boss">Offline bot opponents for a full game</span></p>
+          <a class="btn btn-primary" id="lc-enter" href="#pongz">Enter level ↓</a>
+        </article>
+      </div>
+      <div class="board-foot">
+        <span>Map and 3D built for this site; the project work described is Gautam's.</span>
+        <span id="map-mode">Levels in the order played, 2022 to now.</span>
+      </div>
+
+      <div class="legend" role="list" aria-label="Key numbers">
+        <div role="listitem"><div class="v">3.5+</div><div class="k">Years of production C#</div></div>
+        <div role="listitem"><div class="v">3</div><div class="k">Professional Unity projects</div></div>
+        <div role="listitem"><div class="v">50x</div><div class="k">Faster character exports</div></div>
+        <div role="listitem"><div class="v">40K+</div><div class="k">Pongz downloads</div></div>
       </div>
     </div>
   </section>
 
-  <div class="hud" role="list" aria-label="Key numbers">
-    <div class="wrap">
-      <div class="stat coral" role="listitem"><div class="v">3.5+</div><div class="k">Years of production C#</div></div>
-      <div class="stat amber" role="listitem"><div class="v">3</div><div class="k">Professional Unity projects</div></div>
-      <div class="stat coral" role="listitem"><div class="v">50x</div><div class="k">Faster character exports</div></div>
-      <div class="stat jade" role="listitem"><div class="v">40K+</div><div class="k">Pongz downloads</div></div>
-    </div>
-  </div>
+  <div id="levels"></div>
 
-  <!-- ===================== PROJECT SELECT ===================== -->
-  <section id="projects" aria-labelledby="projects-title">
+  <!-- ===================== LEVEL 1: CHARACTER CREATOR ===================== -->
+  <section id="character-creator" class="level-page" aria-labelledby="cc-title">
     <div class="wrap">
-      <div class="sec-head">
-        <p class="eyebrow">Select a project</p>
-        <h2 id="projects-title">Three projects, three hard problems</h2>
-        <p class="note">One is a live mobile game you can download today. The other two are Windows 3D tools that were never released publicly, and that is where most of my years went.</p>
+      <div class="lp-head">
+        <span class="lp-num" aria-hidden="true">1</span>
+        <p class="eyebrow">Level 1 · Deftsoft · Windows 3D tool · Led development</p>
+        <h2 id="cc-title">Character Creator</h2>
+        <div>
+          <p class="tag">Photoreal humans from sliders, and an export pipeline made 50x faster.</p>
+          <p class="lede" style="margin-top:10px">A photorealistic character creation tool for Windows, built in Unity. Users shape a realistic human head to toe in real time, from facial structure and body shape to skin, hair, and clothing. I led development and designed its core architecture.</p>
+        </div>
       </div>
-      <div class="select">
-        <a class="pick jade" href="#pongz">
-          <div class="chips"><span class="chip on">● Live</span><span class="chip">iOS · Android</span><span class="chip">2025 – 26</span></div>
-          <h3>Pongz – SG Mahjong</h3>
-          <p>Real-time multiplayer Mahjong. Client architecture, bot opponents, the full UI.</p>
-          <p class="boss"><b>BOSS</b>Offline bot opponents for a full game</p>
-          <span class="go">Play level ▸</span>
-        </a>
-        <a class="pick coral" href="#character-creator">
-          <div class="chips"><span class="chip on">Led development</span><span class="chip">Windows</span><span class="chip">2022 – 24</span></div>
-          <h3>Character Creator</h3>
-          <p>Photorealistic humans shaped head to toe in real time.</p>
-          <p class="boss"><b>BOSS</b>Merging 4K textures on export, 50x faster</p>
-          <span class="go">Play level ▸</span>
-        </a>
-        <a class="pick amber" href="#movie-studio">
-          <div class="chips"><span class="chip on">3D tools</span><span class="chip">Windows</span><span class="chip">2022 – 24</span></div>
-          <h3>Movie Studio 3D</h3>
-          <p>Compose and preview 3D scenes: assets, lighting, cameras, a timeline.</p>
-          <p class="boss"><b>BOSS</b>IK hand placement, open for over a year</p>
-          <span class="go">Play level ▸</span>
-        </a>
+      <div class="lp-body">
+        <aside class="sheet panel" aria-label="Character Creator stat sheet">
+          <h3>Stat sheet</h3>
+          <dl>
+            <dt>Role</dt><dd>Unity Developer, led development</dd>
+            <dt>When</dt><dd>2022 – 2024</dd>
+            <dt>Platform</dt><dd>Windows</dd>
+            <dt>Status</dt><dd>Unreleased, confidential</dd>
+            <dt>Stack</dt><dd>Unity, C#, Unity Jobs System, multithreading, 3D math</dd>
+          </dl>
+        </aside>
+        <div class="content">
+          <figure class="schematic">
+            <svg viewBox="0 0 720 360" role="img" aria-labelledby="cc-svg-t">
+              <title id="cc-svg-t">Schematic of a character creator: a panel of sliders on the left driving a 3D head and body in the viewport</title>
+              <rect x="0" y="0" width="720" height="360" fill="#f7f1e3"/>
+              <rect x="16" y="16" width="230" height="328" fill="#efe6d2" stroke="#1f1b16" stroke-width="2"/>
+              <text class="ttl" x="32" y="42">FACE · BODY · SKIN · HAIR · CLOTHES</text>
+              <g class="lbl">
+                <text x="32" y="78">Jaw width</text><text x="32" y="120">Cheekbones</text><text x="32" y="162">Nose bridge</text><text x="32" y="204">Shoulders</text><text x="32" y="246">Body mass</text><text x="32" y="288">Skin tone</text>
+              </g>
+              <g stroke="#d6cbb0" stroke-width="5" stroke-linecap="square">
+                <line x1="32" y1="92" x2="228" y2="92"/><line x1="32" y1="134" x2="228" y2="134"/><line x1="32" y1="176" x2="228" y2="176"/><line x1="32" y1="218" x2="228" y2="218"/><line x1="32" y1="260" x2="228" y2="260"/><line x1="32" y1="302" x2="228" y2="302"/>
+              </g>
+              <g stroke="#c8402a" stroke-width="5" stroke-linecap="square">
+                <line x1="32" y1="92" x2="150" y2="92"/><line x1="32" y1="134" x2="186" y2="134"/><line x1="32" y1="176" x2="96" y2="176"/><line x1="32" y1="218" x2="170" y2="218"/><line x1="32" y1="260" x2="120" y2="260"/><line x1="32" y1="302" x2="200" y2="302"/>
+              </g>
+              <g fill="#f7f1e3" stroke="#1f1b16" stroke-width="2.5"><circle cx="150" cy="92" r="7"/><circle cx="186" cy="134" r="7"/><circle cx="96" cy="176" r="7"/><circle cx="170" cy="218" r="7"/><circle cx="120" cy="260" r="7"/><circle cx="200" cy="302" r="7"/></g>
+              <g fill="none" stroke="#1f1b16" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M486 64c-34 0-56 28-56 66 0 44 26 78 56 78s56-34 56-78c0-38-22-66-56-66z" fill="#efe6d2"/>
+                <path d="M462 120h14M496 120h14M486 128v26l-8 6M472 176c8 6 20 6 28 0"/>
+                <path d="M452 200l-6 30M520 200l6 30"/>
+                <path d="M446 230c-60 10-100 30-118 110M526 230c60 10 100 30 118 110"/>
+              </g>
+              <g fill="none" stroke="#c8402a" stroke-width="1.5" stroke-dasharray="4 5">
+                <path d="M412 130h-30M560 130h30M486 46v-16"/>
+              </g>
+              <path d="M250 180h80" stroke="#c8402a" stroke-width="2.5" stroke-dasharray="6 6"/>
+              <path d="M330 180l-10-6v12z" fill="#c8402a"/>
+              <text class="lblc" x="440" y="340">real-time preview</text>
+            </svg>
+            <figcaption>Schematic, not a screenshot. The real tool is confidential, so this shows the idea: sliders on one side, a photoreal human on the other.</figcaption>
+          </figure>
+
+          <div class="boss">
+            <p class="hp">Boss fight <i></i> <em>Cleared</em></p>
+            <h3>50x faster character exports</h3>
+            <p>Every character starts from a base model that ships with many 4K textures, several of them layered for effects, such as multiple normal maps. On export, the tool has to bake the model and keep only the textures this character actually uses, each merged into a single map. Shaders can't hand back that final texture, so the merge runs on the CPU.</p>
+            <p>I built it both ways. The first version used the classic path: read pixels, copy the texture, multiply on one thread, apply. The second <strong>rebuilt the merge on the Unity Jobs System</strong>, running the per-pixel math across cores on pixel data in NativeArrays with no texture copies. I chose the Jobs version for the export path, and it <strong>raised export throughput 50x</strong>.</p>
+          </div>
+
+          <div class="speed" aria-label="Export throughput, relative">
+            <div class="row"><span>One thread</span><span class="bar"><i style="width:2%"></i></span><b>1x</b></div>
+            <div class="row"><span>Jobs System</span><span class="bar"><i style="width:100%"></i></span><b>50x</b></div>
+            <small>Character export throughput, relative to the original pipeline. Bars drawn to scale.</small>
+          </div>
+
+          <div class="abilities">
+            <article class="ability">
+              <h3><span class="k">LEAD</span>Ran development</h3>
+              <p>Led development and designed the core architecture. Planned the work from client requirements, ran client calls, assigned tasks to teammates, and made technical decisions with the design team, while writing code myself.</p>
+            </article>
+            <article class="ability">
+              <h3><span class="k">3D</span>Face and body structure</h3>
+              <p>Built the customizable facial and body structure systems behind photorealistic character generation.</p>
+            </article>
+          </div>
+
+          <div class="confidential">
+            <span class="stamp">CONFIDENTIAL</span>
+            <p>Unreleased and confidential, so this page uses schematics instead of screenshots. I can walk through the implementation in an interview.</p>
+          </div>
+        </div>
       </div>
+      <p class="onward"><a href="#movie-studio">Path continues · Level 2</a></p>
     </div>
   </section>
 
-  <!-- ===================== PONGZ ===================== -->
-  <section id="pongz" class="case jade" aria-labelledby="pongz-title">
+  <!-- ===================== LEVEL 2: MOVIE STUDIO 3D ===================== -->
+  <section id="movie-studio" class="level-page" aria-labelledby="ms-title">
     <div class="wrap">
-      <div class="case-head">
-        <p class="eyebrow">Project 01 · Live mobile game</p>
+      <div class="lp-head">
+        <span class="lp-num" aria-hidden="true">2</span>
+        <p class="eyebrow">Level 2 · Deftsoft · Windows 3D tool</p>
+        <h2 id="ms-title">Movie Studio 3D</h2>
+        <div>
+          <p class="tag">Real-time hand placement on imported characters, solved after a year open.</p>
+          <p class="lede" style="margin-top:10px">A Windows tool for composing and previewing 3D scenes, built in Unity. It works like a small game editor inside the app: a scene hierarchy, a properties panel with lighting and time of day, an asset inventory, cameras, and a timeline. I built several of its core modules.</p>
+        </div>
+      </div>
+      <div class="lp-body">
+        <aside class="sheet panel" aria-label="Movie Studio 3D stat sheet">
+          <h3>Stat sheet</h3>
+          <dl>
+            <dt>Role</dt><dd>Unity Developer</dd>
+            <dt>When</dt><dd>2022 – 2024</dd>
+            <dt>Platform</dt><dd>Windows</dd>
+            <dt>Status</dt><dd>Unreleased; development halted in 2024</dd>
+            <dt>Stack</dt><dd>Unity, C#, 3D math, UGUI</dd>
+          </dl>
+        </aside>
+        <div class="content">
+          <figure class="schematic">
+            <svg viewBox="0 0 720 380" role="img" aria-labelledby="ms-svg-t">
+              <title id="ms-svg-t">Schematic of the scene tool layout: hierarchy, 3D viewport, properties panel, asset inventory and timeline</title>
+              <rect width="720" height="380" fill="#f7f1e3"/>
+              <g fill="#efe6d2" stroke="#1f1b16" stroke-width="2">
+                <rect x="14" y="14" width="140" height="236"/><rect x="564" y="14" width="142" height="236"/><rect x="14" y="260" width="692" height="98"/>
+              </g>
+              <text class="lblc" x="26" y="36" style="font-size:12px">HIERARCHY</text>
+              <g fill="#d6cbb0"><rect x="26" y="50" width="100" height="8"/><rect x="38" y="66" width="90" height="8"/><rect x="38" y="82" width="70" height="8"/><rect x="50" y="98" width="80" height="8"/><rect x="50" y="114" width="60" height="8"/><rect x="38" y="130" width="96" height="8"/><rect x="26" y="146" width="84" height="8"/></g>
+              <rect x="164" y="14" width="390" height="236" fill="#dfe8e2" stroke="#1f1b16" stroke-width="2"/>
+              <text class="ttl" x="176" y="36">SCENE</text>
+              <path d="M165 210 L260 150 L330 190 L420 130 L553 210 V249 H165Z" fill="#efe6d2" stroke="#1f1b16" stroke-width="2"/>
+              <g stroke="#1f1b16" stroke-width="2.5" fill="#f7f1e3"><path d="M330 200 v-34 l10 -6" fill="none"/><circle cx="330" cy="150" r="10"/><path d="M314 186 l16 -14 l16 14" fill="none"/></g>
+              <g stroke-width="2"><line x1="420" y1="96" x2="460" y2="96" stroke="#c8402a"/><line x1="420" y1="96" x2="420" y2="56" stroke="#1d6a66"/><line x1="420" y1="96" x2="396" y2="118" stroke="#1f1b16"/></g>
+              <text class="lblc" x="576" y="36" style="font-size:12px">PROPERTIES</text>
+              <g class="lbl" style="font-size:11px"><text x="576" y="62">Position</text><text x="576" y="98">Rotation</text><text x="576" y="134">Time of day</text><text x="576" y="170">Lights · Lux</text><text x="576" y="206">Skybox</text></g>
+              <g fill="#d6cbb0"><rect x="576" y="68" width="118" height="10"/><rect x="576" y="104" width="118" height="10"/><rect x="576" y="140" width="118" height="10"/><rect x="576" y="176" width="118" height="10"/><rect x="576" y="212" width="118" height="10"/></g>
+              <text class="ttl" x="26" y="282">INVENTORY · TIMELINE</text>
+              <g fill="#d6cbb0"><rect x="26" y="294" width="90" height="16"/><rect x="26" y="316" width="90" height="16"/><rect x="26" y="338" width="90" height="16"/></g>
+              <g fill="#f7f1e3" stroke="#1f1b16" stroke-width="2"><rect x="130" y="294" width="54" height="58"/><rect x="194" y="294" width="54" height="58"/><rect x="258" y="294" width="54" height="58"/><rect x="322" y="294" width="54" height="58"/><rect x="386" y="294" width="54" height="58"/></g>
+              <g stroke="#1d6a66" stroke-width="5"><line x1="460" y1="306" x2="560" y2="306"/><line x1="500" y1="324" x2="680" y2="324"/><line x1="470" y1="342" x2="610" y2="342"/></g>
+              <line x1="590" y1="292" x2="590" y2="354" stroke="#c8402a" stroke-width="2.5"/>
+              <g class="lblc" style="font-size:12px"><text x="466" y="374">Timeline: rebuilt</text><text x="130" y="374">Asset Manager</text><text x="576" y="244">Custom attributes</text></g>
+            </svg>
+            <figcaption>Schematic of the tool's layout, not a screenshot. Red labels mark the parts I built: hierarchy, properties, asset manager, timeline, and the UI around them.</figcaption>
+          </figure>
+
+          <div class="boss">
+            <p class="hp">Boss fight <i></i> <em>Cleared</em></p>
+            <h3>Hands that grip, from any direction</h3>
+            <p>Automatic finger and hand placement on imported rigged characters had been <strong>open on the project for over a year</strong>. I solved it with math rather than raycasts: the solver reads the object's shape from its surface tangents, spaces each finger joint's target along the surface according to the model's bone structure, and follows the object's rotation. Those computed positions and rotations drive IK through Unity's <strong>Animation Rigging</strong> package, in real time.</p>
+            <svg class="hand-anim" viewBox="0 0 320 110" width="100%" style="max-width:420px;margin-top:14px;display:block" aria-hidden="true">
+              <g stroke="#1f1b16" stroke-width="3" fill="none" stroke-linecap="round">
+                <path d="M30 90 L80 70 L120 60"/><path d="M120 60 L160 40 L190 34"/><path d="M120 60 L166 56 L198 56"/><path d="M120 60 L164 70 L194 76"/><path d="M120 60 L156 82 L180 94"/>
+              </g>
+              <rect x="200" y="20" width="24" height="86" rx="12" fill="#efe6d2" stroke="#1f1b16" stroke-width="2.5"/>
+              <g fill="#c8402a" stroke="#1f1b16" stroke-width="1.5">
+                <circle class="j" cx="190" cy="34" r="5" style="--dx:-18px;--dy:-14px"/>
+                <circle class="j" cx="198" cy="56" r="5" style="--dx:-22px;--dy:4px"/>
+                <circle class="j" cx="194" cy="76" r="5" style="--dx:-20px;--dy:12px"/>
+                <circle class="j" cx="180" cy="94" r="5" style="--dx:-16px;--dy:-6px"/>
+              </g>
+              <circle cx="120" cy="60" r="6" fill="#1f1b16"/>
+            </svg>
+          </div>
+
+          <div class="abilities">
+            <article class="ability">
+              <h3><span class="k">TOOL</span>A better timeline</h3>
+              <p>Rebuilt the Timeline system with a horizontal layout, finer timestep control, and a more stable sequencing model.</p>
+            </article>
+            <article class="ability">
+              <h3><span class="k">SYS</span>Core modules</h3>
+              <p>Built the Asset Manager, UI, and Graphics modules, including the in-app hierarchy panel.</p>
+            </article>
+            <article class="ability wide">
+              <h3><span class="k">C#</span>Properties, editable</h3>
+              <p>Built custom C# property attributes that expose object properties as editable fields in the application's UI.</p>
+            </article>
+          </div>
+
+          <div class="confidential">
+            <span class="stamp">CONFIDENTIAL</span>
+            <p>Unreleased and confidential, so this page uses schematics instead of screenshots.</p>
+          </div>
+        </div>
+      </div>
+      <p class="onward"><a href="#pongz">Path continues · Level 3</a></p>
+    </div>
+  </section>
+
+  <!-- ===================== LEVEL 3: PONGZ ===================== -->
+  <section id="pongz" class="level-page" aria-labelledby="pongz-title">
+    <div class="wrap">
+      <div class="lp-head">
+        <span class="lp-num" aria-hidden="true">3</span>
+        <p class="eyebrow">Level 3 · Roothoot · Live mobile game</p>
         <h2 id="pongz-title">Pongz – SG Mahjong</h2>
-        <p class="tag">Live on both stores, played by about 3,400 people a day.</p>
-        <p class="lede">A live, real-time multiplayer Mahjong game for iOS and Android. I designed and built its core client-side architecture and its entire UI.</p>
+        <div>
+          <p class="tag">Live on both stores, played by about 3,400 people a day.</p>
+          <p class="lede" style="margin-top:10px">A live, real-time multiplayer Mahjong game for iOS and Android. I designed and built its core client-side architecture and its entire UI.</p>
+        </div>
       </div>
-      <div class="case-body">
-        <aside class="sheet" aria-label="Pongz stat sheet">
+      <div class="lp-body">
+        <aside class="sheet panel" aria-label="Pongz stat sheet">
           <h3>Stat sheet</h3>
           <dl>
             <dt>Role</dt><dd>Unity Game Developer</dd>
@@ -393,11 +724,11 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
             <dt>Stack</dt><dd>Unity, C#, Socket.IO, Spine, Addressables, UGUI, TextMeshPro</dd>
           </dl>
           <div class="stores">
-            <a class="store" href="https://play.google.com/store/apps/details?id=com.pixelstackstudios.pongz" target="_blank" rel="noopener">
+            <a class="btn btn-teal" href="https://play.google.com/store/apps/details?id=com.pixelstackstudios.pongz" target="_blank" rel="noopener">
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 2.5v19l10-9.5L4 2.5zm11.4 10.8 2.6 2.5-11 6.2 8.4-8.7zm0-2.6L7 2l11 6.2-2.6 2.5zm4.7.2L22 12l-2 1.1-2.8-2.6 2.9-.6z"/></svg>
               Google Play
             </a>
-            <a class="store" href="https://apps.apple.com/in/app/pongz-sg-mahjong/id6755418562" target="_blank" rel="noopener">
+            <a class="btn btn-teal" href="https://apps.apple.com/in/app/pongz-sg-mahjong/id6755418562" target="_blank" rel="noopener">
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.7-1-2.7-4.1zM13.9 5c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.3 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5z"/></svg>
               App Store
             </a>
@@ -406,11 +737,11 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
 
         <div class="content">
           <figure class="frame">
-            <video src="assets/pongz-gameplay.mp4" poster="assets/pongz-gameplay-poster.jpg" muted autoplay loop playsinline preload="metadata" aria-label="Pongz gameplay: the final turns of a ranked hand through to the win screen"></video>
+            <video id="pongz-video" src="assets/pongz-gameplay.mp4" poster="assets/pongz-gameplay-poster.jpg" muted autoplay loop playsinline preload="metadata" aria-label="Pongz gameplay: the final turns of a ranked hand through to the win screen"></video>
             <figcaption>Ranked match, final turns of the hand through to the win screen.</figcaption>
           </figure>
 
-          <div class="boss-fight">
+          <div class="boss">
             <p class="hp">Boss fight <i></i> <em>Cleared</em></p>
             <h3>AI Practice Mode, built end to end</h3>
             <p>Designed and built an offline bot-opponent mode <strong>end to end</strong>: turn-based decision logic for the bots and the full gameplay flow around them, so a player can practice a complete game with no one else online.</p>
@@ -449,243 +780,66 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
             <b>Credits</b>
             <p>Built at Roothoot Private Limited as client work for Pixel Stack Studios, who own the game. Server-side netcode and the rank-point calculation were my teammates' work; I built the client that talks to them.</p>
           </div>
-          <div class="egg-slot"><button class="egg" data-egg="pongz" aria-label="Hidden collectible">中</button></div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- ===================== CHARACTER CREATOR ===================== -->
-  <section id="character-creator" class="case coral" aria-labelledby="cc-title">
-    <div class="wrap">
-      <div class="case-head">
-        <p class="eyebrow">Project 02 · Windows 3D tool · Led development</p>
-        <h2 id="cc-title">Character Creator</h2>
-        <p class="tag">Photoreal humans from sliders, and an export pipeline made 50x faster.</p>
-        <p class="lede">A photorealistic character creation tool for Windows, built in Unity. Users shape a realistic human head to toe in real time, from facial structure and body shape to skin, hair, and clothing. I led development and designed its core architecture.</p>
-      </div>
-      <div class="case-body">
-        <aside class="sheet" aria-label="Character Creator stat sheet">
-          <h3>Stat sheet</h3>
-          <dl>
-            <dt>Role</dt><dd>Unity Developer, led development</dd>
-            <dt>When</dt><dd>2022 – 2024</dd>
-            <dt>Platform</dt><dd>Windows</dd>
-            <dt>Status</dt><dd>Unreleased, confidential</dd>
-            <dt>Stack</dt><dd>Unity, C#, Unity Jobs System, multithreading, 3D math</dd>
-          </dl>
-        </aside>
-        <div class="content">
-          <figure class="schematic">
-            <svg viewBox="0 0 720 360" role="img" aria-labelledby="cc-svg-t">
-              <title id="cc-svg-t">Schematic of a character creator: a panel of sliders on the left driving a 3D head and body in the viewport</title>
-              <rect x="0" y="0" width="720" height="360" fill="#0e1017"/>
-              <rect x="16" y="16" width="230" height="328" rx="8" fill="#1a1d29" stroke="#2e3348"/>
-              <text class="ttl" x="32" y="42">FACE · BODY · SKIN · HAIR · CLOTHES</text>
-              <g class="lbl">
-                <text x="32" y="78">Jaw width</text><text x="32" y="120">Cheekbones</text><text x="32" y="162">Nose bridge</text><text x="32" y="204">Shoulders</text><text x="32" y="246">Body mass</text><text x="32" y="288">Skin tone</text>
-              </g>
-              <g stroke="#2e3348" stroke-width="4" stroke-linecap="round">
-                <line x1="32" y1="92" x2="228" y2="92"/><line x1="32" y1="134" x2="228" y2="134"/><line x1="32" y1="176" x2="228" y2="176"/><line x1="32" y1="218" x2="228" y2="218"/><line x1="32" y1="260" x2="228" y2="260"/><line x1="32" y1="302" x2="228" y2="302"/>
-              </g>
-              <g stroke="#ff7a5c" stroke-width="4" stroke-linecap="round">
-                <line x1="32" y1="92" x2="150" y2="92"/><line x1="32" y1="134" x2="186" y2="134"/><line x1="32" y1="176" x2="96" y2="176"/><line x1="32" y1="218" x2="170" y2="218"/><line x1="32" y1="260" x2="120" y2="260"/><line x1="32" y1="302" x2="200" y2="302"/>
-              </g>
-              <g fill="#ecebf3"><circle cx="150" cy="92" r="7"/><circle cx="186" cy="134" r="7"/><circle cx="96" cy="176" r="7"/><circle cx="170" cy="218" r="7"/><circle cx="120" cy="260" r="7"/><circle cx="200" cy="302" r="7"/></g>
-              <g fill="none" stroke="#ecebf3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".9">
-                <path d="M486 64c-34 0-56 28-56 66 0 44 26 78 56 78s56-34 56-78c0-38-22-66-56-66z"/>
-                <path d="M462 120h14M496 120h14M486 128v26l-8 6M472 176c8 6 20 6 28 0"/>
-                <path d="M452 200l-6 30M520 200l6 30"/>
-                <path d="M446 230c-60 10-100 30-118 110M526 230c60 10 100 30 118 110"/>
-              </g>
-              <g fill="none" stroke="#ff7a5c" stroke-width="1.5" stroke-dasharray="4 5" opacity=".8">
-                <path d="M412 130h-30M560 130h30M486 46v-16"/>
-              </g>
-              <path d="M250 180h80" stroke="#ff7a5c" stroke-width="2" stroke-dasharray="6 6"/>
-              <path d="M330 180l-10-6v12z" fill="#ff7a5c"/>
-              <text class="lblc" x="440" y="340">real-time preview</text>
-            </svg>
-            <figcaption>Schematic, not a screenshot. The real tool is confidential, so this shows the idea: sliders on one side, a photoreal human on the other.</figcaption>
-          </figure>
-
-          <div class="boss-fight">
-            <p class="hp">Boss fight <i></i> <em>Cleared</em></p>
-            <h3>50x faster character exports</h3>
-            <p>Every character starts from a base model that ships with many 4K textures, several of them layered for effects, such as multiple normal maps. On export, the tool has to bake the model and keep only the textures this character actually uses, each merged into a single map. Shaders can't hand back that final texture, so the merge runs on the CPU.</p>
-            <p style="margin-top:10px">I built it both ways. The first version used the classic path: read pixels, copy the texture, multiply on one thread, apply. The second <strong>rebuilt the merge on the Unity Jobs System</strong>, running the per-pixel math across cores on pixel data in NativeArrays with no texture copies. I chose the Jobs version for the export path, and it <strong>raised export throughput 50x</strong>.</p>
-          </div>
-
-          <div class="speed" aria-label="Export throughput, relative">
-            <div class="row"><span>One thread</span><span class="bar"><i style="width:2%"></i></span><b>1x</b></div>
-            <div class="row"><span>Jobs System</span><span class="bar"><i style="width:100%"></i></span><b>50x</b></div>
-            <small>Character export throughput, relative to the original pipeline. Bars drawn to scale.</small>
-          </div>
-
-          <div class="abilities">
-            <article class="ability">
-              <h3><span class="k">LEAD</span>Ran development</h3>
-              <p>Led development and designed the core architecture. Planned the work from client requirements, ran client calls, assigned tasks to teammates, and made technical decisions with the design team, while writing code myself.</p>
-            </article>
-            <article class="ability">
-              <h3><span class="k">3D</span>Face and body structure</h3>
-              <p>Built the customizable facial and body structure systems behind photorealistic character generation.</p>
-            </article>
-          </div>
-
-          <div class="confidential">
-            <span class="stamp">CONFIDENTIAL</span>
-            <p>Unreleased and confidential, so this page uses schematics instead of screenshots. I can walk through the implementation in an interview.</p>
-          </div>
-          <div class="egg-slot"><button class="egg" data-egg="cc" aria-label="Hidden collectible"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="8" x2="14" y2="8"/><circle cx="9" cy="8" r="2.5" fill="currentColor"/></svg></button></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== MOVIE STUDIO 3D ===================== -->
-  <section id="movie-studio" class="case amber" aria-labelledby="ms-title">
-    <div class="wrap">
-      <div class="case-head">
-        <p class="eyebrow">Project 03 · Windows 3D tool</p>
-        <h2 id="ms-title">Movie Studio 3D</h2>
-        <p class="tag">Real-time hand placement on imported characters, solved after a year open.</p>
-        <p class="lede">A Windows tool for composing and previewing 3D scenes, built in Unity. It works like a small game editor inside the app: a scene hierarchy, a properties panel with lighting and time of day, an asset inventory, cameras, and a timeline. I built several of its core modules.</p>
-      </div>
-      <div class="case-body">
-        <aside class="sheet" aria-label="Movie Studio 3D stat sheet">
-          <h3>Stat sheet</h3>
-          <dl>
-            <dt>Role</dt><dd>Unity Developer</dd>
-            <dt>When</dt><dd>2022 – 2024</dd>
-            <dt>Platform</dt><dd>Windows</dd>
-            <dt>Status</dt><dd>Unreleased; development halted in 2024</dd>
-            <dt>Stack</dt><dd>Unity, C#, 3D math, UGUI</dd>
-          </dl>
-        </aside>
-        <div class="content">
-          <figure class="schematic">
-            <svg viewBox="0 0 720 380" role="img" aria-labelledby="ms-svg-t">
-              <title id="ms-svg-t">Schematic of the scene tool layout: hierarchy, 3D viewport, properties panel, asset inventory and timeline</title>
-              <rect width="720" height="380" fill="#0e1017"/>
-              <rect x="14" y="14" width="140" height="236" rx="6" fill="#1a1d29" stroke="#2e3348"/>
-              <text class="ttl" x="26" y="36" style="fill:#ffc145">HIERARCHY</text>
-              <g fill="#2e3348"><rect x="26" y="50" width="100" height="8" rx="3"/><rect x="38" y="66" width="90" height="8" rx="3"/><rect x="38" y="82" width="70" height="8" rx="3"/><rect x="50" y="98" width="80" height="8" rx="3"/><rect x="50" y="114" width="60" height="8" rx="3"/><rect x="38" y="130" width="96" height="8" rx="3"/><rect x="26" y="146" width="84" height="8" rx="3"/></g>
-              <rect x="164" y="14" width="390" height="236" rx="6" fill="#1b2233" stroke="#2e3348"/>
-              <text class="ttl" x="176" y="36">SCENE</text>
-              <path d="M164 210 L260 150 L330 190 L420 130 L554 210 V250 H164Z" fill="#232a3d"/>
-              <g stroke="#ffc145" stroke-width="2" fill="none"><path d="M330 200 v-34 l10 -6"/><circle cx="330" cy="150" r="10"/><path d="M314 186 l16 -14 l16 14"/></g>
-              <g stroke="#ecebf3" stroke-width="1.5" opacity=".6"><line x1="420" y1="96" x2="460" y2="96"/><line x1="420" y1="96" x2="420" y2="56"/><line x1="420" y1="96" x2="396" y2="118"/></g>
-              <rect x="564" y="14" width="142" height="236" rx="6" fill="#1a1d29" stroke="#2e3348"/>
-              <text class="ttl" x="576" y="36" style="fill:#ffc145">PROPERTIES</text>
-              <g class="lbl" style="font-size:11px"><text x="576" y="62">Position</text><text x="576" y="98">Rotation</text><text x="576" y="134">Time of day</text><text x="576" y="170">Lights · Lux</text><text x="576" y="206">Skybox</text></g>
-              <g fill="#2e3348"><rect x="576" y="68" width="118" height="10" rx="3"/><rect x="576" y="104" width="118" height="10" rx="3"/><rect x="576" y="140" width="118" height="10" rx="3"/><rect x="576" y="176" width="118" height="10" rx="3"/><rect x="576" y="212" width="118" height="10" rx="3"/></g>
-              <rect x="14" y="260" width="692" height="106" rx="6" fill="#1a1d29" stroke="#2e3348"/>
-              <text class="ttl" x="26" y="282">INVENTORY · TIMELINE</text>
-              <g fill="#2e3348"><rect x="26" y="294" width="90" height="16" rx="3"/><rect x="26" y="316" width="90" height="16" rx="3"/><rect x="26" y="338" width="90" height="16" rx="3"/></g>
-              <g fill="#232a3d" stroke="#2e3348"><rect x="130" y="294" width="54" height="58" rx="5"/><rect x="194" y="294" width="54" height="58" rx="5"/><rect x="258" y="294" width="54" height="58" rx="5"/><rect x="322" y="294" width="54" height="58" rx="5"/><rect x="386" y="294" width="54" height="58" rx="5"/></g>
-              <g stroke="#ffc145" stroke-width="3" stroke-linecap="round"><line x1="460" y1="306" x2="560" y2="306"/><line x1="500" y1="324" x2="680" y2="324"/><line x1="470" y1="342" x2="610" y2="342"/></g>
-              <line x1="590" y1="292" x2="590" y2="356" stroke="#ff7a5c" stroke-width="2"/>
-              <g class="lblc" style="font-size:12px"><text x="466" y="372" fill="#ffc145">Timeline: rebuilt</text><text x="130" y="372">Asset Manager</text><text x="576" y="244">Custom attributes</text></g>
-            </svg>
-            <figcaption>Schematic of the tool's layout, not a screenshot. Highlighted labels mark the parts I built: hierarchy, properties, asset manager, timeline, and the UI around them.</figcaption>
-          </figure>
-
-          <div class="boss-fight">
-            <p class="hp">Boss fight <i></i> <em>Cleared</em></p>
-            <h3>Hands that grip, from any direction</h3>
-            <p>Automatic finger and hand placement on imported rigged characters had been <strong>open on the project for over a year</strong>. I solved it with math rather than raycasts: the solver reads the object's shape from its surface tangents, spaces each finger joint's target along the surface according to the model's bone structure, and follows the object's rotation. Those computed positions and rotations drive IK through Unity's <strong>Animation Rigging</strong> package, in real time.</p>
-            <svg class="hand-anim" viewBox="0 0 320 110" width="100%" style="max-width:420px;margin-top:14px;display:block" aria-hidden="true">
-              <g stroke="#2e3348" stroke-width="3" fill="none" stroke-linecap="round">
-                <path d="M30 90 L80 70 L120 60"/><path d="M120 60 L160 40 L190 34"/><path d="M120 60 L166 56 L198 56"/><path d="M120 60 L164 70 L194 76"/><path d="M120 60 L156 82 L180 94"/>
-              </g>
-              <rect x="200" y="20" width="24" height="86" rx="12" fill="#232a3d" stroke="#ffc145" stroke-width="2"/>
-              <g fill="#ffc145">
-                <circle class="j" cx="190" cy="34" r="5" style="--dx:-18px;--dy:-14px"/>
-                <circle class="j" cx="198" cy="56" r="5" style="--dx:-22px;--dy:4px"/>
-                <circle class="j" cx="194" cy="76" r="5" style="--dx:-20px;--dy:12px"/>
-                <circle class="j" cx="180" cy="94" r="5" style="--dx:-16px;--dy:-6px"/>
-              </g>
-              <circle cx="120" cy="60" r="6" fill="#ecebf3"/>
-            </svg>
-          </div>
-
-          <div class="abilities">
-            <article class="ability">
-              <h3><span class="k">TOOL</span>A better timeline</h3>
-              <p>Rebuilt the Timeline system with a horizontal layout, finer timestep control, and a more stable sequencing model.</p>
-            </article>
-            <article class="ability">
-              <h3><span class="k">SYS</span>Core modules</h3>
-              <p>Built the Asset Manager, UI, and Graphics modules, including the in-app hierarchy panel.</p>
-            </article>
-            <article class="ability wide">
-              <h3><span class="k">C#</span>Properties, editable</h3>
-              <p>Built custom C# property attributes that expose object properties as editable fields in the application's UI.</p>
-            </article>
-          </div>
-
-          <div class="confidential">
-            <span class="stamp">CONFIDENTIAL</span>
-            <p>Unreleased and confidential, so this page uses schematics instead of screenshots.</p>
-          </div>
-          <div class="egg-slot"><button class="egg" data-egg="ms" aria-label="Hidden collectible"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 6h12v8H2zM2 6l1-4h11v4"/></svg></button></div>
-        </div>
-      </div>
+      <p class="onward"><a href="#tools">Side quests</a></p>
     </div>
   </section>
 
   <!-- ===================== SIDE QUESTS ===================== -->
-  <section id="tools" class="case amber" aria-labelledby="tools-title">
+  <section id="tools" class="level-page" aria-labelledby="tools-title">
     <div class="wrap">
       <div class="sec-head">
         <p class="eyebrow">Side quests</p>
         <h2 id="tools-title">Smaller tools</h2>
       </div>
       <div class="quests">
-        <article class="quest">
-          <span class="ico" aria-hidden="true">⌖</span>
-          <div><h3>Passthrough raycaster</h3><p>An invisible UI element that registers input without blocking raycasts to the 3D objects behind it.</p></div>
+        <article class="scroll">
+          <span class="ico" aria-hidden="true"><svg viewBox="0 0 26 26" fill="none" stroke="#1f1b16" stroke-width="2.4"><circle cx="13" cy="13" r="8"/><path d="M13 1v7M13 18v7M1 13h7M18 13h7"/><circle cx="13" cy="13" r="2" fill="#c8402a" stroke="none"/></svg></span>
+          <div><p class="q">Side quest</p><h3>Passthrough raycaster</h3><p>An invisible UI element that registers input without blocking raycasts to the 3D objects behind it.</p></div>
         </article>
-        <article class="quest">
+        <article class="scroll">
           <span class="ico" aria-hidden="true">Aa</span>
-          <div><h3>UI text extractor</h3><p>A Unity editor tool to extract and manage in-project UI text.</p></div>
+          <div><p class="q">Side quest</p><h3>UI text extractor</h3><p>A Unity editor tool to extract and manage in-project UI text.</p></div>
         </article>
       </div>
     </div>
   </section>
 
-  <!-- ===================== EXPERIENCE ===================== -->
-  <section id="experience" class="case" aria-labelledby="exp-title">
+  <!-- ===================== EXPERIENCE: THE ROUTE ===================== -->
+  <section id="experience" class="level-page" aria-labelledby="exp-title">
     <div class="wrap">
       <div class="sec-head">
-        <p class="eyebrow">Experience</p>
+        <p class="eyebrow">The route so far</p>
         <h2 id="exp-title">Where the years went</h2>
       </div>
-      <div class="timeline">
-        <article class="job jade">
-          <p class="when"><b>2025 – 26</b>Mar 2025 – Jun 2026</p>
-          <div>
-            <h3>Unity Game Developer</h3>
-            <p class="co">Roothoot Private Limited · Hyderabad · client work for Pixel Stack Studios</p>
-            <p>Pongz – SG Mahjong, live on iOS and Android.</p>
-            <span class="dur" style="width:55%" aria-hidden="true"><i style="width:100%"></i></span>
-          </div>
-        </article>
-        <article class="job coral">
+      <ol class="route">
+        <li class="stop panel" data-n="A">
           <p class="when"><b>2022 – 24</b>Jun 2022 – Oct 2024</p>
           <div>
             <h3>Unity Developer</h3>
             <p class="co">Live Deftsoft Informatics Pvt. Ltd. · Mohali</p>
             <p>Character Creator (led development) and Movie Studio 3D, plus editor tooling. About 2 years 4 months, the larger share of my experience.</p>
-            <span class="dur" style="width:100%" aria-hidden="true"><i style="width:100%"></i></span>
+            <p class="levels">Levels 1 and 2</p>
+            <span class="dur" aria-hidden="true"><i style="width:100%"></i></span>
           </div>
-        </article>
-      </div>
+        </li>
+        <li class="stop panel" data-n="B">
+          <p class="when"><b>2025 – 26</b>Mar 2025 – Jun 2026</p>
+          <div>
+            <h3>Unity Game Developer</h3>
+            <p class="co">Roothoot Private Limited · Hyderabad · client work for Pixel Stack Studios</p>
+            <p>Pongz – SG Mahjong, live on iOS and Android.</p>
+            <p class="levels">Level 3</p>
+            <span class="dur" aria-hidden="true" style="width:55%"><i style="width:100%"></i></span>
+          </div>
+        </li>
+      </ol>
     </div>
   </section>
 
-  <!-- ===================== ABOUT ===================== -->
-  <section id="about" class="about case coral" aria-labelledby="about-title">
+  <!-- ===================== ABOUT + INVENTORY ===================== -->
+  <section id="about" class="about level-page" aria-labelledby="about-title">
     <div class="wrap">
       <div>
         <div class="sec-head">
@@ -697,29 +851,33 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
           <p>I spent two years building Windows 3D tools in Unity, including a character creator I led development on, then moved to mobile and helped ship Pongz – SG Mahjong to both app stores. I work directly with artists, animators, sound engineers, and clients, and I like problems that need math as much as code.</p>
         </div>
       </div>
-      <div class="inv">
-        <div class="sec-head" style="margin-bottom:0"><p class="eyebrow">Inventory</p><h2 style="font-size:var(--step-2)">Equipped skills</h2></div>
-        <div><h3>Core</h3><ul class="slots"><li class="slot rare">Unity</li><li class="slot rare">C#</li><li class="slot">Client architecture</li><li class="slot">Gameplay systems</li></ul></div>
-        <div><h3>AI, multiplayer, UI</h3><ul class="slots"><li class="slot">Bot opponent AI</li><li class="slot">Socket.IO (client)</li><li class="slot">UGUI / TextMeshPro</li><li class="slot">Tutorials &amp; onboarding</li><li class="slot">Localization</li></ul></div>
-        <div><h3>3D, animation, tools</h3><ul class="slots"><li class="slot">3D math</li><li class="slot">Spine 2D</li><li class="slot">Unity Timeline</li><li class="slot">Animation Rigging (IK)</li><li class="slot">Texture baking</li><li class="slot">Editor tooling</li><li class="slot">Custom C# attributes</li></ul></div>
-        <div><h3>Performance</h3><ul class="slots"><li class="slot">Unity Jobs System</li><li class="slot">Multithreading</li><li class="slot">NativeArray</li><li class="slot">Unity Profiler</li><li class="slot">Addressables</li><li class="slot">URP / HDRP</li></ul></div>
-        <div><h3>Platforms</h3><ul class="slots"><li class="slot">Android</li><li class="slot">iOS</li><li class="slot">Windows</li></ul></div>
+      <div class="inv panel">
+        <div><p class="eyebrow">Inventory</p><h3 style="font-family:var(--f-display);font-weight:400;font-size:var(--step-2);margin-top:4px">Equipped skills</h3></div>
+        <div><h4>Core</h4><ul class="slots"><li class="slot rare">Unity</li><li class="slot rare">C#</li><li class="slot">Client architecture</li><li class="slot">Gameplay systems</li></ul></div>
+        <div><h4>AI, multiplayer, UI</h4><ul class="slots"><li class="slot">Bot opponent AI</li><li class="slot">Socket.IO (client)</li><li class="slot">UGUI / TextMeshPro</li><li class="slot">Tutorials &amp; onboarding</li><li class="slot">Localization</li></ul></div>
+        <div><h4>3D, animation, tools</h4><ul class="slots"><li class="slot">3D math</li><li class="slot">Spine 2D</li><li class="slot">Unity Timeline</li><li class="slot">Animation Rigging (IK)</li><li class="slot">Texture baking</li><li class="slot">Editor tooling</li><li class="slot">Custom C# attributes</li></ul></div>
+        <div><h4>Performance</h4><ul class="slots"><li class="slot">Unity Jobs System</li><li class="slot">Multithreading</li><li class="slot">NativeArray</li><li class="slot">Unity Profiler</li><li class="slot">Addressables</li><li class="slot">URP / HDRP</li></ul></div>
+        <div><h4>Platforms</h4><ul class="slots"><li class="slot">Android</li><li class="slot">iOS</li><li class="slot">Windows</li></ul></div>
       </div>
     </div>
   </section>
 
-  <!-- ===================== CONTACT ===================== -->
-  <section id="contact" class="contact case" aria-labelledby="contact-title">
+  <!-- ===================== CONTACT: LEVEL 4 ===================== -->
+  <section id="contact" class="contact level-page" aria-labelledby="contact-title">
     <div class="wrap">
-      <p class="cont">Continue?</p>
-      <h2 id="contact-title">Hiring a Unity developer? Let's talk.</h2>
-      <div class="contact-row">
-        <span class="email-box"><code id="email">gautamc3080@gmail.com</code><button type="button" id="copy-email">Copy</button></span>
-        <a class="btn btn-primary" href="mailto:gautamc3080@gmail.com">Email me</a>
-        <a class="btn btn-ghost" href="https://linkedin.com/in/gautam-chaudhary-g3080" target="_blank" rel="noopener">LinkedIn</a>
-        <a class="btn btn-ghost" href="assets/Gautam_Resume.pdf" download="Gautam_Resume.pdf">Download resume</a>
+      <div class="lock-panel panel">
+        <span class="lvl-n" aria-hidden="true"><svg viewBox="0 0 30 30" fill="none" stroke="#1f1b16" stroke-width="2.6"><path d="M9 13V9a6 6 0 0 1 12 0v4"/><rect x="6" y="13" width="18" height="13" fill="#c8402a"/></svg></span>
+        <p class="eyebrow">Level 4 · Your studio · Locked</p>
+        <h2 id="contact-title">Hiring a Unity developer? Let's talk.</h2>
+        <p class="unlock">Unlocks when you send an email.</p>
+        <div class="contact-row">
+          <span class="email-box"><code id="email">gautamc3080@gmail.com</code><button type="button" id="copy-email">Copy</button></span>
+          <a class="btn btn-primary" href="mailto:gautamc3080@gmail.com">Email me</a>
+          <a class="btn" href="https://linkedin.com/in/gautam-chaudhary-g3080" target="_blank" rel="noopener">LinkedIn</a>
+          <a class="btn" href="assets/Gautam_Resume.pdf" download="Gautam_Resume.pdf">Download resume</a>
+        </div>
+        <p class="meta">Mumbai, India · Available immediately</p>
       </div>
-      <p class="meta">Mumbai, India · Available immediately</p>
     </div>
   </section>
 </main>
@@ -727,39 +885,109 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
 <footer>
   <div class="wrap">
     <span>© 2026 Gautam · Unity Game Developer</span>
-    <span>One collectible hides in each project.</span>
+    <span>Map and 3D built for this site; the project work described is Gautam's.</span>
   </div>
 </footer>
 
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-
 <script>
-(function () {
-  // Collectibles: one hidden in each project.
-  var names = { pongz: "a Mahjong tile", cc: "a face slider", ms: "a clapperboard" };
-  var found = {};
-  var toast = document.getElementById("toast");
-  var counter = document.getElementById("counter");
-  var timer;
-  function say(msg, win) {
-    toast.textContent = msg;
-    toast.classList.toggle("win", !!win);
-    toast.classList.add("show");
-    clearTimeout(timer);
-    timer = setTimeout(function () { toast.classList.remove("show"); }, win ? 4500 : 2600);
+/* Level select state, shared by the 3D map and the SVG fallback. */
+window.MapUI = (function () {
+  var LEVELS = [
+    { n: 1, href: "#character-creator", title: "Character Creator", meta: "Level 1 · Deftsoft · 2022–24 · Unreleased",
+      chip: '<span class="chip nda">Cleared · NDA</span>',
+      desc: "Photorealistic humans shaped head to toe in real time. A Windows 3D tool; I led development.",
+      boss: "Merging 4K textures on export, 50x faster", enter: "Enter level ↓" },
+    { n: 2, href: "#movie-studio", title: "Movie Studio 3D", meta: "Level 2 · Deftsoft · 2022–24 · Unreleased",
+      chip: '<span class="chip nda">Cleared · NDA</span>',
+      desc: "Compose and preview 3D scenes: assets, lighting, cameras, a timeline. A Windows 3D tool.",
+      boss: "IK hand placement, open for over a year", enter: "Enter level ↓" },
+    { n: 3, href: "#pongz", title: "Pongz – SG Mahjong", meta: "Level 3 · Roothoot · 2025–26",
+      chip: '<span class="chip live">Live · 40K+ downloads</span>',
+      desc: "Real-time multiplayer Mahjong for iOS and Android. Client architecture, bot opponents, the full UI.",
+      boss: "Offline bot opponents for a full game", enter: "Enter level ↓" },
+    { n: 4, href: "#contact", title: "Your studio", meta: "Level 4 · Uncharted", locked: true,
+      chip: '<span class="chip locked">Locked</span>',
+      desc: "Unlocks when you send an email. Based in Mumbai, available immediately.",
+      boss: "Yours to name", enter: "Send an email ↓" }
+  ];
+  var map = document.getElementById("map");
+  var cur = 2, hooks = [];
+  var $ = function (id) { return document.getElementById(id); };
+  var card = $("level-card");
+
+  function render() {
+    var L = LEVELS[cur];
+    $("lc-n").textContent = L.n;
+    $("lc-meta").textContent = L.meta;
+    $("lc-title").textContent = L.title;
+    $("lc-status").innerHTML = L.chip;
+    $("lc-desc").textContent = L.desc;
+    $("lc-boss").textContent = L.boss;
+    var enter = $("lc-enter");
+    enter.href = L.href; enter.textContent = L.enter;
+    card.classList.toggle("is-locked", !!L.locked);
+    document.querySelectorAll("[data-level]").forEach(function (el) {
+      var on = +el.dataset.level === cur;
+      if (el.tagName === "BUTTON" && el.closest(".level-list")) el.setAttribute("aria-pressed", on ? "true" : "false");
+      el.classList.toggle("is-current", on);
+    });
   }
-  document.querySelectorAll("[data-egg]").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var id = btn.dataset.egg;
-      if (found[id]) return;
-      found[id] = true;
-      btn.classList.add("found");
-      var n = Object.keys(found).length;
-      counter.textContent = "★ " + n + "/3";
-      if (n === 3) say("Full set. You found one in every project.", true);
-      else say("You found " + names[id] + ". " + (3 - n) + " to go.");
+  function select(i, animate) {
+    i = (i + LEVELS.length) % LEVELS.length;
+    var changed = i !== cur;
+    cur = i; render();
+    hooks.forEach(function (h) { h(cur, animate !== false && changed); });
+  }
+  function bindLevelEl(el) {
+    el.addEventListener("click", function (e) { e.preventDefault(); select(+el.dataset.level); });
+  }
+  document.querySelectorAll(".level-list [data-level], .fb-node").forEach(bindLevelEl);
+  $("prev").addEventListener("click", function () { select(cur - 1); });
+  $("next").addEventListener("click", function () { select(cur + 1); });
+  map.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); select(cur + 1); }
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); select(cur - 1); }
+    else if (e.key === "Enter" && e.target === map) { e.preventDefault(); location.hash = LEVELS[cur].href; }
+  });
+
+  // SVG fallback pin follows the current level.
+  hooks.push(function (i) {
+    document.querySelectorAll(".fb-pin").forEach(function (pin) {
+      var p = JSON.parse(pin.dataset.stops)[i];
+      pin.setAttribute("transform", "translate(" + p[0] + " " + p[1] + ")");
+      pin.style.transform = "translate(" + p[0] + "px," + p[1] + "px)";
     });
   });
+
+  hooks[0](cur);
+
+  var settled = false;
+  var timer = setTimeout(function () { fail("timeout"); }, 9000);
+  function fail(reason) {
+    if (settled) return; settled = true; clearTimeout(timer);
+    map.dataset.state = "fallback";
+    $("map-mode").textContent = "Showing the flat map.";
+    if (window.console && reason !== "timeout") console.info("Map: 3D unavailable (" + reason + "), using the flat map.");
+  }
+  function ready() {
+    if (settled) return false; settled = true; clearTimeout(timer);
+    map.dataset.state = "3d";
+    return true;
+  }
+  render();
+  return {
+    LEVELS: LEVELS, select: select, bindLevelEl: bindLevelEl, fail: fail, ready: ready,
+    get current() { return cur; },
+    onSelect: function (fn) { hooks.push(fn); }
+  };
+})();
+
+(function () {
+  // Reduced motion: don't autoplay the gameplay video.
+  var v = document.getElementById("pongz-video");
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches && v) {
+    v.removeAttribute("autoplay"); v.pause(); v.controls = true;
+  }
 
   // Screenshot lightbox
   document.querySelectorAll("[data-zoom]").forEach(function (b) {
@@ -795,6 +1023,488 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
       }, selectIt);
     } catch (err) { selectIt(); }
   });
+})();
+</script>
+
+<script type="module">
+/* The 3D world map: low-poly islands, ink outlines, a dashed route and a hopping pin.
+   Any failure (no WebGL, CDN blocked) leaves the static SVG map in place. */
+const UI = window.MapUI;
+(async () => {
+  let THREE, Line2, LineGeometry, LineMaterial, LineSegments2, LineSegmentsGeometry;
+  try {
+    THREE = await import("three");
+    [{ Line2 }, { LineGeometry }, { LineMaterial }, { LineSegments2 }, { LineSegmentsGeometry }] = await Promise.all([
+      import("three/addons/lines/Line2.js"), import("three/addons/lines/LineGeometry.js"),
+      import("three/addons/lines/LineMaterial.js"), import("three/addons/lines/LineSegments2.js"),
+      import("three/addons/lines/LineSegmentsGeometry.js")
+    ]);
+  } catch (e) { UI.fail("three.js did not load"); return; }
+  try { build(); } catch (e) { UI.fail(e && e.message || "init"); }
+
+  function build() {
+    const map = document.getElementById("map");
+    const stage = document.getElementById("stage");
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const COL = { paper: 0xf2eadb, paper2: 0xf7f1e3, cliff: 0xcdb98f, beach: 0xe6d6ae, fog: 0xe2ddcf, ink: 0x1f1b16, verm: 0xc8402a, teal: 0x1d6a66, tree: 0x2c7a70 };
+    const TOP = 0.55;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "low-power" });
+    if (!renderer.getContext()) throw new Error("no webgl");
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setClearColor(0xdfe8e2, 1);
+    renderer.domElement.setAttribute("aria-hidden", "true");
+    stage.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.5, 200);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xcfc3a4, 2.3));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.5);
+    sun.position.set(-5, 10, 6);
+    scene.add(sun);
+
+    // ---------- helpers ----------
+    let seed = 7;
+    const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+    const wob = (a, s) => 1 + .1 * Math.sin(3 * a + s) + .06 * Math.sin(5 * a + s * 2.3) + .04 * Math.sin(7 * a + s * .7);
+    const inkLine = new LineMaterial({ color: COL.ink, linewidth: 1.6 });
+    let lineMats = [inkLine];
+    const matCache = {};
+    const mat = (color, o) => {
+      if (!o && matCache[color]) return matCache[color];
+      const m = new THREE.MeshLambertMaterial(Object.assign({ color, flatShading: true, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 }, o || {}));
+      if (!o) matCache[color] = m;
+      return m;
+    };
+    const hullMat = new THREE.MeshBasicMaterial({ color: COL.ink, side: THREE.BackSide });
+    function inked(mesh, thr = 30) {
+      const eg = new THREE.EdgesGeometry(mesh.geometry, thr);
+      const l = new LineSegments2(new LineSegmentsGeometry().fromEdgesGeometry(eg), inkLine);
+      l.raycast = () => {};
+      mesh.add(l);
+      return mesh;
+    }
+    function hulled(mesh, t = 0.07) { // silhouette outline for round shapes
+      const h = new THREE.Mesh(mesh.geometry, hullMat);
+      h.scale.setScalar(1 + t);
+      h.raycast = () => {};
+      mesh.add(h);
+      return mesh;
+    }
+    function jitter(geo, s) {
+      const p = geo.attributes.position;
+      for (let i = 0; i < p.count; i++) {
+        const x = p.getX(i), z = p.getZ(i);
+        if (Math.hypot(x, z) < 1e-4) continue;
+        const k = wob(Math.atan2(z, x), s);
+        p.setX(i, x * k); p.setZ(i, z * k);
+      }
+      geo.computeVertexNormals();
+      return geo;
+    }
+    function canvasTex(w, h, draw) {
+      const c = document.createElement("canvas"); c.width = w; c.height = h;
+      draw(c.getContext("2d"), w, h);
+      const t = new THREE.CanvasTexture(c);
+      t.colorSpace = THREE.SRGBColorSpace;
+      t.anisotropy = 4;
+      return t;
+    }
+
+    // ---------- sea ----------
+    const waveTex = canvasTex(128, 76, (g, w, h) => {
+      g.fillStyle = "#dfe8e2"; g.fillRect(0, 0, w, h);
+      g.strokeStyle = "#b6cac2"; g.lineWidth = 2.6; g.lineCap = "round";
+      const wave = (x, y) => { g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + 7, y - 7, x + 14, y); g.quadraticCurveTo(x + 21, y + 7, x + 28, y); g.stroke(); };
+      wave(8, 20); wave(72, 58);
+    });
+    waveTex.wrapS = waveTex.wrapT = THREE.RepeatWrapping;
+    waveTex.repeat.set(30, 50);
+    const sea = new THREE.Mesh(new THREE.PlaneGeometry(90, 90), new THREE.MeshBasicMaterial({ map: waveTex }));
+    sea.rotation.x = -Math.PI / 2;
+    scene.add(sea);
+
+    // shared textures for landmarks
+    const slateTex = canvasTex(128, 96, (g, w, h) => {
+      g.fillStyle = "#1f1b16"; g.fillRect(0, 0, w, h);
+      g.strokeStyle = "#efe6d2"; g.lineWidth = 4;
+      [30, 56, 80].forEach(y => { g.beginPath(); g.moveTo(12, y); g.lineTo(w - 12, y); g.stroke(); });
+      g.beginPath(); g.moveTo(w / 2, 30); g.lineTo(w / 2, 56); g.stroke();
+    });
+    const stripeTex = canvasTex(128, 24, (g, w, h) => {
+      g.fillStyle = "#f7f1e3"; g.fillRect(0, 0, w, h);
+      g.fillStyle = "#1f1b16";
+      for (let x = -24; x < w; x += 32) { g.beginPath(); g.moveTo(x, h); g.lineTo(x + 16, 0); g.lineTo(x + 32, 0); g.lineTo(x + 16, h); g.fill(); }
+    });
+    const faceTex = canvasTex(128, 96, (g, w, h) => { // a "five of circles" tile face
+      g.fillStyle = "#f7f1e3"; g.fillRect(0, 0, w, h);
+      const dot = (x, y, c) => { g.fillStyle = c; g.beginPath(); g.arc(x, y, 12, 0, Math.PI * 2); g.fill(); g.fillStyle = "#f7f1e3"; g.beginPath(); g.arc(x, y, 5, 0, Math.PI * 2); g.fill(); };
+      dot(34, 26, "#1d6a66"); dot(94, 26, "#1d6a66"); dot(64, 48, "#c8402a"); dot(34, 70, "#1d6a66"); dot(94, 70, "#1d6a66");
+    });
+
+    // ---------- landmarks ----------
+    function makeBust(lm) {
+      const plinth = inked(new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.32, 0.75), mat(COL.teal)));
+      plinth.position.y = 0.16;
+      const chest = inked(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.52, 0.38, 8), mat(COL.paper2)), 25);
+      chest.position.y = 0.51;
+      const neck = inked(new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 0.2, 7), mat(COL.paper2)), 25);
+      neck.position.y = 0.78;
+      const head = hulled(new THREE.Mesh(new THREE.IcosahedronGeometry(0.31, 1), mat(COL.paper2)), 0.08);
+      head.scale.set(0.9, 1.15, 0.95);
+      head.position.y = 1.12;
+      const nose = inked(new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.14, 4).rotateX(Math.PI / 2), mat(COL.paper2)), 20);
+      nose.position.set(0, 1.1, 0.3);
+      lm.add(plinth, chest, neck, head, nose);
+      lm.userData.top = 1.55;
+    }
+    function makeClapper(lm) {
+      const inkM = mat(COL.ink), slateM = mat(0xffffff, { map: slateTex }), stripeM = mat(0xfffffe, { map: stripeTex });
+      const slate = inked(new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.68, 0.14), [inkM, inkM, inkM, inkM, slateM, inkM]));
+      slate.position.y = 0.4;
+      const base = inked(new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.13, 0.15), stripeM));
+      base.position.y = 0.8;
+      const hinge = new THREE.Group();
+      hinge.position.set(-0.5, 0.87, 0);
+      hinge.rotation.z = 0.38;
+      const stick = inked(new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.13, 0.15), stripeM));
+      stick.position.set(0.5, 0.07, 0);
+      hinge.add(stick);
+      const rig = new THREE.Group(); // a small camera rig beside it
+      rig.position.set(0.95, 0, 0.25);
+      for (let k = 0; k < 3; k++) {
+        const leg = inked(new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.9, 5), inkM), 60);
+        const a = k / 3 * Math.PI * 2;
+        leg.position.set(Math.cos(a) * 0.17, 0.42, Math.sin(a) * 0.17);
+        leg.rotation.set(Math.sin(a) * 0.35, 0, -Math.cos(a) * 0.35);
+        rig.add(leg);
+      }
+      const body = inked(new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.28, 0.24), mat(COL.verm)));
+      body.position.y = 1.0;
+      const lens = inked(new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, 0.2, 8).rotateZ(Math.PI / 2), inkM), 40);
+      lens.position.set(0.3, 1.0, 0);
+      const reel = inked(new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.06, 10).rotateX(Math.PI / 2), mat(COL.paper2)), 40);
+      reel.position.set(-0.08, 1.3, 0);
+      const reel2 = reel.clone(); reel2.position.set(0.16, 1.27, 0);
+      rig.add(body, lens, reel, reel2);
+      lm.add(slate, base, hinge, rig);
+      lm.userData.top = 1.55;
+    }
+    function makeTiles(lm) {
+      const ivory = mat(COL.paper2), back = mat(COL.teal), face = mat(0xfffffd, { map: faceTex });
+      for (let k = 0; k < 4; k++) {
+        const t = new THREE.Group();
+        const body = inked(new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.13, 0.6), k === 3 ? [ivory, ivory, face, ivory, ivory, ivory] : ivory));
+        body.position.y = 0.125;
+        const b = inked(new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.06, 0.6), back));
+        b.position.y = 0.03;
+        t.add(body, b);
+        t.position.y = k * 0.19;
+        t.rotation.y = (k % 2 ? 1 : -1) * 0.12 * k;
+        lm.add(t);
+      }
+      const st = new THREE.Group(); // one tile standing on its edge
+      const sb = inked(new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.78, 0.13), [ivory, ivory, ivory, ivory, face, ivory]));
+      const sbk = inked(new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.78, 0.06), back));
+      sbk.position.z = -0.095;
+      st.add(sb, sbk);
+      st.position.set(0.8, 0.39, 0.15);
+      st.rotation.y = -0.35;
+      lm.add(st);
+      lm.userData.top = 1.3;
+    }
+    function makeLock(lm, clouds) {
+      const cm = mat(COL.paper2, { flatShading: false });
+      [[-0.9, 0.5, 0.2, 0.6], [-0.2, 0.72, -0.3, 0.75], [0.6, 0.55, 0.15, 0.62], [0.15, 0.42, 0.75, 0.52], [-0.7, 0.4, -0.75, 0.5], [1.0, 0.38, -0.55, 0.48]].forEach(([x, y, z, r], k) => {
+        const c = hulled(new THREE.Mesh(new THREE.IcosahedronGeometry(r, 2), cm), 0.06);
+        c.position.set(x, y, z);
+        c.scale.y = 0.6;
+        c.userData.base = x;
+        lm.add(c); clouds.push(c);
+      });
+      const lock = new THREE.Group();
+      const body = inked(new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.42, 0.22), mat(COL.verm)));
+      const shackle = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.05, 8, 16, Math.PI), mat(COL.ink));
+      shackle.position.y = 0.21;
+      lock.add(body, shackle);
+      lock.position.y = 1.3;
+      lm.add(lock);
+      lm.userData.top = 1.7;
+    }
+
+    // ---------- world (rebuilt when the map flips between landscape and portrait) ----------
+    const LAYOUTS = {
+      land: [{ x: -7.0, z: -0.9, r: 1.85 }, { x: -2.4, z: 1.25, r: 1.75 }, { x: 2.4, z: -0.95, r: 2.05 }, { x: 7.1, z: 1.0, r: 1.65 }],
+      port: [{ x: -2.3, z: -6.6, r: 1.6 }, { x: 2.3, z: -2.2, r: 1.55 }, { x: -2.3, z: 2.2, r: 1.75 }, { x: 2.3, z: 6.5, r: 1.5 }]
+    };
+    const SEEDS = [1.3, 2.9, 4.1, 5.7];
+    let W = null; // current world
+    function makeWorld(portrait) {
+      seed = 7;
+      const group = new THREE.Group();
+      const ISL = LAYOUTS[portrait ? "port" : "land"].map((L, i) => Object.assign({ s: SEEDS[i], locked: i === 3 }, L));
+      const w = { group, ISL, portrait, pickables: [], ripples: [], landmarks: [], rings: [], clouds: [], lines: [] };
+      ISL.forEach((L, i) => {
+        const g = new THREE.Group();
+        g.position.set(L.x, 0, L.z);
+        g.userData.level = i;
+        group.add(g);
+        const top = new THREE.Mesh(jitter(new THREE.CylinderGeometry(L.r, L.r * 1.07, 0.72, 15, 1), L.s),
+          [mat(COL.cliff), mat(L.locked ? COL.fog : COL.paper), mat(COL.cliff)]);
+        top.position.y = TOP - 0.36;
+        inked(top, 34);
+        g.add(top); w.pickables.push(top);
+        const beach = new THREE.Mesh(jitter(new THREE.CylinderGeometry(L.r * 1.17, L.r * 1.22, 0.16, 15, 1), L.s + .5), mat(COL.beach));
+        beach.position.y = 0.06;
+        inked(beach, 34);
+        g.add(beach); w.pickables.push(beach);
+        // offset solid ink shadow, like the page's box-shadows
+        const sh = new THREE.Mesh(jitter(new THREE.CircleGeometry(L.r * 1.22, 15).rotateX(-Math.PI / 2), L.s + .5),
+          new THREE.MeshBasicMaterial({ color: COL.ink, transparent: true, opacity: .9, depthWrite: false }));
+        sh.position.set(0.3, 0.012, 0.3);
+        g.add(sh);
+        const ringPts = [];
+        for (let k = 0; k <= 48; k++) { const a = k / 48 * Math.PI * 2, rr = L.r * 1.5 * wob(a, L.s + .5); ringPts.push(new THREE.Vector3(Math.cos(a) * rr, 0.02, Math.sin(a) * rr)); }
+        const rip = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(ringPts), new THREE.LineBasicMaterial({ color: 0x8fb0a6 }));
+        g.add(rip); w.ripples.push(rip);
+        // stop marker where the pin lands
+        L.stop = portrait ? new THREE.Vector3(L.x + (L.x < 0 ? 0.55 : -0.55), TOP, L.z + 0.35) : new THREE.Vector3(L.x + 0.15, TOP, L.z + L.r * 0.42);
+        const disc = inked(new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.06, 20), mat(COL.paper2)), 40);
+        disc.position.set(L.stop.x - L.x, TOP + 0.03, L.stop.z - L.z);
+        g.add(disc);
+        const ring = new THREE.Mesh(new THREE.RingGeometry(0.4, 0.5, 28).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: L.locked ? COL.ink : COL.verm, side: THREE.DoubleSide }));
+        ring.position.copy(disc.position).y += 0.04;
+        g.add(ring); w.rings.push(ring);
+        // landmark
+        const lm = new THREE.Group();
+        lm.position.set(portrait ? (L.x < 0 ? -0.45 : 0.45) : -0.15, TOP, portrait ? -0.45 : -L.r * 0.3);
+        lm.userData.level = i;
+        g.add(lm); w.landmarks.push(lm);
+        if (i === 0) makeBust(lm); else if (i === 1) makeClapper(lm); else if (i === 2) makeTiles(lm); else makeLock(lm, w.clouds);
+        lm.traverse(o => { if (o.isMesh && o.material !== hullMat) w.pickables.push(o); });
+        if (!L.locked) {
+          let placed = 0, tries = 0;
+          while (placed < 5 && tries++ < 80) {
+            const a = rnd() * Math.PI * 2, d = L.r * (0.55 + rnd() * 0.3);
+            const x = Math.cos(a) * d, z = Math.sin(a) * d;
+            if (Math.hypot(x - lm.position.x, z - lm.position.z) < 1.0) continue;
+            if (Math.hypot(x - disc.position.x, z - disc.position.z) < 0.75) continue;
+            const h = 0.42 + rnd() * 0.25;
+            const tree = inked(new THREE.Mesh(new THREE.ConeGeometry(0.2, h, 5), mat(COL.tree)), 20);
+            tree.position.set(x, TOP + h / 2, z);
+            tree.rotation.y = rnd() * 3;
+            g.add(tree); placed++;
+          }
+        }
+      });
+
+      // route
+      const heightAt = (x, z) => {
+        for (const L of ISL) {
+          const dx = x - L.x, dz = z - L.z, d = Math.hypot(dx, dz), a = Math.atan2(dz, dx);
+          if (d < L.r * wob(a, L.s) * 0.97) return TOP + 0.025;
+          if (d < L.r * 1.17 * wob(a, L.s + .5)) return 0.16;
+        }
+        return 0.04;
+      };
+      const ctrl = [];
+      ISL.forEach((L, i) => {
+        if (i) {
+          const A = ISL[i - 1].stop, B = L.stop;
+          const m = A.clone().add(B).multiplyScalar(0.5), dir = B.clone().sub(A), len = dir.length();
+          ctrl.push(m.add(new THREE.Vector3(-dir.z, 0, dir.x).normalize().multiplyScalar(len * 0.16 * (i % 2 ? 1 : -1))));
+        }
+        ctrl.push(L.stop.clone());
+      });
+      const curve = new THREE.CatmullRomCurve3(ctrl, false, "centripetal");
+      const N = 700;
+      w.N = N;
+      w.samples = curve.getSpacedPoints(N).map(p => new THREE.Vector3(p.x, heightAt(p.x, p.z), p.z));
+      w.stopIdx = ISL.map(L => {
+        let best = 0, bd = 1e9;
+        w.samples.forEach((p, k) => { const d = (p.x - L.stop.x) ** 2 + (p.z - L.stop.z) ** 2; if (d < bd) { bd = d; best = k; } });
+        return best;
+      });
+      const dashed = (from, to, color, width, dash, gap, opacity) => {
+        const pos = [];
+        for (let k = from; k <= to; k++) { const p = w.samples[k]; pos.push(p.x, p.y + 0.02, p.z); }
+        const geo = new LineGeometry(); geo.setPositions(pos);
+        const m = new LineMaterial({ color, linewidth: width, dashed: true, dashSize: dash, gapSize: gap, transparent: opacity < 1, opacity });
+        w.lines.push(m);
+        const line = new Line2(geo, m); line.computeLineDistances();
+        group.add(line);
+      };
+      dashed(w.stopIdx[0], w.stopIdx[2], COL.verm, 3.4, 0.24, 0.17, 1);
+      dashed(w.stopIdx[2], w.stopIdx[3], COL.ink, 2.4, 0.08, 0.2, 0.75);
+
+      // pin
+      const pin = new THREE.Group();
+      const pinM = mat(COL.verm);
+      const cone = inked(new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.55, 10).rotateX(Math.PI), pinM), 40);
+      cone.position.y = 0.3;
+      const head = hulled(new THREE.Mesh(new THREE.IcosahedronGeometry(0.25, 2), mat(COL.verm, { flatShading: false })), 0.09);
+      head.position.y = 0.66;
+      const eye = new THREE.Mesh(new THREE.IcosahedronGeometry(0.1, 2), mat(COL.paper2, { flatShading: false }));
+      eye.position.set(0, 0.7, 0.2);
+      pin.add(cone, head, eye);
+      group.add(pin);
+      const pinShadow = new THREE.Mesh(new THREE.CircleGeometry(0.2, 18).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: COL.ink, transparent: true, opacity: .35, depthWrite: false }));
+      group.add(pinShadow);
+      w.pin = pin; w.pinShadow = pinShadow;
+
+      // bounds for the camera fit
+      w.bounds = [];
+      ISL.forEach(L => {
+        for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI * 2; w.bounds.push(new THREE.Vector3(L.x + Math.cos(a) * L.r * 1.3, 0, L.z + Math.sin(a) * L.r * 1.3)); }
+        if (!portrait) w.bounds.push(new THREE.Vector3(L.x, 2.4, L.z - L.r * 0.3));
+      });
+      return w;
+    }
+    function disposeWorld(w) {
+      scene.remove(w.group);
+      w.group.traverse(o => { if (o.geometry) o.geometry.dispose(); });
+      w.lines.forEach(m => m.dispose());
+    }
+
+    let curIdx = 0, anim = null;
+    function placePin(idx, lift) {
+      idx = Math.max(0, Math.min(W.N, idx));
+      const s = W.samples, i0 = Math.floor(idx), i1 = Math.min(W.N, i0 + 1), f = idx - i0;
+      const p = s[i0].clone().lerp(s[i1], f);
+      W.pin.position.set(p.x, p.y + lift, p.z);
+      W.pinShadow.position.set(p.x, p.y + 0.015, p.z);
+      const k = 1 - Math.min(lift, 1) * 0.5;
+      W.pinShadow.scale.set(k, k, k);
+    }
+    function goTo(i, animate) {
+      const to = W.stopIdx[i];
+      if (!animate || reduce) { anim = null; curIdx = to; placePin(to, 0); kick(); return; }
+      const from = curIdx, s = W.samples;
+      let dist = 0;
+      for (let k = Math.min(from, to); k < Math.max(from, to); k++) dist += Math.hypot(s[k + 1].x - s[k].x, s[k + 1].z - s[k].z);
+      const hops = Math.max(1, Math.round(dist / 1.15));
+      anim = { from, to, hops, start: performance.now(), dur: Math.min(3200, hops * 230) };
+      kick();
+    }
+    UI.onSelect(goTo);
+
+    // ---------- labels (DOM, so they stay crisp and focusable) ----------
+    const SUBS = ["Deftsoft · 2022–24", "Deftsoft · 2022–24", "Roothoot · 2025–26", "Locked"];
+    const labels = UI.LEVELS.map((L, i) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "node-label" + (L.locked ? " locked" : "") + (i === UI.current ? " is-current" : "");
+      b.dataset.level = i;
+      b.setAttribute("aria-label", "Level " + L.n + ": " + L.title);
+      b.innerHTML = "<b>" + L.n + "</b><span>" + (L.locked ? "Your studio" : L.title) + "<small>" + SUBS[i] + "</small></span>";
+      UI.bindLevelEl(b);
+      stage.appendChild(b);
+      return b;
+    });
+    const tmp = new THREE.Vector3();
+    function placeLabels(w, h) {
+      W.ISL.forEach((L, i) => {
+        const el = labels[i], lm = W.landmarks[i], bw = el.offsetWidth || 160, bh = el.offsetHeight || 44;
+        let x, y, tx;
+        if (W.portrait) { // beside the island, over open sea
+          const left = L.x > 0;
+          tmp.set(L.x + (left ? -L.r * 1.05 : L.r * 1.05), TOP, L.z - L.r * 0.35).project(camera);
+          x = (tmp.x * 0.5 + 0.5) * w; y = (-tmp.y * 0.5 + 0.5) * h;
+          x = left ? Math.max(bw + 6, x) : Math.min(w - bw - 6, x);
+          tx = left ? "-100%" : "0";
+          el.style.transform = "translate(" + Math.round(x) + "px," + Math.round(y) + "px) translate(" + tx + ",-50%)";
+        } else {
+          tmp.set(L.x + lm.position.x, TOP + lm.userData.top, L.z + lm.position.z).project(camera);
+          x = (tmp.x * 0.5 + 0.5) * w; y = (-tmp.y * 0.5 + 0.5) * h;
+          x = Math.max(bw / 2 + 6, Math.min(w - bw / 2 - 6, x));
+          y = Math.max(bh + 6, y);
+          el.style.transform = "translate(" + Math.round(x) + "px," + Math.round(y) + "px) translate(-50%,-100%)";
+        }
+      });
+    }
+
+    // ---------- picking ----------
+    const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+    function pick(ev) {
+      const r = renderer.domElement.getBoundingClientRect();
+      ndc.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+      ray.setFromCamera(ndc, camera);
+      const hit = ray.intersectObjects(W.pickables, false)[0];
+      if (!hit) return -1;
+      let o = hit.object;
+      while (o && o.userData.level === undefined) o = o.parent;
+      return o ? o.userData.level : -1;
+    }
+    renderer.domElement.addEventListener("click", ev => { const i = pick(ev); if (i >= 0) { UI.select(i); map.focus({ preventScroll: true }); } });
+    renderer.domElement.addEventListener("pointermove", ev => {
+      if (ev.pointerType !== "mouse") return;
+      renderer.domElement.style.cursor = pick(ev) >= 0 ? "pointer" : "default";
+    });
+
+    // ---------- camera fit ----------
+    const target = new THREE.Vector3(0, 0.4, 0.1);
+    let VW = 0, VH = 0;
+    function fit() {
+      VW = map.clientWidth; VH = map.clientHeight;
+      if (!VW || !VH) return;
+      renderer.setSize(VW, VH, false);
+      camera.aspect = VW / VH;
+      const portrait = camera.aspect < 0.95;
+      if (!W || W.portrait !== portrait) {
+        if (W) disposeWorld(W);
+        W = makeWorld(portrait);
+        scene.add(W.group);
+        anim = null; curIdx = W.stopIdx[UI.current]; placePin(curIdx, 0);
+      }
+      const el = portrait ? 1.08 : 0.92;
+      const dir = new THREE.Vector3(0, Math.sin(el), Math.cos(el));
+      let lo = 6, hi = 90;
+      const ymax = portrait ? 0.9 : 0.84;
+      for (let it = 0; it < 24; it++) {
+        const d = (lo + hi) / 2;
+        camera.position.copy(target).addScaledVector(dir, d);
+        camera.lookAt(target); camera.updateProjectionMatrix(); camera.updateMatrixWorld();
+        const ok = W.bounds.every(p => { tmp.copy(p).project(camera); return Math.abs(tmp.x) < 0.95 && tmp.y > -0.93 && tmp.y < ymax; });
+        if (ok) hi = d; else lo = d;
+      }
+      camera.position.copy(target).addScaledVector(dir, hi);
+      camera.lookAt(target); camera.updateProjectionMatrix(); camera.updateMatrixWorld();
+      inkLine.resolution.set(VW, VH);
+      W.lines.forEach(m => m.resolution.set(VW, VH));
+      placeLabels(VW, VH);
+      kick();
+    }
+
+    // ---------- loop ----------
+    let visible = true, raf = 0;
+    const t0 = performance.now();
+    function frame(now) {
+      raf = 0;
+      const t = (now - t0) / 1000;
+      if (!reduce) {
+        waveTex.offset.set(Math.sin(t * 0.35) * 0.012, Math.sin(t * 0.5) * 0.02);
+        W.ripples.forEach((r, i) => { const s = 1 + Math.sin(t * 1.1 + i * 1.7) * 0.035; r.scale.set(s, 1, s); });
+        W.clouds.forEach((c, i) => { c.position.x = c.userData.base + Math.sin(t * 0.5 + i) * 0.08; });
+        W.rings.forEach((r, i) => { const s = i === UI.current ? 1 + Math.sin(t * 4) * 0.12 : 1; r.scale.set(s, 1, s); });
+      }
+      if (anim) {
+        const p = Math.max(0, Math.min(1, (now - anim.start) / anim.dur));
+        placePin(anim.from + (anim.to - anim.from) * p, Math.abs(Math.sin(Math.PI * anim.hops * p)) * 0.55);
+        if (p >= 1) { curIdx = anim.to; anim = null; placePin(curIdx, 0); }
+      }
+      renderer.render(scene, camera);
+      if (visible && (!reduce || anim)) raf = requestAnimationFrame(frame);
+    }
+    function kick() { if (!raf) raf = requestAnimationFrame(frame); }
+
+    fit();
+    renderer.render(scene, camera); // render once before swapping out the flat map
+    if (!UI.ready()) { renderer.dispose(); stage.innerHTML = ""; return; }
+    fit(); // labels can be measured now that they are visible
+    new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible) kick(); }).observe(map);
+    new ResizeObserver(fit).observe(map);
+    document.getElementById("map-mode").textContent = "Click an island, use the list, or focus the map and use the arrow keys.";
+  }
 })();
 </script>
 </body>
