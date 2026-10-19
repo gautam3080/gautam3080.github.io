@@ -349,6 +349,38 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
 @media (max-width: 1023px) and (min-width: 700px) {
   .gallery { grid-template-columns: repeat(3, 1fr); }
 }
+/* ---------- script window (Gautam.cs) ---------- */
+.objref { display: inline-flex; align-items: center; gap: 7px; min-height: 30px; padding: 3px 10px 3px 7px; background: var(--bg1); border: 1px solid #3f3f3f; border-radius: 3px; color: var(--bright); font-family: var(--f-mono); font-size: 12.5px; cursor: pointer; text-align: left; }
+.objref:hover { border-color: var(--blue, #4a8ee8); background: #2e2e2e; }
+.objref .ic { color: #6fa7e6; }
+.objref small { font-family: var(--f-sans); color: var(--muted); font-size: 12px; }
+.code-win { width: min(1020px, 94vw); height: min(86vh, 900px); max-width: none; max-height: none; padding: 0; border: 1px solid #454545; border-radius: 6px; background: #1e1e1e; color: #d4d4d4; box-shadow: 0 24px 80px rgba(0,0,0,.6); overflow: hidden; }
+.code-win[open] { display: flex; flex-direction: column; }
+.code-win::backdrop { background: rgba(8,8,8,.72); }
+.cw-bar { display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 12px; background: #252526; border-bottom: 1px solid #333; flex: none; flex-wrap: wrap; }
+.cw-bar .ic { color: #6fa7e6; }
+.cw-title { font-family: var(--f-mono); font-size: 13px; color: #fff; }
+.cw-path { font-family: var(--f-mono); font-size: 11.5px; color: #9a9a9a; }
+.cw-bar .grow { flex: 1; }
+.cw-bar .btn { min-height: 32px; }
+.cw-body { flex: 1; min-height: 0; overflow: auto; padding: 10px 0 24px; scrollbar-color: #4a4a4a #1e1e1e; }
+.code { list-style: none; margin: 0; padding: 0; counter-reset: ln; font-family: var(--f-mono); font-size: 13px; line-height: 1.6; min-width: max-content; }
+.code li { counter-increment: ln; display: grid; grid-template-columns: 52px minmax(0, 1fr); }
+.code li::before { content: counter(ln); text-align: right; padding-right: 18px; color: #6e7681; user-select: none; }
+.code li:hover { background: #2a2d2e; }
+.code span.l { white-space: pre; padding-right: 24px; padding-left: calc(var(--i, 0) * 1ch); }
+.code .kw { color: #569cd6; } .code .ty { color: #4ec9b0; } .code .st { color: #ce9178; } .code .cm { color: #6a9955; } .code .nu { color: #b5cea8; } .code .at { color: #dcdcaa; }
+.cw-status { display: flex; gap: 14px; padding: 4px 12px; background: var(--sel); color: #fff; font-family: var(--f-mono); font-size: 11.5px; flex: none; }
+@media (max-width: 700px) {
+  .code-win { width: 100vw; height: 100vh; height: 100dvh; border: 0; border-radius: 0; }
+  .cw-path { display: none; }
+  .code { font-size: 12px; min-width: 0; }
+  .code li { grid-template-columns: 34px minmax(0, 1fr); }
+  .code li::before { padding-right: 8px; }
+  .code span.l { white-space: pre-wrap; overflow-wrap: anywhere; padding-right: 10px; padding-left: calc(var(--i, 0) * .5ch); }
+  .tb-right .script-btn { display: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }
@@ -393,6 +425,7 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
       <button class="tbtn" id="btnStep" type="button" title="Step one frame"><svg aria-hidden="true"><use href="#i-step"/></svg><span class="sr">Step</span></button>
     </div>
     <div class="tb-right">
+      <button class="btn script-btn" type="button" data-open-script title="Open Gautam.cs: my resume, written as a C# script"><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg>Gautam.cs</button>
       <a class="btn resume-btn" href="assets/Gautam_Resume.pdf" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>Resume<span>PDF</span></a>
     </div>
   </header>
@@ -484,6 +517,7 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
         <details class="comp c-blue" open>
           <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Developer <small>(Script)</small></h3></summary>
           <div class="comp-b">
+            <div class="field"><span>Script</span><span><button class="objref" type="button" data-open-script><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg>Gautam.cs <small>my resume, as C#</small></button></span></div>
             <div class="field"><span>Role</span><span class="val">Unity Game Developer</span></div>
             <div class="field"><span>Experience</span><span class="val">3.5+ years of production C#</span></div>
             <div class="field"><span>Based in</span><span class="val">Mumbai, India</span></div>
@@ -854,12 +888,13 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
     <div class="tabs"><span class="tab on">Console</span></div>
     <div class="cons-bar">
       <span class="grow"></span>
-      <button class="cnt" type="button" data-filter="info" aria-pressed="true" title="Show info messages"><svg aria-hidden="true"><use href="#i-info"/></svg><span id="nInfo">7</span><span class="sr"> info messages</span></button>
+      <button class="cnt" type="button" data-filter="info" aria-pressed="true" title="Show info messages"><svg aria-hidden="true"><use href="#i-info"/></svg><span id="nInfo">8</span><span class="sr"> info messages</span></button>
       <button class="cnt" type="button" data-filter="warn" aria-pressed="true" title="Show warnings"><svg aria-hidden="true"><use href="#i-warn"/></svg><span>1</span><span class="sr"> warning</span></button>
       <button class="cnt" type="button" disabled title="No errors"><svg aria-hidden="true"><use href="#i-err"/></svg><span>0</span><span class="sr"> errors</span></button>
     </div>
     <div class="scroll">
       <ul class="logs" id="logs">
+        <li class="info"><button type="button" data-open-script><svg aria-hidden="true"><use href="#i-info"/></svg><span class="src">Gautam.cs</span><span class="msg">Resume compiled with 0 errors. Click to open the script.</span></button></li>
         <li class="info"><button type="button" data-select="pongz"><svg aria-hidden="true"><use href="#i-info"/></svg><span class="src">Pongz_SGMahjong</span><span class="msg">Live on iOS and Android: 40K+ downloads, ~3.4K daily active players.</span></button></li>
         <li class="info"><button type="button" data-select="pongz"><svg aria-hidden="true"><use href="#i-info"/></svg><span class="src">Pongz_SGMahjong</span><span class="msg">AI Practice Mode built end to end: bot decision logic plus the full game flow around it.</span></button></li>
         <li class="info"><button type="button" data-select="cc"><svg aria-hidden="true"><use href="#i-info"/></svg><span class="src">CharacterCreator</span><span class="msg">Export throughput raised 50x by rebuilding the 4K texture merge on the Unity Jobs System.</span></button></li>
@@ -877,6 +912,148 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
     <span class="r">Site design and 3D demos built for this page; project work described is Gautam's. © 2026 Gautam</span>
   </footer>
 </div>
+
+<dialog class="code-win" id="codeWin" aria-labelledby="cwTitle">
+  <div class="cw-bar">
+    <svg class="ic" aria-hidden="true"><use href="#i-script"/></svg>
+    <span class="cw-title" id="cwTitle">Gautam.cs</span>
+    <span class="cw-path">Assets/Scripts/Gautam.cs</span>
+    <span class="grow"></span>
+    <button class="btn" type="button" id="cwCopy">Copy</button>
+    <a class="btn" href="assets/Gautam_Resume.pdf" target="_blank" rel="noopener">PDF version</a>
+    <button class="btn" type="button" id="cwClose">Close</button>
+  </div>
+  <div class="cw-body" tabindex="0" aria-label="Gautam.cs source"><ol class="code" id="cwCode"></ol></div>
+  <div class="cw-status"><span>C#</span><span>UTF-8</span><span id="cwLines"></span><span>0 errors</span></div>
+</dialog>
+<script type="text/plain" id="gautamCs">
+// Gautam.cs
+// My resume, written as a Unity component. Same facts as the PDF.
+// It reads fine; please don't ship it in a build.
+
+using UnityEngine;
+
+[DisallowMultipleComponent]
+public class Gautam : MonoBehaviour
+{
+    [Header("Contact")]
+    public string role      = "Unity Game Developer";
+    public string location  = "Mumbai, India";
+    public string email     = "gautamc3080@gmail.com";
+    public string linkedIn  = "linkedin.com/in/gautam-chaudhary-g3080";
+    public string portfolio = "gautam3080.github.io";
+    public bool   availableImmediately = true;
+
+    [Header("Summary")]
+    public float yearsOfProductionCSharp = 3.5f; // and counting
+
+    [TextArea(4, 8)]
+    public string summary =
+        "Unity game developer with 3.5+ years of production C# across mobile " +
+        "and Windows 3D products. Designed and built the core client architecture, " +
+        "bot opponent AI, animation systems, and mobile performance work for a live " +
+        "real-time multiplayer title on iOS and Android. Also led development of a " +
+        "photorealistic character creator, where a Jobs System rewrite made exports " +
+        "50x faster, and solved real-time IK hand placement for a 3D scene tool.";
+
+    readonly Skills skills = new Skills
+    {
+        Languages   = { "C#", "async/await and Task-based concurrency", "SOLID principles",
+                        "Design patterns", "3D math" },
+        Unity       = { "URP", "UGUI", "ScriptableObjects", "Addressables", "AssetBundles",
+                        "Shader Graph", "Timeline", "Jobs System", "Unity Profiler",
+                        "Custom editor tooling" },
+        Gameplay    = { "Client-side architecture", "Modular and component architecture",
+                        "Game state management", "Bot opponent AI", "Turn-based decision logic",
+                        "Tutorial and onboarding systems", "Localization",
+                        "Custom raycasting and input handling" },
+        Multiplayer = { "Socket.IO (client)", "Client state sync against an authoritative server",
+                        "Real-time event handling" },
+        Animation   = { "Spine 2D skeletal animation", "3D animation integration",
+                        "Animation Rigging (IK)", "Procedural hand and finger placement",
+                        "Particle systems", "Unity physics" },
+        Performance = { "Mobile optimization", "Draw call and SetPass call reduction",
+                        "LOD groups", "Texture atlasing", "Memory management",
+                        "Multithreading", "NativeArray / CPU texture processing" },
+        Tools       = { "Git", "Figma", "Android", "iOS", "Windows" },
+    };
+
+    readonly Job[] experience =
+    {
+        new Job("Roothoot Private Limited", "Unity Game Developer")
+        {
+            Where  = "Hyderabad, India",
+            When   = "Mar 2025 - Jun 2026",
+            Client = "Pixel Stack Studios",
+            Projects =
+            {
+                new Project("Pongz - SG Mahjong", Status.Live)
+                {
+                    About     = "Live real-time multiplayer, iOS and Android",
+                    Reach     = "40K+ downloads, ~3.4K daily active players",
+                    Built     =
+                    {
+                        "Core client-side architecture, designed and built from the ground up",
+                        "AI Practice Mode end to end: offline bots, turn-based decisions, full game flow",
+                        "2D and 3D animation systems, including Spine and its gameplay integration",
+                        "Mobile performance across live releases: fewer draw calls and SetPass calls " +
+                            "with LOD groups and texture atlasing, profiled with the Unity Profiler",
+                        "Client-side Socket.IO events and state sync against an authoritative server",
+                        "The complete UI layer: screens, HUD, in-game flow, UI-to-systems integration",
+                        "Interactive tutorial and onboarding, plus multi-language localization",
+                    },
+                },
+            },
+        },
+
+        new Job("Live Deftsoft Informatics Pvt. Ltd.", "Unity Developer")
+        {
+            Where  = "Mohali, India",
+            When   = "Jun 2022 - Oct 2024",
+            Focus  = "Client deliveries, Windows 3D tools",
+            Projects =
+            {
+                new Project("Character Creator", Status.Unreleased | Status.Confidential)
+                {
+                    About = "Photorealistic character creation tool, Windows",
+                    Built =
+                    {
+                        "Led development and designed the core architecture; planned the work " +
+                            "from client requirements and coordinated tasks across the team",
+                        "Rebuilt the export pipeline on the Unity Jobs System, merging layered 4K " +
+                            "texture maps on NativeArray pixel data with no texture copies: 50x throughput",
+                        "Customizable facial and body structure systems",
+                    },
+                },
+
+                new Project("Movie Studio 3D", Status.Unreleased | Status.Confidential)
+                {
+                    About = "3D scene composition and previsualization tool, Windows",
+                    Built =
+                    {
+                        "Real-time finger and hand placement for imported rigged characters: IK targets " +
+                            "computed from surface geometry and bone structure, driven through " +
+                            "Animation Rigging. Open on the project for over a year before that",
+                        "Rebuilt the Timeline: horizontal layout, finer timestep, stabler sequencing",
+                        "Asset Manager, UI, hierarchy panel, and Graphics modules",
+                        "Editor tool to extract and manage in-project UI text",
+                        "Custom C# property attributes that expose properties as editable UI fields",
+                    },
+                },
+            },
+        },
+    };
+
+    [Header("Education")]
+    public string diploma = "Diploma in Computer Science, Government Polytechnic College, Amritsar";
+    public string years   = "2019 - 2022";
+
+    void Start()
+    {
+        Debug.Log($"{role} with {yearsOfProductionCSharp}+ years. Hiring? {email}");
+    }
+}
+</script>
 
 <noscript><style>.page[hidden]{display:block}.fallback{display:grid}#sceneCanvas,.ovl{display:none}</style></noscript>
 
@@ -1007,6 +1184,62 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
       enterPlay();
       if (window.matchMedia("(max-width: 1023px)").matches) document.querySelector(".center").scrollIntoView({ block: "start" });
     });
+  });
+
+  // ---------- Gautam.cs: the resume as a script ----------
+  var cw = document.getElementById("codeWin"), cwCode = document.getElementById("cwCode");
+  var csSrc = document.getElementById("gautamCs").textContent.replace(/^\n/, "").replace(/\s+$/, "");
+  var KW = /^(using|public|private|readonly|new|class|void|string|bool|float|true|false|return|var)$/;
+  var TY = /^(MonoBehaviour|Skills|Job|Project|Status|Debug)$/;
+  var AT = /^(DisallowMultipleComponent|Header|TextArea)$/;
+  function esc(t) { return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function tok(c, t) { return '<span class="' + c + '">' + esc(t) + "</span>"; }
+  function hl(line) {
+    var re = /(\/\/.*$)|(\$?"(?:[^"\\]|\\.)*")|(\b\d+(?:\.\d+)?f?\b)|([A-Za-z_]\w*)|([\s\S])/g, out = "", m;
+    while ((m = re.exec(line))) {
+      if (m[1]) out += tok("cm", m[1]);
+      else if (m[2]) out += tok("st", m[2]);
+      else if (m[3]) out += tok("nu", m[3]);
+      else if (m[4]) out += KW.test(m[4]) ? tok("kw", m[4]) : TY.test(m[4]) ? tok("ty", m[4]) : AT.test(m[4]) ? tok("at", m[4]) : esc(m[4]);
+      else out += esc(m[5]);
+    }
+    return out;
+  }
+  var csLines = csSrc.split("\n");
+  // indentation becomes padding, so wrapped lines on a phone stay aligned under their own indent
+  cwCode.innerHTML = csLines.map(function (l) {
+    var ind = l.match(/^ */)[0].length;
+    return '<li><span class="l" style="--i:' + ind + '">' + (hl(l.slice(ind)) || " ") + "</span></li>";
+  }).join("");
+  document.getElementById("cwLines").textContent = csLines.length + " lines";
+  var ranStart = false, opener = null;
+  function openScript(e) {
+    opener = e && e.currentTarget;
+    if (typeof cw.showModal === "function") cw.showModal(); else cw.setAttribute("open", "");
+    cw.querySelector(".cw-body").scrollTop = 0;
+    document.getElementById("cwClose").focus();
+  }
+  function closeScript() { if (cw.open) { if (cw.close) cw.close(); else cw.removeAttribute("open"); } }
+  cw.addEventListener("close", function () {
+    // like pressing Play on the component: Start() runs once and logs to the Console
+    if (!ranStart) {
+      ranStart = true;
+      var li = document.createElement("li"); li.className = "info";
+      li.innerHTML = '<button type="button" data-select="contact"><svg aria-hidden="true"><use href="#i-info"/></svg><span class="src">Gautam.Start()</span><span class="msg">Unity Game Developer with 3.5+ years. Hiring? gautamc3080@gmail.com</span></button>';
+      var logs = document.getElementById("logs"); logs.insertBefore(li, logs.children[1] || null);
+      var n = document.getElementById("nInfo"); n.textContent = +n.textContent + 1;
+      if (document.querySelector('.cnt[data-filter="info"]').getAttribute("aria-pressed") !== "true") li.hidden = true;
+    }
+    if (opener && opener.focus) opener.focus();
+  });
+  document.querySelectorAll("[data-open-script]").forEach(function (b) { b.addEventListener("click", openScript); });
+  document.getElementById("cwClose").addEventListener("click", closeScript);
+  cw.addEventListener("click", function (e) { if (e.target === cw) closeScript(); });
+  document.getElementById("cwCopy").addEventListener("click", function () {
+    var b = this;
+    function done(ok) { b.textContent = ok ? "Copied" : "Copy failed"; setTimeout(function () { b.textContent = "Copy"; }, 1600); }
+    if (navigator.clipboard) navigator.clipboard.writeText(csSrc).then(function () { done(true); }, function () { done(false); });
+    else done(false);
   });
 
   // ---------- Console filters ----------
