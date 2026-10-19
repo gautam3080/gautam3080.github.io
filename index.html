@@ -447,15 +447,16 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
               <button class="btn primary" type="button" data-play><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg>Play gameplay capture</button>
             </div>
             <div data-for="cc" hidden>
-              <div class="slider live-only"><label for="sJaw">Jaw width</label><input id="sJaw" type="range" min="0" max="100" value="55"><output for="sJaw">55</output></div>
+              <div class="slider live-only"><label for="sJaw">Jaw width</label><input id="sJaw" type="range" min="0" max="100" value="50"><output for="sJaw">50</output></div>
               <div class="slider live-only"><label for="sCheek">Cheekbone height</label><input id="sCheek" type="range" min="0" max="100" value="50"><output for="sCheek">50</output></div>
-              <div class="slider live-only"><label for="sEye">Eye spacing</label><input id="sEye" type="range" min="0" max="100" value="45"><output for="sEye">45</output></div>
+              <div class="slider live-only"><label for="sEye">Eye spacing</label><input id="sEye" type="range" min="0" max="100" value="50"><output for="sEye">50</output></div>
               <p class="honest live-only">Wireframe demo built for this page, not the confidential tool.</p>
             </div>
             <div data-for="ms" hidden>
               <div class="slider live-only"><label for="sTiltZ">Bar tilt</label><input id="sTiltZ" type="range" min="-50" max="50" value="0"><output for="sTiltZ">0°</output></div>
               <div class="slider live-only"><label for="sTiltX">Bar lean</label><input id="sTiltX" type="range" min="-40" max="40" value="0"><output for="sTiltX">0°</output></div>
-              <p class="live-only">Drag the bar or move a slider. Amber markers are the IK targets; the hand re-solves its grip.</p>
+              <div class="slider live-only"><label for="sDiam">Bar diameter</label><input id="sDiam" type="range" min="4" max="10" value="7"><output for="sDiam">7 cm</output></div>
+              <p class="live-only">Drag the bar, tilt it, or change its diameter. Amber markers are the IK targets; the hand re-solves its grip.</p>
               <p class="honest live-only">Web demo built for this page, not the confidential tool.</p>
             </div>
           </div>
@@ -703,7 +704,7 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
           <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Deep Dive <small>(Script)</small></h3></summary>
           <div class="comp-b prose">
             <h4>Hands that grip, from any direction</h4>
-            <p>Automatic finger and hand placement on imported rigged characters had been <strong>open on the project for over a year</strong>. I solved it with math rather than raycasts: the solver reads the object's shape from its surface tangents, spaces each finger joint's target along the surface according to the model's bone structure, and follows the object's rotation. Those computed positions and rotations drive IK through Unity's <strong>Animation Rigging</strong> package, in real time.</p>
+            <p>Automatic finger and hand placement on imported rigged characters had been <strong>open on the project for over a year</strong>. I solved it with math rather than raycasts: the solver reads the object's shape from its surface tangents, spaces each finger joint's target along the surface according to the model's bone structure, and follows the object's rotation. It keeps working when the object's scale or diameter changes. Those computed positions and rotations drive IK through Unity's <strong>Animation Rigging</strong> package, in real time.</p>
           </div>
         </details>
         <details class="comp c-blue" open>
@@ -991,7 +992,7 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
   btnPlay.addEventListener("click", function () { playing ? exitPlay() : enterPlay(); });
   btnPause.addEventListener("click", function () {
     if (!playing) { enterPlay(); video.pause(); btnPause.setAttribute("aria-pressed", "true"); return; }
-    if (video.paused) { video.play(); btnPause.setAttribute("aria-pressed", "false"); }
+    if (video.paused) { var pp = video.play(); if (pp && pp.catch) pp.catch(function () {}); btnPause.setAttribute("aria-pressed", "false"); }
     else { video.pause(); btnPause.setAttribute("aria-pressed", "true"); }
   });
   btnStep.addEventListener("click", function () {
@@ -1201,34 +1202,36 @@ neck.add(new THREE.Mesh(neckGeo, occMat), new THREE.Mesh(neckGeo, wireMat)); cc.
 const shGeo = new THREE.SphereGeometry(1, 18, 5, 0, Math.PI * 2, Math.PI * 0.3, Math.PI * 0.2);
 const shoulders = new THREE.Group(); shoulders.position.y = -0.05; shoulders.scale.set(1.3, 1.1, 0.6);
 shoulders.add(new THREE.Mesh(shGeo, wireMat)); cc.add(shoulders);
-const P = { jaw: 0.55, cheek: 0.5, eye: 0.45 };
+const P = { jaw: 0.5, cheek: 0.5, eye: 0.5 };
+// Ranges stay inside what a real face does: each slider nudges one feature, never the whole head.
 function morph() {
   const a = headGeo.attributes.position.array;
-  const jawW = 0.6 + 0.48 * P.jaw;
-  const cy = -0.34 + 0.42 * P.cheek;
-  const ex = 0.2 + 0.2 * P.eye;
+  const taper = 0.3 - 0.18 * P.jaw;   // how much the lower face narrows toward the chin
+  const cy = -0.04 + 0.16 * P.cheek;  // cheekbone height
+  const ex = 0.27 + 0.08 * P.eye;     // half the distance between the eyes
   for (let i = 0; i < a.length; i += 3) {
     const x0 = basePos[i], y0 = basePos[i + 1], z0 = basePos[i + 2];
     let x = x0 * 0.8, y = y0 * 1.06, z = z0 * 0.92;
-    const low = sm(-0.05, -0.95, y0);
-    x *= 1 + (jawW - 1) * low;
+    const low = sm(-0.15, -0.95, y0);
+    x *= 1 - taper * low;
     z *= 1 - 0.12 * low * sm(0, -0.8, z0);
-    z += 0.08 * low * Math.max(z0, 0);
+    z += 0.06 * low * Math.max(z0, 0);
     if (z0 < 0) z *= 1 + 0.14 * sm(0, -0.9, z0) * sm(-0.4, 0.2, y0);
     const side = sm(0.3, 0.75, Math.abs(x0)) * sm(-0.35, 0.35, z0);
-    x *= 1 + 0.17 * side * Math.exp(-(((y0 - cy) / 0.15) ** 2));
+    x *= 1 + 0.07 * side * Math.exp(-(((y0 - cy) / 0.12) ** 2));
     const front = sm(0.55, 0.95, z0);
     z += 0.22 * front * Math.exp(-(x0 * x0) / 0.01) * Math.exp(-((y0 + 0.08) ** 2) / 0.03);
     z += 0.05 * front * Math.exp(-((y0 - 0.33) ** 2) / 0.006);
     let ind = 0;
-    for (const s of [-1, 1]) ind += 0.1 * Math.exp(-((x0 - s * ex) ** 2 + (y0 - 0.2) ** 2) / 0.011) * sm(0.45, 0.85, z0);
+    for (const s of [-1, 1]) ind += 0.07 * Math.exp(-((x0 - s * ex) ** 2 + (y0 - 0.2) ** 2) / 0.011) * sm(0.45, 0.85, z0);
     a[i] = x * (1 - ind); a[i + 1] = y * (1 - ind * 0.3); a[i + 2] = z * (1 - ind);
   }
   headGeo.attributes.position.needsUpdate = true;
   headGeo.computeBoundingSphere();
   const ez = Math.sqrt(Math.max(0, 1 - ex * ex - 0.04));
-  eyes[0].position.set(-ex * 0.8, 0.2 * 1.06, ez * 0.92 - 0.12);
-  eyes[1].position.set(ex * 0.8, 0.2 * 1.06, ez * 0.92 - 0.12);
+  // sit each eye just inside its socket so it stays visible at every slider value
+  eyes[0].position.set(-ex * 0.8 * 0.93, 0.2 * 1.06 * 0.98, ez * 0.92 * 0.93 - 0.03);
+  eyes[1].position.set(ex * 0.8 * 0.93, 0.2 * 1.06 * 0.98, ez * 0.92 * 0.93 - 0.03);
 }
 morph();
 [["sJaw", "jaw"], ["sCheek", "cheek"], ["sEye", "eye"]].forEach(([id, key]) => {
@@ -1239,7 +1242,8 @@ morph();
 /* ---------------- Movie Studio 3D: jointed hand gripping a bar, with IK targets ---------------- */
 const ms = new THREE.Group(); ms.position.copy(POS.ms); scene.add(ms);
 const PIV = new THREE.Vector3(0, 1.7, 0);
-const R_BAR = 0.35, R_F = 0.055, R = R_BAR + R_F;
+const R_BAR0 = 0.35, R_F = 0.055;
+let R_BAR = R_BAR0, R = R_BAR + R_F; // bar radius is live: the grip re-solves for any diameter
 const bar = new THREE.Group(); bar.position.copy(PIV); ms.add(bar);
 const barMesh = new THREE.Mesh(new THREE.CylinderGeometry(R_BAR, R_BAR, 2.8, 20), std(0x5b6f86));
 barMesh.userData.bar = true; bar.add(barMesh);
@@ -1249,10 +1253,9 @@ const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.3, 8), cap
 const hand = new THREE.Group(); hand.position.copy(PIV); ms.add(hand);
 const HY = 0.15;
 const skin = std(0xbdbdbd), jointMat = std(0x9a9a9a);
-const palm = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.72, 0.64), skin); palm.position.set(R + 0.035, HY, 0.32); hand.add(palm);
+const palm = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.72, 0.64), skin); hand.add(palm);
 const fore = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.12, 1.2, 10), skin);
 const foreDir = new THREE.Vector3(0.85, -0.25, 0.75).normalize();
-fore.position.set(R + 0.04, HY, 0.6).addScaledVector(foreDir, 0.6);
 fore.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), foreDir); hand.add(fore);
 const segGeo = new THREE.CylinderGeometry(1, 1, 1, 8), jGeo = new THREE.SphereGeometry(1, 8, 6);
 const FINGERS = [
@@ -1263,17 +1266,34 @@ const FINGERS = [
   f.joints = f.s.map(() => { const m = new THREE.Mesh(jGeo, jointMat); m.scale.setScalar(R_F * 1.08); hand.add(m); return m; });
   return f;
 });
-const THUMB = { root: new THREE.Vector3(R + 0.07, HY + 0.38, 0.46), open: [new THREE.Vector3(0.66, HY + 0.43, 0.4), new THREE.Vector3(0.86, HY + 0.47, 0.3)],
-  grip: [0.95, 1.7].map((p) => new THREE.Vector3((R + 0.01) * Math.cos(p), HY + 0.38, (R + 0.01) * Math.sin(p))) };
+const THUMB = { root: new THREE.Vector3(), open: [new THREE.Vector3(), new THREE.Vector3()], grip: [new THREE.Vector3(), new THREE.Vector3()] };
 THUMB.segs = [0, 1].map(() => { const m = new THREE.Mesh(segGeo, skin); m.scale.set(R_F * 1.15, 1, R_F * 1.15); hand.add(m); return m; });
 THUMB.joints = [0, 1].map(() => { const m = new THREE.Mesh(jGeo, jointMat); m.scale.setScalar(R_F * 1.2); hand.add(m); return m; });
 // IK target markers live on the bar, so they move with it instantly; the hand catches up and re-grips
 const markMat = new THREE.MeshBasicMaterial({ color: 0xe0b341, depthTest: false, transparent: true });
 const markGeo = new THREE.OctahedronGeometry(0.055);
-function addMark(p) { const m = new THREE.Mesh(markGeo, markMat); m.position.copy(p); m.renderOrder = 10; bar.add(m); return m; }
-FINGERS.forEach((f) => { let phi = 0; f.s.forEach((s) => { phi += 2 * Math.asin(s / (2 * R)); }); addMark(new THREE.Vector3(R * Math.cos(phi), HY + f.y, -R * Math.sin(phi))); });
-addMark(THUMB.grip[1]);
-const handTarget = addMark(new THREE.Vector3(R + 0.12, HY, 0.32)); handTarget.scale.setScalar(1.6);
+function addMark() { const m = new THREE.Mesh(markGeo, markMat); m.renderOrder = 10; bar.add(m); return m; }
+FINGERS.forEach((f) => { f.mark = addMark(); });
+const thumbMark = addMark();
+const handTarget = addMark(); handTarget.scale.setScalar(1.6);
+const barParts = bar.children.filter((c) => c.userData.bar);
+// Re-derive every grip target from the current radius: the same math serves a thin rod or a thick pole.
+function setRadius(rb) {
+  R_BAR = rb; R = R_BAR + R_F;
+  const k = R_BAR / R_BAR0;
+  barParts.forEach((m) => m.scale.set(k, 1, k));
+  palm.position.set(R + 0.035, HY, 0.32);
+  fore.position.set(R + 0.04, HY, 0.6).addScaledVector(foreDir, 0.6);
+  THUMB.root.set(R + 0.07, HY + 0.38, 0.46);
+  THUMB.open[0].set(R + 0.255, HY + 0.43, 0.4); THUMB.open[1].set(R + 0.455, HY + 0.47, 0.3);
+  // thumb wraps from the palm side; on thin bars it travels further round, like a real grip
+  const t0 = Math.min(1.6, 0.39 / R), t1 = t0 + Math.min(1.1, 0.3 / R);
+  [t0, t1].forEach((p, i) => THUMB.grip[i].set((R + 0.01) * Math.cos(p), HY + 0.38, (R + 0.01) * Math.sin(p)));
+  FINGERS.forEach((f) => { let phi = 0; f.s.forEach((s) => { phi += 2 * Math.asin(s / (2 * R)); }); f.mark.position.set(R * Math.cos(phi), HY + f.y, -R * Math.sin(phi)); });
+  thumbMark.position.copy(THUMB.grip[1]);
+  handTarget.position.set(R + 0.12, HY, 0.32);
+}
+setRadius(R_BAR0);
 const up = new THREE.Vector3(0, 1, 0), tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3();
 function placeSeg(mesh, a, b) {
   tmpA.subVectors(b, a); const len = tmpA.length();
@@ -1314,6 +1334,14 @@ function applyTilt(fromSlider) {
 let lastTouch = performance.now();
 sTiltZ.addEventListener("input", () => { tilt.z = THREE.MathUtils.degToRad(+sTiltZ.value); applyTilt(true); });
 sTiltX.addEventListener("input", () => { tilt.x = THREE.MathUtils.degToRad(+sTiltX.value); applyTilt(true); });
+const sDiam = document.getElementById("sDiam");
+let regripUntil = 0;
+function applyDiam(cm) {
+  sDiam.value = cm; sDiam.nextElementSibling.textContent = cm + " cm";
+  setRadius(cm * 0.05); // 7 cm on the slider = the default bar
+  regripUntil = performance.now() + 220; lastTouch = performance.now(); kick();
+}
+sDiam.addEventListener("input", () => applyDiam(+sDiam.value));
 
 /* ---------------- move gizmo on the selected object ---------------- */
 const moveGizmo = new THREE.Group(); scene.add(moveGizmo);
@@ -1325,10 +1353,10 @@ const moveGizmo = new THREE.Group(); scene.add(moveGizmo);
 
 /* ---------------- camera, controls, interaction ---------------- */
 const SHOTS = {
-  overview: { t: [0, 1.0, 0], p: [1.6, 5.6, 13.2] },
+  overview: { t: [0, 2.1, 0], p: [1.6, 6.0, 11.4] },
   pongz: { t: [-5.2, 0.45, 0.35], p: [-3.9, 3.1, 5.1] },
   cc: { t: [0, 1.6, 0], p: [1.9, 2.4, 4.8] },
-  ms: { t: [5.2, 1.7, 0], p: [8.2, 2.9, -2.6] }
+  ms: { t: [5.2, 1.75, 0], p: [7.6, 4.3, -2.3] }
 };
 let sel = window.__getSel ? window.__getSel() : "overview";
 const shotFor = (id) => SHOTS[id] || SHOTS.overview;
@@ -1492,13 +1520,15 @@ function tick(now) {
   if (sel === "ms" && !reduce && !drag && now - lastTouch > 5200) {
     tilt.z = THREE.MathUtils.degToRad((Math.random() * 2 - 1) * 38); tilt.x = THREE.MathUtils.degToRad((Math.random() * 2 - 1) * 26);
     applyTilt(false);
+    if (Math.random() < 0.5) applyDiam(4 + Math.round(Math.random() * 6));
   }
   const ang = hand.quaternion.angleTo(bar.quaternion);
   if (reduce) { hand.quaternion.copy(bar.quaternion); curl = 1; }
   else {
     if (ang > 0.002) { hand.quaternion.slerp(bar.quaternion, Math.min(1, dt * (ang > 0.15 ? 2.6 : 5))); busy = true; }
     else hand.quaternion.copy(bar.quaternion);
-    const want = ang > 0.06 ? 0.3 : 1;
+    const want = ang > 0.06 || now < regripUntil ? 0.3 : 1;
+    if (now < regripUntil) busy = true;
     if (Math.abs(curl - want) > 0.002) { curl += (want - curl) * Math.min(1, dt * 7); busy = true; } else curl = want;
   }
   poseHand();
