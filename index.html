@@ -7,787 +7,1069 @@
 <meta name="description" content="Gautam, Unity game developer. 3.5+ years of production C#: a live multiplayer Mahjong game, a photorealistic character creator, and a 3D scene composition tool.">
 <meta property="og:title" content="Gautam | Unity Game Developer">
 <meta property="og:description" content="Mahjong bots. Photoreal humans. Movie sets in a box. 3.5+ years of production Unity and C#.">
+<meta name="theme-color" content="#191919">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: a game-engine viewport. Grid-lined scene background, three project "cartridges" of equal
-   weight, each with its own color, a stat sheet, a boss fight, and a schematic where screenshots can't go. */
+/* Layout: the page is a Unity Editor window. Toolbar on top, Hierarchy on the left, a live Scene view
+   in the middle (Game tab plays the Pongz capture), Inspector on the right, Console along the bottom.
+   Below 1024px the panels stack: hierarchy becomes a sticky tab strip, scene ~55vh, inspector below. */
 :root {
-  --bg: #12141c;
-  --panel: #1a1d29;
-  --panel-2: #222637;
-  --line: #2e3348;
-  --text: #ecebf3;
-  --muted: #a3a7c2;
-  --jade: #3cc58e;
-  --coral: #ff7a5c;
-  --amber: #ffc145;
-  --ink: #12141c;
-  --c: var(--coral);
-  --f-display: "Bungee", "Arial Black", Impact, sans-serif;
-  --f-body: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --bg0: #191919;
+  --bg1: #232323;
+  --bg2: #282828;
+  --bg3: #3c3c3c;
+  --field: #1d1d1d;
+  --sep: #121212;
+  --sel: #2c5d87;
+  --text: #d2d2d2;
+  --bright: #ececec;
+  --muted: #a0a0a0;
+  --dim: #7c7c7c;
+  --red: #e8564a;
+  --green: #8fd14f;
+  --blue: #4a8ee8;
+  --amber: #e0b341;
+  --c: var(--blue);
+  --f-sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
-  --f-cjk: "Noto Serif SC", "Songti SC", "SimSun", "Noto Serif CJK SC", serif;
-  --step--1: .85rem; --step-0: 1rem; --step-1: 1.22rem; --step-2: 1.55rem; --step-3: clamp(1.7rem, 3.4vw, 2.3rem); --step-4: clamp(2.2rem, 6vw, 4rem);
-  --radius: 12px;
+  --tab-h: 28px;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 80px; }
-body {
-  margin: 0;
-  background-color: var(--bg);
-  background-image:
-    radial-gradient(ellipse at 70% -10%, rgba(255,122,92,.10), transparent 55%),
-    radial-gradient(ellipse at 0% 30%, rgba(60,197,142,.07), transparent 50%),
-    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
-  background-size: auto, auto, 40px 40px, 40px 40px;
-  color: var(--text);
-  font-family: var(--f-body);
-  font-size: var(--step-0);
-  line-height: 1.6;
-}
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
-a { color: var(--c); }
-:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; border-radius: 4px; }
-.wrap { max-width: 1160px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-h1, h2, h3 { text-wrap: balance; margin: 0; }
-p { margin: 0; }
+html, body { margin: 0; }
+body { background: var(--bg0); color: var(--text); font-family: var(--f-sans); font-size: 14px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+a { color: #7fb0ea; }
+a:hover { color: #a9caf2; }
+:focus-visible { outline: 2px solid var(--amber); outline-offset: 1px; }
+h1, h2, h3, p { margin: 0; }
 ul { margin: 0; padding: 0; list-style: none; }
-.eyebrow { font-family: var(--f-mono); font-size: var(--step--1); letter-spacing: .14em; text-transform: uppercase; color: var(--c); }
-.jade { --c: var(--jade); } .coral { --c: var(--coral); } .amber { --c: var(--amber); }
+button { font: inherit; color: inherit; }
+.mono { font-family: var(--f-mono); }
+.ic { width: 16px; height: 16px; flex: none; }
+[hidden] { display: none !important; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.c-green { --c: var(--green); } .c-red { --c: var(--red); } .c-blue { --c: var(--blue); } .c-amber { --c: var(--amber); }
 
-/* ---------- top bar ---------- */
-.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: rgba(18,20,28,.9); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
-.topbar .wrap { display: flex; align-items: center; gap: 16px; padding-block: 10px; }
-.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-family: var(--f-display); font-size: 1.05rem; }
-.logo b { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: var(--coral); color: var(--ink); box-shadow: 3px 3px 0 var(--amber); font-weight: 400; }
-.nav { display: flex; gap: 2px; margin-left: auto; flex-wrap: wrap; }
-.nav a { color: var(--muted); text-decoration: none; font-family: var(--f-mono); font-size: var(--step--1); padding: 6px 10px; border-radius: 6px; }
-.nav a:hover { color: var(--text); background: var(--panel-2); }
-.resume-btn { font-family: var(--f-mono); font-size: var(--step--1); font-weight: 700; text-decoration: none; color: var(--ink); background: var(--amber); padding: 6px 12px; border-radius: 6px; white-space: nowrap; box-shadow: 0 3px 0 #a87412; }
-.resume-btn:hover { transform: translateY(-1px); }
-.counter { font-family: var(--f-mono); font-size: var(--step--1); color: var(--amber); border: 1px dashed var(--amber); padding: 4px 8px; border-radius: 6px; white-space: nowrap; }
-
-/* ---------- hero ---------- */
-.hero .wrap { display: grid; grid-template-columns: 1.25fr 1fr; gap: 40px; align-items: center; padding-block: 64px 52px; }
-.hero h1 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-4); line-height: 1.04; margin-block: 14px 20px; }
-.hero h1 span { display: block; }
-.hero h1 .w1 { color: var(--jade); } .hero h1 .w2 { color: var(--coral); } .hero h1 .w3 { color: var(--amber); }
-.hero .sub { font-size: var(--step-1); color: var(--muted); max-width: 54ch; }
-.hero .sub b { color: var(--text); font-weight: 600; }
-.btns { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-.btn { font-family: var(--f-display); font-size: .95rem; letter-spacing: .03em; text-decoration: none; padding: 14px 20px; border-radius: 10px; border: 0; cursor: pointer; transition: transform .12s ease, box-shadow .12s ease; display: inline-flex; align-items: center; gap: 8px; }
-.btn-primary { background: var(--coral); color: var(--ink); box-shadow: 0 5px 0 #b44a31; }
-.btn-ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 2px var(--line); }
-.btn:hover { transform: translateY(-2px); }
-.btn-primary:active { transform: translateY(4px); box-shadow: 0 1px 0 #b44a31; }
-
-.carts { position: relative; height: 340px; }
-.cart {
-  position: absolute; width: 190px; height: 250px; border-radius: 16px 16px 10px 10px;
-  background: var(--panel); border: 2px solid var(--c); color: var(--text); text-decoration: none;
-  display: flex; flex-direction: column; overflow: hidden;
-  box-shadow: 0 10px 0 color-mix(in srgb, var(--c) 45%, #000), 0 22px 40px rgba(0,0,0,.45);
-  transition: transform .25s ease;
+/* ---------- editor grid ---------- */
+.app {
+  height: 100vh; height: 100dvh;
+  display: grid; gap: 2px; background: var(--sep);
+  grid-template-columns: 236px minmax(0, 1fr) minmax(360px, 410px);
+  grid-template-rows: 44px minmax(0, 1fr) 196px 26px;
+  grid-template-areas: "tool tool tool" "hier scene insp" "cons cons insp" "stat stat stat";
 }
-.cart .label { flex: 1; display: grid; place-items: center; background: linear-gradient(160deg, color-mix(in srgb, var(--c) 30%, var(--panel)), var(--panel)); }
-.cart .label svg { width: 92px; height: 92px; }
-.cart .name { font-family: var(--f-display); font-size: .82rem; padding: 10px 12px 2px; line-height: 1.2; }
-.cart .kind { font-family: var(--f-mono); font-size: .7rem; color: var(--muted); padding: 0 12px 12px; text-transform: uppercase; letter-spacing: .08em; }
-.cart .notch { height: 12px; background: repeating-linear-gradient(90deg, var(--c) 0 10px, transparent 10px 16px); opacity: .7; }
-.cart.k1 { left: 0; top: 50px; transform: rotate(-9deg); }
-.cart.k2 { left: 30%; top: 0; transform: rotate(2deg); z-index: 2; }
-.cart.k3 { left: 60%; top: 62px; transform: rotate(10deg); }
-.cart:hover, .cart:focus-visible { transform: translateY(-16px) rotate(0); z-index: 3; }
+.panel { background: var(--bg2); display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.tabs { display: flex; align-items: flex-end; gap: 0; height: var(--tab-h); background: var(--bg0); flex: none; padding-left: 2px; }
+.tab { display: inline-flex; align-items: center; gap: 6px; height: calc(var(--tab-h) - 2px); padding: 0 12px; font-size: 12.5px; color: var(--muted); background: transparent; border: 0; border-radius: 3px 3px 0 0; cursor: default; white-space: nowrap; text-decoration: none; }
+.tab.on { background: var(--bg2); color: var(--bright); box-shadow: inset 0 2px 0 var(--c, var(--blue)); }
+button.tab { cursor: pointer; }
+button.tab:not(.on):hover { color: var(--text); background: #222; }
+.tabs .spacer { flex: 1; }
+.scroll { overflow: auto; flex: 1; min-height: 0; scrollbar-color: #4a4a4a var(--bg2); scrollbar-width: thin; }
 
-/* ---------- HUD ---------- */
-.hud { background: var(--panel); border-block: 1px solid var(--line); }
-.hud .wrap { display: grid; grid-template-columns: repeat(4, 1fr); }
-.stat { padding: 20px 18px; border-right: 1px solid var(--line); min-width: 0; }
-.stat:last-child { border-right: 0; }
-.stat .v { font-family: var(--f-display); font-size: var(--step-3); color: var(--c); line-height: 1.1; font-variant-numeric: tabular-nums; }
-.stat .k { font-family: var(--f-mono); font-size: .76rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+/* ---------- toolbar ---------- */
+.toolbar { grid-area: tool; background: var(--bg0); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; padding: 0 10px; }
+.tb-left, .tb-right { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.tb-right { justify-content: flex-end; }
+.logo { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--bright); font-family: var(--f-mono); font-size: 13.5px; font-weight: 500; padding: 4px 8px 4px 4px; margin-right: 8px; border-radius: 3px; }
+.logo:hover { color: var(--bright); background: var(--bg1); }
+.logo .ic { width: 20px; height: 20px; }
+.logo span { color: var(--muted); }
+.menu { display: flex; gap: 2px; }
+.menu a { color: var(--text); text-decoration: none; font-size: 13px; padding: 5px 9px; border-radius: 3px; }
+.menu a:hover { background: var(--bg3); color: var(--bright); }
+.transport { display: flex; gap: 2px; background: var(--sep); border-radius: 4px; padding: 2px; }
+.tbtn { width: 38px; height: 28px; display: grid; place-items: center; background: var(--bg3); border: 0; border-radius: 3px; cursor: pointer; color: var(--text); padding: 0; }
+.tbtn:hover { background: #474747; }
+.tbtn[aria-pressed="true"] { background: var(--sel); color: #fff; }
+.tbtn svg { width: 14px; height: 14px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 30px; padding: 5px 12px; font-size: 13px; font-weight: 500; text-decoration: none; color: var(--bright); background: var(--bg3); border: 1px solid var(--sep); border-radius: 3px; cursor: pointer; white-space: nowrap; }
+.btn:hover { background: #4a4a4a; color: #fff; }
+.btn.primary { background: var(--sel); border-color: #1c3d5a; color: #fff; }
+.btn.primary:hover { background: #356ea0; }
+.btn .ic { width: 15px; height: 15px; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 6px; }
 
-/* ---------- sections ---------- */
-section { padding-block: 76px; }
-.sec-head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
-.sec-head h2 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-3); line-height: 1.1; }
-.sec-head p.note { color: var(--muted); max-width: 64ch; }
+/* ---------- hierarchy ---------- */
+.hier { grid-area: hier; }
+.hier .tab { --c: var(--bright); }
+.tree { padding: 4px 0 12px; }
+.tree a { display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px 0 calc(10px + var(--ind, 0) * 16px); color: var(--text); text-decoration: none; font-size: 13px; white-space: nowrap; }
+.tree a:hover { background: #303030; color: var(--bright); }
+.tree a[aria-current="true"] { background: var(--sel); color: #fff; }
+.tree .scene-row { font-weight: 600; background: #2e2e2e; height: 26px; }
+.tree .ic { width: 15px; height: 15px; color: #b7b7b7; }
+.tree a[data-obj="pongz"] .ic, .tree a[data-obj="cc"] .ic, .tree a[data-obj="ms"] .ic { color: #6fa7e6; }
+.tree a[aria-current="true"] .ic { color: #fff; }
+.tree .nm { overflow: hidden; text-overflow: ellipsis; }
+.badge { font-family: var(--f-mono); font-size: 10px; font-weight: 500; letter-spacing: .04em; padding: 0 5px; border-radius: 2px; line-height: 16px; border: 1px solid currentColor; }
+.badge.live { color: var(--green); }
+.badge.nda { color: var(--amber); }
+.tree a[aria-current="true"] .badge { color: #fff; }
+.tree .badge { margin-left: auto; }
+.hier-hint { font-size: 12px; color: var(--dim); padding: 6px 12px; border-top: 1px solid var(--bg1); }
 
-/* project select */
-.select { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-.pick { display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-top: 6px solid var(--c); border-radius: var(--radius); padding: 22px 20px; transition: transform .18s ease, border-color .18s ease; min-width: 0; }
-.pick:hover { transform: translateY(-6px); border-color: var(--c); }
-.pick h3 { font-family: var(--f-display); font-weight: 400; font-size: 1.15rem; line-height: 1.2; }
-.pick p { color: var(--muted); font-size: .96rem; }
-.pick .boss { font-size: .92rem; color: var(--text); }
-.pick .boss b { font-family: var(--f-mono); font-size: .72rem; color: var(--c); letter-spacing: .1em; margin-right: 6px; }
-.pick .go { margin-top: auto; font-family: var(--f-mono); font-size: var(--step--1); font-weight: 700; color: var(--c); }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { font-family: var(--f-mono); font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 4px 8px; border-radius: 5px; background: var(--panel-2); color: var(--muted); }
-.chip.on { background: var(--c); color: var(--ink); }
+/* ---------- scene / game ---------- */
+.center { grid-area: scene; background: var(--bg2); }
+.scene-bar { display: flex; align-items: center; gap: 4px; height: 30px; padding: 0 6px; background: var(--bg2); border-bottom: 1px solid var(--sep); flex: none; font-size: 12px; }
+.sbtn { height: 22px; display: inline-flex; align-items: center; gap: 5px; padding: 0 8px; background: var(--bg3); border: 1px solid var(--sep); border-radius: 3px; color: var(--text); font-size: 12px; cursor: pointer; }
+.sbtn:hover { background: #474747; }
+.sbtn[aria-pressed="true"] { background: var(--sel); color: #fff; }
+.scene-bar .info { margin-left: auto; color: var(--dim); font-family: var(--f-mono); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.views { position: relative; flex: 1; min-height: 0; }
+.view { position: absolute; inset: 0; }
+.view[hidden] { display: none !important; }
+#sceneView { background: #2a2a2a; overflow: hidden; }
+#sceneCanvas { display: block; width: 100%; height: 100%; outline: none; }
+.hero { position: absolute; left: 16px; top: 14px; max-width: min(560px, 70%); pointer-events: none; z-index: 2; transition: transform .25s ease, opacity .25s ease; transform-origin: 0 0; }
+.hero .eyebrow { font-family: var(--f-mono); font-size: 12px; color: var(--muted); letter-spacing: .04em; margin-bottom: 8px; }
+.hero h1 { font-size: clamp(1.6rem, 2.7vw, 2.6rem); line-height: 1.12; font-weight: 600; color: var(--bright); letter-spacing: -.01em; text-shadow: 0 1px 0 rgba(0,0,0,.6); }
+.hero h1 span { display: block; padding-left: 14px; position: relative; }
+.hero h1 span::before { content: ""; position: absolute; left: 0; top: .2em; bottom: .2em; width: 4px; border-radius: 1px; background: var(--c); }
+.hero .sub { margin-top: 10px; font-size: 13px; color: var(--text); font-family: var(--f-mono); text-shadow: 0 1px 0 rgba(0,0,0,.6); }
+.hero.compact { transform: scale(.6); opacity: .92; }
+.hero.compact .sub, .hero.compact .eyebrow { visibility: hidden; }
+.gizmo { position: absolute; right: 8px; top: 8px; width: 92px; height: 108px; pointer-events: none; z-index: 2; }
+.gizmo text { font-family: var(--f-mono); font-size: 11px; font-weight: 500; }
+.ovl { position: absolute; left: 12px; bottom: 12px; width: 280px; max-width: calc(100% - 24px); background: rgba(35,35,35,.96); border: 1px solid var(--sep); border-radius: 4px; z-index: 3; font-size: 12.5px; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+.ovl-h { display: flex; align-items: center; gap: 6px; padding: 5px 8px; background: var(--bg1); border-bottom: 1px solid var(--sep); border-radius: 4px 4px 0 0; font-weight: 500; color: var(--bright); font-size: 12px; }
+.ovl-b { padding: 8px 10px 10px; display: grid; gap: 8px; }
+.ovl-b p { color: var(--muted); }
+.ovl [data-for][hidden] { display: none; }
+.slider { display: grid; grid-template-columns: 112px 1fr 34px; gap: 8px; align-items: center; }
+.slider label { color: var(--text); }
+.slider output { font-family: var(--f-mono); font-size: 11px; text-align: right; color: var(--muted); }
+input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 22px; background: transparent; margin: 0; cursor: pointer; }
+input[type="range"]::-webkit-slider-runnable-track { height: 3px; background: #555; border-radius: 2px; }
+input[type="range"]::-moz-range-track { height: 3px; background: #555; border-radius: 2px; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; margin-top: -4.5px; border-radius: 50%; background: #c4c4c4; border: 1px solid var(--sep); }
+input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #c4c4c4; border: 1px solid var(--sep); }
+input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
+.honest { font-size: 11.5px; color: var(--dim); }
+.fallback { position: absolute; inset: 0; display: none; place-items: center; padding: 64px 16px 16px; background-color: #2a2a2a; background-image: linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px); background-size: 32px 32px; }
+.scene-fallback .fallback { display: grid; }
+.scene-fallback #sceneCanvas, .scene-fallback .gizmo, .scene-fallback .ovl .live-only { display: none; }
+.fallback-art { width: min(560px, 100%); display: grid; gap: 8px; justify-items: center; text-align: center; }
+.fallback-art svg, .fallback-art img { width: 100%; height: auto; max-height: 52vh; object-fit: contain; border: 1px solid var(--sep); border-radius: 3px; }
+.fallback-art p { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); }
+#gameView { background: #000; display: flex; flex-direction: column; }
+#gameView video { flex: 1; min-height: 0; width: 100%; height: 100%; object-fit: contain; background: #000; display: block; }
+.game-cap { display: flex; gap: 12px; align-items: center; padding: 6px 10px; background: var(--bg1); font-size: 12px; color: var(--muted); border-top: 1px solid var(--sep); }
+.game-cap b { color: var(--bright); font-weight: 500; }
+.game-cap .rec { width: 8px; height: 8px; border-radius: 50%; background: var(--red); flex: none; }
 
-/* case studies */
-.case { border-top: 1px solid var(--line); }
-.case-head { margin-bottom: 30px; display: flex; flex-direction: column; gap: 10px; }
-.case-head h2 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-3); line-height: 1.1; }
-.case-head .tag { font-size: var(--step-2); font-weight: 800; line-height: 1.25; color: var(--text); max-width: 34ch; }
-.case-head .lede { color: var(--muted); font-size: var(--step-1); max-width: 64ch; }
-.case-body { display: grid; grid-template-columns: 290px 1fr; gap: 32px; align-items: start; }
-.sheet { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: var(--radius); padding: 18px; position: sticky; top: 90px; min-width: 0; }
-.sheet h3 { font-family: var(--f-mono); font-size: var(--step--1); letter-spacing: .14em; text-transform: uppercase; color: var(--c); margin-bottom: 10px; }
-.sheet dl { display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; margin: 0; font-size: .92rem; }
-.sheet dt { font-family: var(--f-mono); color: var(--muted); font-size: .76rem; text-transform: uppercase; padding-top: 2px; }
-.sheet dd { margin: 0; min-width: 0; }
-.stores { display: grid; gap: 10px; margin-top: 18px; }
-.store { display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; font-family: var(--f-display); font-size: .85rem; padding: 12px; border-radius: 8px; background: var(--c); color: var(--ink); box-shadow: 0 4px 0 color-mix(in srgb, var(--c) 50%, #000); }
-.store:hover { transform: translateY(-2px); }
-.store svg { width: 18px; height: 18px; }
-.content { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
-
-.frame { margin: 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); background: #000; }
-.frame video, .frame img { display: block; width: 100%; height: auto; }
-.frame figcaption, .shot figcaption, .schematic figcaption { font-family: var(--f-mono); font-size: .78rem; color: var(--muted); padding: 10px 12px; background: var(--panel); }
-.gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.shot { margin: 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: var(--panel); min-width: 0; }
-.shot button { display: block; padding: 0; border: 0; background: none; cursor: zoom-in; width: 100%; }
+/* ---------- inspector ---------- */
+.insp { grid-area: insp; }
+.insp .tab { --c: var(--bright); }
+.page[hidden] { display: none; }
+.obj-head { display: grid; grid-template-columns: auto 1fr; gap: 6px 10px; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--sep); background: var(--bg2); }
+.obj-head .cube { width: 34px; height: 34px; display: grid; place-items: center; background: var(--bg1); border: 1px solid var(--sep); border-radius: 3px; color: var(--c); grid-row: span 2; }
+.obj-head .cube .ic { width: 20px; height: 20px; }
+.obj-head h2 { font-size: 14px; font-weight: 600; color: var(--bright); background: var(--field); border: 1px solid var(--sep); border-radius: 3px; padding: 2px 8px; line-height: 1.5; overflow-wrap: anywhere; }
+.obj-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); }
+.obj-meta b { color: var(--text); font-weight: 500; }
+.comp { border-bottom: 1px solid var(--sep); }
+.comp > summary { list-style: none; display: flex; align-items: center; gap: 7px; padding: 0 10px; min-height: 30px; background: #303030; border-top: 1px solid #383838; cursor: pointer; user-select: none; }
+.comp > summary::-webkit-details-marker { display: none; }
+.comp > summary::before { content: ""; width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid var(--muted); transform: rotate(-90deg); transition: transform .12s; flex: none; }
+.comp[open] > summary::before { transform: none; }
+.comp > summary:hover { background: #363636; }
+.comp > summary h3 { font-size: 13px; font-weight: 600; color: var(--bright); }
+.comp > summary h3 small { font-weight: 400; color: var(--muted); font-size: 13px; }
+.comp > summary .ic { color: var(--c); }
+.comp > summary .chk { width: 13px; height: 13px; border-radius: 2px; background: var(--field); border: 1px solid #555; display: grid; place-items: center; flex: none; }
+.comp > summary .chk::after { content: ""; width: 7px; height: 4px; border-left: 2px solid var(--text); border-bottom: 2px solid var(--text); transform: rotate(-45deg) translate(1px, -1px); }
+.comp-b { padding: 10px 12px 14px; display: grid; gap: 10px; }
+.field { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 13px; }
+.field > span:first-child { color: var(--muted); padding-top: 3px; }
+.val { background: var(--field); border: 1px solid var(--sep); border-radius: 3px; padding: 2px 8px; color: var(--text); min-height: 26px; overflow-wrap: anywhere; }
+.val.live { color: var(--green); }
+.val.nda { color: var(--amber); }
+.prose { display: grid; gap: 9px; font-size: 14px; color: var(--text); }
+.prose strong { color: var(--bright); font-weight: 600; }
+.prose .lead { font-size: 15.5px; color: var(--bright); font-weight: 500; line-height: 1.45; }
+.prose h4 { font-size: 14.5px; color: var(--bright); font-weight: 600; margin: 0; }
+.helpbox { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: start; background: #2f2a1f; border: 1px solid #4a3f22; border-radius: 3px; padding: 8px 10px; font-size: 13px; color: #e6dcc0; }
+.helpbox.info { background: #22292f; border-color: #2f4252; color: #c9d8e6; }
+.helpbox svg { width: 18px; height: 18px; margin-top: 1px; }
+.list { display: grid; gap: 0; border: 1px solid var(--sep); border-radius: 3px; overflow: hidden; }
+.list > * { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; padding: 8px 10px; background: var(--bg1); font-size: 13.5px; }
+.list > *:nth-child(even) { background: #262626; }
+.list .k { font-family: var(--f-mono); font-size: 10.5px; color: var(--c); padding-top: 3px; letter-spacing: .04em; }
+.list h4 { font-size: 13.5px; color: var(--bright); font-weight: 600; margin: 0 0 2px; }
+.list p { color: var(--text); }
+.stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; background: var(--sep); border: 1px solid var(--sep); border-radius: 3px; overflow: hidden; }
+.stats div { background: var(--bg1); padding: 8px 10px; }
+.stats b { display: block; font-family: var(--f-mono); font-size: 20px; font-weight: 500; color: var(--bright); line-height: 1.2; }
+.stats span { font-size: 12px; color: var(--muted); }
+.picks { display: grid; gap: 6px; }
+.pick { display: grid; gap: 3px; text-align: left; text-decoration: none; padding: 9px 10px 10px 12px; background: var(--bg1); border: 1px solid var(--sep); border-left: 3px solid var(--c); border-radius: 3px; color: var(--text); }
+.pick:hover { background: #2e2e2e; color: var(--text); }
+.pick .t { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--bright); font-size: 14px; }
+.pick .t .badge { margin-left: auto; }
+.pick .m { font-size: 12px; color: var(--muted); font-family: var(--f-mono); }
+.pick .h { font-size: 13px; }
+.pick .h b { font-family: var(--f-mono); font-size: 10.5px; color: var(--c); font-weight: 500; margin-right: 4px; }
+.gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.shot { margin: 0; min-width: 0; }
+.shot button { display: block; width: 100%; padding: 0; border: 1px solid var(--sep); border-radius: 3px; overflow: hidden; background: #000; cursor: zoom-in; }
+.shot button:hover { border-color: var(--blue); }
 .shot img { display: block; width: 100%; aspect-ratio: 2000 / 923; object-fit: cover; }
-
-.boss-fight { position: relative; background: linear-gradient(135deg, color-mix(in srgb, var(--c) 18%, var(--panel)), var(--panel) 70%); border: 2px solid var(--c); border-radius: var(--radius); padding: 22px 22px 22px; }
-.boss-fight .hp { display: flex; align-items: center; gap: 10px; font-family: var(--f-mono); font-size: .76rem; letter-spacing: .1em; text-transform: uppercase; color: var(--c); margin-bottom: 8px; }
-.boss-fight .hp i { flex: 1; max-width: 160px; height: 8px; border-radius: 4px; background: var(--panel-2); position: relative; overflow: hidden; }
-.boss-fight .hp i::after { content: ""; position: absolute; inset: 0 100% 0 0; background: var(--c); }
-.boss-fight .hp em { font-style: normal; color: var(--text); }
-.boss-fight h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
-.boss-fight p { color: var(--muted); }
-.boss-fight p strong { color: var(--text); }
-
-.abilities { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-.ability { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 18px 20px; min-width: 0; }
-.ability h3 { font-weight: 800; font-size: 1.05rem; color: var(--text); margin-bottom: 6px; display: flex; gap: 10px; align-items: baseline; }
-.ability h3 .k { font-family: var(--f-mono); font-size: .7rem; color: var(--ink); background: var(--c); padding: 1px 6px; border-radius: 3px; flex: none; }
-.ability p { color: var(--muted); font-size: .96rem; }
-.ability.wide { grid-column: 1 / -1; }
-
-.credits { border-left: 4px solid var(--c); background: var(--panel); padding: 16px 18px; border-radius: 0 var(--radius) var(--radius) 0; }
-.credits b { font-family: var(--f-mono); font-size: .76rem; letter-spacing: .1em; text-transform: uppercase; color: var(--c); display: block; margin-bottom: 4px; }
-.credits p { color: var(--muted); }
-
-.schematic { margin: 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); background: #0e1017; }
+.shot figcaption { font-size: 11.5px; color: var(--muted); padding-top: 4px; line-height: 1.35; }
+.vplayer { position: relative; display: block; width: 100%; padding: 0; border: 1px solid var(--sep); border-radius: 3px; overflow: hidden; background: #000; cursor: pointer; }
+.vplayer img { display: block; width: 100%; height: auto; opacity: .85; }
+.vplayer span { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: inline-flex; align-items: center; gap: 8px; background: rgba(25,25,25,.92); border: 1px solid var(--sep); padding: 8px 14px; border-radius: 3px; font-size: 13px; font-weight: 500; color: #fff; }
+.vplayer:hover span { background: var(--sel); }
+.vcap { font-size: 12px; color: var(--muted); }
+.speed { display: grid; gap: 6px; }
+.speed .row { display: grid; grid-template-columns: 86px 1fr 40px; gap: 10px; align-items: center; font-size: 12.5px; color: var(--muted); }
+.speed .bar { height: 14px; background: var(--field); border: 1px solid var(--sep); border-radius: 2px; position: relative; overflow: hidden; }
+.speed .bar i { position: absolute; inset: 0 auto 0 0; background: var(--c); }
+.speed .row b { font-family: var(--f-mono); color: var(--bright); font-weight: 500; text-align: right; }
+.speed small { font-size: 11.5px; color: var(--dim); }
+.schematic { margin: 0; border: 1px solid var(--sep); border-radius: 3px; overflow: hidden; background: #1e1e1e; }
 .schematic svg { display: block; width: 100%; height: auto; }
-.schematic .lbl { font-family: var(--f-mono); font-size: 13px; fill: var(--muted); }
-.schematic .lblc { font-family: var(--f-mono); font-size: 13px; font-weight: 700; fill: var(--c); }
-.schematic .ttl { font-family: var(--f-mono); font-size: 12px; fill: #6d728f; letter-spacing: .08em; }
-.stamp { display: inline-block; font-family: var(--f-display); color: var(--c); border: 3px solid var(--c); padding: 2px 10px; border-radius: 6px; transform: rotate(-3deg); font-size: .82rem; letter-spacing: .05em; }
-.confidential { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; color: var(--muted); font-size: .94rem; border: 1px dashed var(--line); border-radius: var(--radius); padding: 14px 16px; }
-.confidential p { flex: 1 1 260px; }
+.schematic figcaption { font-size: 12px; color: var(--muted); padding: 7px 10px; background: var(--bg1); border-top: 1px solid var(--sep); }
+.schematic .lbl { font-family: var(--f-mono); font-size: 13px; fill: #a0a0a0; }
+.schematic .lblc { font-family: var(--f-mono); font-size: 13px; font-weight: 500; fill: var(--c); }
+.schematic .ttl { font-family: var(--f-mono); font-size: 12px; fill: #7c7c7c; letter-spacing: .08em; }
+.job .dur { height: 8px; border-radius: 1px; background: var(--field); border: 1px solid var(--sep); position: relative; }
+.job .dur i { position: absolute; inset: 0 auto 0 0; background: var(--c); }
+.tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.tags li { font-size: 12.5px; padding: 2px 8px; background: var(--bg3); border: 1px solid var(--sep); border-radius: 3px; color: var(--text); }
+.tags li.key { background: var(--sel); color: #fff; }
+.skill-g { display: grid; gap: 5px; }
+.skill-g h4 { font-size: 12px; font-weight: 500; color: var(--muted); margin: 0; }
+.email-box { display: flex; align-items: stretch; border: 1px solid var(--sep); border-radius: 3px; overflow: hidden; max-width: 100%; }
+.email-box code { flex: 1; min-width: 0; font-family: var(--f-mono); font-size: 13px; padding: 6px 10px; background: var(--field); user-select: all; overflow-wrap: anywhere; color: var(--bright); }
+.email-box button { border: 0; border-left: 1px solid var(--sep); background: var(--bg3); padding: 6px 14px; cursor: pointer; font-size: 13px; }
+.email-box button:hover { background: #4a4a4a; }
+.contact-h { font-size: 22px; font-weight: 600; color: var(--bright); line-height: 1.25; }
 
-.speed { display: grid; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
-.speed .row { display: grid; grid-template-columns: 74px 1fr 52px; gap: 12px; align-items: center; font-family: var(--f-mono); font-size: .8rem; color: var(--muted); }
-.speed .bar { height: 16px; border-radius: 4px; background: var(--panel-2); position: relative; overflow: hidden; }
-.speed .bar i { position: absolute; inset: 0 auto 0 0; background: var(--c); border-radius: 4px; }
-.speed .row b { color: var(--text); text-align: right; font-variant-numeric: tabular-nums; }
-.speed small { font-family: var(--f-mono); font-size: .74rem; color: #6d728f; }
+/* ---------- console ---------- */
+.cons { grid-area: cons; }
+.cons-bar { display: flex; align-items: center; gap: 4px; height: 28px; padding: 0 6px; border-bottom: 1px solid var(--sep); flex: none; }
+.cons-bar .grow { flex: 1; }
+.cnt { height: 22px; display: inline-flex; align-items: center; gap: 5px; padding: 0 7px; background: transparent; border: 1px solid transparent; border-radius: 3px; font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); cursor: pointer; }
+.cnt[aria-pressed="true"] { background: var(--bg3); border-color: var(--sep); color: var(--bright); }
+.cnt svg { width: 13px; height: 13px; }
+.cnt:disabled { cursor: default; }
+.logs li { border-bottom: 1px solid #222; }
+.logs li:nth-child(odd) { background: #2b2b2b; }
+.logs button { display: grid; grid-template-columns: 18px auto minmax(0, 1fr); gap: 8px; align-items: start; width: 100%; text-align: left; padding: 5px 10px; background: transparent; border: 0; cursor: pointer; font-size: 12.5px; line-height: 1.45; }
+.logs button:hover { background: #333; }
+.logs svg { width: 15px; height: 15px; margin-top: 1px; }
+.logs .src { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); padding-top: 1px; }
+.logs .warn .msg { color: #ecd28a; }
+.logs li[hidden] { display: none; }
 
-/* side quests */
-.quests { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-.quest { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; min-width: 0; }
-.quest .ico { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; background: var(--panel-2); color: var(--amber); font-family: var(--f-mono); font-weight: 700; }
-.quest h3 { font-weight: 800; font-size: 1.05rem; margin-bottom: 4px; }
-.quest p { color: var(--muted); font-size: .95rem; }
+/* ---------- status bar ---------- */
+.status { grid-area: stat; background: var(--bg0); display: flex; align-items: center; gap: 16px; padding: 0 10px; font-size: 11.5px; color: var(--dim); min-width: 0; }
+.status .l { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+.status .r { white-space: nowrap; }
 
-/* experience */
-.timeline { display: grid; gap: 16px; }
-.job { display: grid; grid-template-columns: 220px 1fr; gap: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
-.job .when { font-family: var(--f-mono); font-size: .82rem; color: var(--muted); }
-.job .when b { display: block; font-family: var(--f-display); font-weight: 400; font-size: 1.4rem; color: var(--c); }
-.job h3 { font-weight: 800; font-size: 1.12rem; }
-.job .co { color: var(--muted); font-size: .95rem; margin-bottom: 10px; }
-.dur { height: 10px; border-radius: 5px; background: var(--panel-2); margin-top: 12px; position: relative; max-width: 100%; }
-.dur i { position: absolute; inset: 0 auto 0 0; border-radius: 5px; background: var(--c); }
+/* ---------- lightbox ---------- */
+.lightbox { position: fixed; inset: 0; z-index: 60; background: rgba(10,10,10,.94); display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top, 0px)) 16px max(16px, env(safe-area-inset-bottom, 0px)); cursor: zoom-out; }
+.lightbox img { max-width: 100%; max-height: calc(100vh - 100px); border: 1px solid #333; }
+.lightbox figcaption { color: var(--muted); font-size: 13px; margin-top: 8px; text-align: center; }
+.lightbox .x { position: absolute; top: max(10px, env(safe-area-inset-top, 0px)); right: 10px; min-width: 44px; min-height: 44px; }
 
-/* about + inventory */
-.about .wrap { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: start; }
-.bio { display: flex; flex-direction: column; gap: 16px; font-size: 1.08rem; max-width: 62ch; }
-.inv { display: grid; gap: 16px; }
-.inv h3 { font-family: var(--f-mono); font-size: .76rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
-.slots { display: flex; flex-wrap: wrap; gap: 8px; }
-.slot { font-family: var(--f-mono); font-size: .8rem; padding: 7px 11px; border-radius: 6px; background: var(--panel); border: 1px solid var(--line); color: var(--text); }
-.slot.rare { border-color: var(--amber); color: var(--amber); }
+/* no-JS: show every inspector page in sequence */
+.nojs .page[hidden] { display: block; }
 
-/* contact */
-.contact { text-align: center; }
-.contact .wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
-.contact h2 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-4); line-height: 1.05; max-width: 17ch; }
-.contact .cont { font-family: var(--f-display); color: var(--amber); font-size: var(--step-2); }
-.contact-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
-.email-box { display: inline-flex; align-items: stretch; border-radius: 10px; overflow: hidden; box-shadow: inset 0 0 0 2px var(--line); max-width: 100%; }
-.email-box code { font-family: var(--f-mono); padding: 12px 14px; user-select: all; overflow-wrap: anywhere; }
-.email-box button { font-family: var(--f-mono); font-size: var(--step--1); border: 0; background: var(--panel-2); color: var(--text); padding: 12px 14px; cursor: pointer; }
-.email-box button:hover { background: var(--line); }
-.meta { font-family: var(--f-mono); font-size: var(--step--1); color: var(--muted); }
-
-footer { border-top: 1px solid var(--line); background: var(--panel); }
-footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding-block: 22px; font-family: var(--f-mono); font-size: var(--step--1); color: var(--muted); }
-
-/* collectibles */
-.egg { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; border: 1px dashed var(--line); background: transparent; color: var(--muted); cursor: pointer; padding: 0; opacity: .6; transition: opacity .2s, transform .2s, color .2s; font-family: var(--f-cjk); font-size: 1rem; }
-.egg:hover, .egg:focus-visible { opacity: 1; transform: rotate(-10deg) scale(1.1); color: var(--c); }
-.egg.found { opacity: 1; color: var(--ink); background: var(--c); border-color: var(--c); pointer-events: none; }
-.egg svg { width: 16px; height: 16px; }
-.egg-slot { display: flex; justify-content: flex-end; margin-top: -8px; }
-.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(150%); visibility: hidden; background: var(--text); color: var(--ink); font-weight: 600; padding: 14px 18px; border-radius: 10px; box-shadow: 0 5px 0 var(--coral), 0 16px 30px rgba(0,0,0,.45); z-index: 50; transition: transform .3s ease, visibility .3s; max-width: calc(100vw - 32px); }
-.toast.show { transform: translateX(-50%) translateY(0); visibility: visible; }
-.toast.win { background: var(--amber); box-shadow: 0 5px 0 #a87412, 0 16px 30px rgba(0,0,0,.45); }
-
-/* lightbox */
-.lightbox { position: fixed; inset: 0; z-index: 60; background: rgba(8,9,13,.92); display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); cursor: zoom-out; }
-.lightbox img { max-width: 100%; max-height: 100%; border-radius: 10px; }
-
-/* ---------- responsive ---------- */
-@media (max-width: 960px) {
-  .hero .wrap { grid-template-columns: 1fr; padding-block: 40px 36px; }
-  .carts { height: 250px; max-width: 420px; }
-  .cart { width: 140px; height: 186px; }
-  .cart .label svg { width: 64px; height: 64px; }
-  .hud .wrap { grid-template-columns: repeat(2, 1fr); }
-  .stat:nth-child(2) { border-right: 0; }
-  .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
-  .select { grid-template-columns: 1fr; max-width: 560px; }
-  .case-body { grid-template-columns: 1fr; }
-  .sheet { position: static; }
-  .about .wrap { grid-template-columns: 1fr; gap: 32px; }
+/* ---------- desktop, short screens ---------- */
+@media (min-width: 1024px) and (max-height: 720px) {
+  .app { grid-template-rows: 44px minmax(0, 1fr) 132px 26px; }
 }
-@media (max-width: 640px) {
-  .nav { display: none; }
-  .resume-btn { margin-left: auto; }
-  section { padding-block: 54px; }
-  .abilities, .quests, .gallery { grid-template-columns: 1fr; }
-  .job { grid-template-columns: 1fr; gap: 10px; }
-  .cart .name { font-size: .7rem; }
-  .stat { padding: 16px 12px; }
+
+/* ---------- stacked layout (tablet / phone) ---------- */
+@media (max-width: 1023px) {
+  .app { display: block; height: auto; background: var(--bg0); }
+  .panel { border-bottom: 2px solid var(--sep); }
+  .toolbar { display: flex; flex-wrap: nowrap; height: auto; padding: 6px max(10px, env(safe-area-inset-right, 0px)) 6px max(10px, env(safe-area-inset-left, 0px)); gap: 8px; border-bottom: 2px solid var(--sep); }
+  .tb-left { flex: 1; }
+  .menu { display: none; }
+  .logo { margin-right: 0; min-height: 44px; }
+  .logo span { display: none; }
+  .tbtn { width: 44px; height: 44px; }
+  .btn, .sbtn, .cnt { min-height: 44px; }
+  .btn.resume-btn span { display: none; }
+  .hier { position: sticky; top: 0; z-index: 20; }
+  .hier .tabs, .hier-hint { display: none; }
+  .tree { display: flex; overflow-x: auto; padding: 0; gap: 0; scrollbar-width: none; overscroll-behavior-x: contain; }
+  .tree::-webkit-scrollbar { display: none; }
+  .tree li { flex: none; }
+  .tree a, .tree .scene-row { height: 44px; padding: 0 12px; font-weight: 500; background: transparent; border-right: 1px solid var(--sep); }
+  .tree a[aria-current="true"] { background: var(--sel); }
+  .tree .badge { margin-left: 2px; }
+  .center { height: auto; }
+  .views { position: static; }
+  .view { position: relative; inset: auto; }
+  #sceneView { display: flex; flex-direction: column; }
+  #sceneCanvas, #gameView, .fallback { height: 55vh; min-height: 340px; max-height: 620px; flex: none; }
+  @supports (height: 1svh) { #sceneCanvas, #gameView, .fallback { height: 55svh; } }
+  .fallback { position: absolute; inset: 0 0 auto 0; }
+  .scene-fallback .fallback { position: relative; }
+  .scene-fallback .ovl { border-top: 1px solid var(--sep); }
+  .scene-fallback .fallback { padding-top: 132px; }
+  .scene-fallback .hero .sub { display: none; }
+  .scene-bar { height: auto; flex-wrap: wrap; padding: 4px 6px; }
+  .tabs { height: 46px; }
+  .tab { height: 44px; }
+  .hero { left: 12px; top: 10px; max-width: calc(100% - 100px); }
+  .hero h1 { font-size: clamp(1.25rem, 6vw, 1.9rem); }
+  .hero .sub { font-size: 11.5px; }
+  .hero.compact { transform: scale(.7); }
+  .gizmo { transform: scale(.8); transform-origin: 100% 0; }
+  .ovl { position: static; width: auto; max-width: none; border-radius: 0; border: 0; border-top: 1px solid var(--sep); box-shadow: none; }
+  .ovl-h { border-radius: 0; }
+  .slider { grid-template-columns: 116px 1fr 36px; min-height: 44px; }
+  input[type="range"] { height: 44px; }
+  input[type="range"]::-webkit-slider-thumb { width: 22px; height: 22px; margin-top: -9.5px; }
+  input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; }
+  .comp > summary { min-height: 44px; }
+  .field { grid-template-columns: 92px minmax(0, 1fr); }
+  .gallery { grid-template-columns: 1fr; gap: 10px; }
+  .shot figcaption { font-size: 12.5px; }
+  .email-box button { min-width: 64px; }
+  .logs button { min-height: 44px; padding-block: 8px; }
+  .status { flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px max(12px, env(safe-area-inset-left, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)); }
+  .status .l, .status .r { white-space: normal; }
 }
-@media (prefers-reduced-motion: no-preference) {
-  .cart.k2 { animation: bob 3.4s ease-in-out infinite; }
-  @keyframes bob { 50% { transform: translateY(-10px) rotate(2deg); } }
-  .boss-fight .hp i::after { animation: hp 2.4s ease-out .3s both; }
-  @keyframes hp { from { inset: 0 0 0 0; } to { inset: 0 100% 0 0; } }
-  .hand-anim .j { animation: settle 3s ease-in-out infinite alternate; }
-  @keyframes settle { from { transform: translate(var(--dx), var(--dy)); } to { transform: none; } }
+@media (max-width: 1023px) and (min-width: 700px) {
+  .gallery { grid-template-columns: repeat(3, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { animation: none !important; transition: none !important; }
+  *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }
 </style>
 </head>
 <body>
+<script>document.documentElement.className = "js";</script>
 
-<header class="topbar">
-  <div class="wrap">
-    <a class="logo" href="#top"><b aria-hidden="true">G</b>Gautam</a>
-    <nav class="nav" aria-label="Sections">
-      <a href="#projects">Projects</a>
-      <a href="#experience">Experience</a>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
-    </nav>
-    <a class="resume-btn" href="assets/Gautam_Resume.pdf" target="_blank" rel="noopener">Resume PDF</a>
-    <span class="counter" id="counter" title="One collectible is hidden in each project">★ 0/3</span>
-  </div>
-</header>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-cube" viewBox="0 0 16 16"><path d="M8 1.5 14 4.8v6.4L8 14.5 2 11.2V4.8Z M2 4.8 8 8l6-3.2M8 8v6.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></symbol>
+  <symbol id="i-prefab" viewBox="0 0 16 16"><path d="M8 1.5 14 4.8v6.4L8 14.5 2 11.2V4.8Z" fill="currentColor" opacity=".35"/><path d="M8 1.5 14 4.8v6.4L8 14.5 2 11.2V4.8Z M2 4.8 8 8l6-3.2M8 8v6.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></symbol>
+  <symbol id="i-scene" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M2 10.5 6 7l3 3 2-2 3 3" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="i-script" viewBox="0 0 16 16"><path d="M3.5 1.5h6l3 3v10h-9Z" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M6 8.2h4.6M5.6 10.6h4.6M7.2 6.6l-.8 5.6M9.4 6.6l-.8 5.6" stroke="currentColor" stroke-width="1"/></symbol>
+  <symbol id="i-info" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="#d2d2d2"/><path d="M8 7v4.5M8 4.6v.1" stroke="#232323" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 16 16"><path d="M8 1.6 15 14H1Z" fill="#e0b341"/><path d="M8 6v4M8 12v.1" stroke="#232323" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-err" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="#e8564a"/><path d="M5.6 5.6l4.8 4.8M10.4 5.6l-4.8 4.8" stroke="#232323" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-play" viewBox="0 0 16 16"><path d="M4 2.5v11L13 8Z" fill="currentColor"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 16 16"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" fill="currentColor"/></symbol>
+  <symbol id="i-step" viewBox="0 0 16 16"><path d="M2.5 2.5v11L9.5 8Z M11 2.5h2.5v11H11z" fill="currentColor"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 16 16"><path d="M3.5 1.5h6l3 3v10h-9Z M9.5 1.5v3h3 M5.5 8h5M5.5 10.5h5" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 16 16"><rect x="1.5" y="3.5" width="13" height="9" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m2 4 6 5 6-5" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+  <symbol id="i-video" viewBox="0 0 16 16"><rect x="1.5" y="3.5" width="9.5" height="9" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m11 7 3.5-2v6L11 9" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+  <symbol id="i-image" viewBox="0 0 16 16"><rect x="1.5" y="2.5" width="13" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="5.5" cy="6" r="1.3" fill="currentColor"/><path d="m2 12 4-4 3 3 2-2 3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+</svg>
 
-<main id="top">
-  <section class="hero" aria-labelledby="hero-title" style="padding-block:0">
-    <div class="wrap">
-      <div>
-        <p class="eyebrow">Player 1 · Unity Game Developer</p>
-        <h1 id="hero-title"><span class="w1">Mahjong bots.</span> <span class="w2">Photoreal humans.</span> <span class="w3">Movie sets in a box.</span></h1>
-        <p class="sub">I'm Gautam, a Unity developer with <b>3.5+ years of production C#</b>. I designed and built the client architecture of a live multiplayer game, led development of a photorealistic character creator, and solved real-time hand placement for a 3D scene tool. Based in Mumbai. Available immediately.</p>
-        <div class="btns">
-          <a class="btn btn-primary" href="#projects">Pick a project ▸</a>
-          <a class="btn btn-ghost" href="assets/Gautam_Resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
+<div class="app" id="app">
+
+  <!-- ===================== TOOLBAR ===================== -->
+  <header class="toolbar">
+    <div class="tb-left">
+      <a class="logo" href="#" data-select="overview" aria-label="gautam.unity, overview"><svg class="ic" aria-hidden="true"><use href="#i-prefab"/></svg>gautam<span>.unity</span></a>
+      <nav class="menu" aria-label="Sections">
+        <a href="#pongz" data-select="pongz">Projects</a>
+        <a href="#experience" data-select="exp">Experience</a>
+        <a href="#about" data-select="about">About</a>
+        <a href="#contact" data-select="contact">Contact</a>
+      </nav>
+    </div>
+    <div class="transport" role="group" aria-label="Play the Pongz gameplay capture">
+      <button class="tbtn" id="btnPlay" type="button" aria-pressed="false" title="Play: Pongz gameplay capture"><svg aria-hidden="true"><use href="#i-play"/></svg><span class="sr">Play</span></button>
+      <button class="tbtn" id="btnPause" type="button" aria-pressed="false" title="Pause"><svg aria-hidden="true"><use href="#i-pause"/></svg><span class="sr">Pause</span></button>
+      <button class="tbtn" id="btnStep" type="button" title="Step one frame"><svg aria-hidden="true"><use href="#i-step"/></svg><span class="sr">Step</span></button>
+    </div>
+    <div class="tb-right">
+      <a class="btn resume-btn" href="assets/Gautam_Resume.pdf" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>Resume<span>&nbsp;PDF</span></a>
+    </div>
+  </header>
+
+  <!-- ===================== HIERARCHY ===================== -->
+  <nav class="panel hier" aria-label="Hierarchy">
+    <div class="tabs"><span class="tab on">Hierarchy</span></div>
+    <div class="scroll">
+      <ul class="tree" id="tree">
+        <li><a class="scene-row" href="#" data-obj="overview"><svg class="ic" aria-hidden="true"><use href="#i-scene"/></svg><span class="nm">Portfolio</span></a></li>
+        <li><a href="#pongz" data-obj="pongz" style="--ind:1"><svg class="ic" aria-hidden="true"><use href="#i-prefab"/></svg><span class="nm">Pongz_SGMahjong</span><span class="badge live">LIVE</span></a></li>
+        <li><a href="#character-creator" data-obj="cc" style="--ind:1"><svg class="ic" aria-hidden="true"><use href="#i-prefab"/></svg><span class="nm">CharacterCreator</span><span class="badge nda">NDA</span></a></li>
+        <li><a href="#movie-studio" data-obj="ms" style="--ind:1"><svg class="ic" aria-hidden="true"><use href="#i-prefab"/></svg><span class="nm">MovieStudio3D</span><span class="badge nda">NDA</span></a></li>
+        <li><a href="#side-quests" data-obj="quests" style="--ind:1"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg><span class="nm">SideQuests</span></a></li>
+        <li><a href="#experience" data-obj="exp" style="--ind:1"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg><span class="nm">Experience</span></a></li>
+        <li><a href="#about" data-obj="about" style="--ind:1"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg><span class="nm">About</span></a></li>
+        <li><a href="#contact" data-obj="contact" style="--ind:1"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg><span class="nm">Contact</span></a></li>
+      </ul>
+    </div>
+    <p class="hier-hint">Select an object. Arrow keys move the selection.</p>
+  </nav>
+
+  <!-- ===================== SCENE / GAME ===================== -->
+  <main class="panel center" id="top">
+    <div class="tabs" role="tablist" aria-label="View">
+      <button class="tab on" type="button" role="tab" id="tabScene" aria-selected="true" aria-controls="sceneView">Scene</button>
+      <button class="tab" type="button" role="tab" id="tabGame" aria-selected="false" aria-controls="gameView">Game</button>
+    </div>
+    <div class="scene-bar" id="sceneBar">
+      <button class="sbtn live-only" type="button" id="btnFrame" title="Frame selected (F)">Frame selected</button>
+      <button class="sbtn live-only" type="button" id="btnWire" aria-pressed="false">Wireframe</button>
+      <span class="info" id="sceneInfo">Persp</span>
+    </div>
+    <div class="views">
+      <div class="view" id="sceneView" role="tabpanel" aria-labelledby="tabScene">
+        <canvas id="sceneCanvas" aria-label="Interactive 3D scene. Use the controls under the scene to change it."></canvas>
+        <div class="hero" id="hero">
+          <p class="eyebrow">Gautam · Unity Game Developer</p>
+          <h1><span class="c-green">Mahjong bots.</span> <span class="c-red">Photoreal humans.</span> <span class="c-blue">Movie sets in a box.</span></h1>
+          <p class="sub">3.5+ years of production C# · Mumbai · Available immediately</p>
+        </div>
+        <svg class="gizmo" id="gizmo" viewBox="-46 -46 92 108" aria-hidden="true"></svg>
+        <div class="fallback" id="fallback"><div class="fallback-art" id="fallbackArt"></div></div>
+        <div class="ovl" id="ovl">
+          <div class="ovl-h"><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><span id="ovlTitle">Scene</span></div>
+          <div class="ovl-b">
+            <div data-for="overview other">
+              <p class="live-only">Drag to orbit, scroll or pinch to zoom. Pick an object in the Hierarchy to frame it.</p>
+            </div>
+            <div data-for="pongz" hidden>
+              <p class="live-only">Drag a tile to move it. Tap a tile to turn it. Drag empty space to orbit.</p>
+              <button class="btn primary" type="button" data-play><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg>Play gameplay capture</button>
+            </div>
+            <div data-for="cc" hidden>
+              <div class="slider live-only"><label for="sJaw">Jaw width</label><input id="sJaw" type="range" min="0" max="100" value="55"><output for="sJaw">55</output></div>
+              <div class="slider live-only"><label for="sCheek">Cheekbone height</label><input id="sCheek" type="range" min="0" max="100" value="50"><output for="sCheek">50</output></div>
+              <div class="slider live-only"><label for="sEye">Eye spacing</label><input id="sEye" type="range" min="0" max="100" value="45"><output for="sEye">45</output></div>
+              <p class="honest live-only">Wireframe demo built for this page, not the confidential tool.</p>
+            </div>
+            <div data-for="ms" hidden>
+              <div class="slider live-only"><label for="sTiltZ">Bar tilt</label><input id="sTiltZ" type="range" min="-50" max="50" value="0"><output for="sTiltZ">0°</output></div>
+              <div class="slider live-only"><label for="sTiltX">Bar lean</label><input id="sTiltX" type="range" min="-40" max="40" value="0"><output for="sTiltX">0°</output></div>
+              <p class="live-only">Drag the bar or move a slider. Amber markers are the IK targets; the hand re-solves its grip.</p>
+              <p class="honest live-only">Web demo built for this page, not the confidential tool.</p>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="carts" aria-label="Projects">
-        <a class="cart k1 jade" href="#pongz">
-          <span class="label" aria-hidden="true"><svg viewBox="0 0 64 64"><rect x="14" y="6" width="36" height="50" rx="5" fill="#f4ecd8"/><rect x="14" y="52" width="36" height="6" rx="3" fill="#3cc58e"/><text x="32" y="42" text-anchor="middle" font-size="28" font-weight="700" fill="#d23a2c" font-family="serif">中</text></svg></span>
-          <span class="notch"></span><span class="name">Pongz – SG Mahjong</span><span class="kind">Live mobile game</span>
-        </a>
-        <a class="cart k2 coral" href="#character-creator">
-          <span class="label" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="#ecebf3" stroke-width="3" stroke-linecap="round"><ellipse cx="22" cy="24" rx="10" ry="12"/><path d="M8 56c2-10 7-15 14-15s12 5 14 15"/><line x1="42" y1="16" x2="58" y2="16"/><line x1="42" y1="32" x2="58" y2="32"/><line x1="42" y1="48" x2="58" y2="48"/><circle cx="47" cy="16" r="3.5" fill="#ff7a5c" stroke="none"/><circle cx="54" cy="32" r="3.5" fill="#ffc145" stroke="none"/><circle cx="46" cy="48" r="3.5" fill="#3cc58e" stroke="none"/></svg></span>
-          <span class="notch"></span><span class="name">Character Creator</span><span class="kind">Windows 3D tool</span>
-        </a>
-        <a class="cart k3 amber" href="#movie-studio">
-          <span class="label" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="#ecebf3" stroke-width="3" stroke-linejoin="round"><rect x="6" y="24" width="52" height="32" rx="3"/><path d="M6 24 L10 10 L58 10 L58 24" fill="#ecebf3"/><path d="M18 10 L14 24 M30 10 L26 24 M42 10 L38 24 M54 10 L50 24" stroke="#1a1d29" stroke-width="3"/><path d="M27 33 L40 40 L27 47 Z" fill="#ffc145" stroke="none"/></svg></span>
-          <span class="notch"></span><span class="name">Movie Studio 3D</span><span class="kind">Windows 3D tool</span>
-        </a>
+      <div class="view" id="gameView" role="tabpanel" aria-labelledby="tabGame" hidden>
+        <video id="gameVideo" src="assets/pongz-gameplay.mp4" poster="assets/pongz-gameplay-poster.jpg" muted loop playsinline preload="none" aria-label="Pongz gameplay: the final turns of a ranked hand through to the win screen"></video>
+        <p class="game-cap"><span class="rec" aria-hidden="true"></span><span><b>Pongz – SG Mahjong</b> · Ranked match, final turns of the hand through to the win screen.</span></p>
       </div>
     </div>
-  </section>
+  </main>
 
-  <div class="hud" role="list" aria-label="Key numbers">
-    <div class="wrap">
-      <div class="stat coral" role="listitem"><div class="v">3.5+</div><div class="k">Years of production C#</div></div>
-      <div class="stat amber" role="listitem"><div class="v">3</div><div class="k">Professional Unity projects</div></div>
-      <div class="stat coral" role="listitem"><div class="v">50x</div><div class="k">Faster character exports</div></div>
-      <div class="stat jade" role="listitem"><div class="v">40K+</div><div class="k">Pongz downloads</div></div>
-    </div>
-  </div>
+  <!-- ===================== INSPECTOR ===================== -->
+  <aside class="panel insp" aria-label="Inspector">
+    <div class="tabs"><span class="tab on">Inspector</span></div>
+    <div class="scroll" id="inspScroll">
 
-  <!-- ===================== PROJECT SELECT ===================== -->
-  <section id="projects" aria-labelledby="projects-title">
-    <div class="wrap">
-      <div class="sec-head">
-        <p class="eyebrow">Select a project</p>
-        <h2 id="projects-title">Three projects, three hard problems</h2>
-        <p class="note">One is a live mobile game you can download today. The other two are Windows 3D tools that were never released publicly, and that is where most of my years went.</p>
-      </div>
-      <div class="select">
-        <a class="pick jade" href="#pongz">
-          <div class="chips"><span class="chip on">● Live</span><span class="chip">iOS · Android</span><span class="chip">2025 – 26</span></div>
-          <h3>Pongz – SG Mahjong</h3>
-          <p>Real-time multiplayer Mahjong. Client architecture, bot opponents, the full UI.</p>
-          <p class="boss"><b>BOSS</b>Offline bot opponents for a full game</p>
-          <span class="go">Play level ▸</span>
-        </a>
-        <a class="pick coral" href="#character-creator">
-          <div class="chips"><span class="chip on">Led development</span><span class="chip">Windows</span><span class="chip">2022 – 24</span></div>
-          <h3>Character Creator</h3>
-          <p>Photorealistic humans shaped head to toe in real time.</p>
-          <p class="boss"><b>BOSS</b>Merging 4K textures on export, 50x faster</p>
-          <span class="go">Play level ▸</span>
-        </a>
-        <a class="pick amber" href="#movie-studio">
-          <div class="chips"><span class="chip on">3D tools</span><span class="chip">Windows</span><span class="chip">2022 – 24</span></div>
-          <h3>Movie Studio 3D</h3>
-          <p>Compose and preview 3D scenes: assets, lighting, cameras, a timeline.</p>
-          <p class="boss"><b>BOSS</b>IK hand placement, open for over a year</p>
-          <span class="go">Play level ▸</span>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== PONGZ ===================== -->
-  <section id="pongz" class="case jade" aria-labelledby="pongz-title">
-    <div class="wrap">
-      <div class="case-head">
-        <p class="eyebrow">Project 01 · Live mobile game</p>
-        <h2 id="pongz-title">Pongz – SG Mahjong</h2>
-        <p class="tag">Live on both stores, played by about 3,400 people a day.</p>
-        <p class="lede">A live, real-time multiplayer Mahjong game for iOS and Android. I designed and built its core client-side architecture and its entire UI.</p>
-      </div>
-      <div class="case-body">
-        <aside class="sheet" aria-label="Pongz stat sheet">
-          <h3>Stat sheet</h3>
-          <dl>
-            <dt>Role</dt><dd>Unity Game Developer</dd>
-            <dt>When</dt><dd>Mar 2025 – Jun 2026</dd>
-            <dt>Platforms</dt><dd>iOS, Android</dd>
-            <dt>Status</dt><dd>Live</dd>
-            <dt>Players</dt><dd>40K+ downloads<br>~3.4K daily active</dd>
-            <dt>Stack</dt><dd>Unity, C#, Socket.IO, Spine, Addressables, UGUI, TextMeshPro</dd>
-          </dl>
-          <div class="stores">
-            <a class="store" href="https://play.google.com/store/apps/details?id=com.pixelstackstudios.pongz" target="_blank" rel="noopener">
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 2.5v19l10-9.5L4 2.5zm11.4 10.8 2.6 2.5-11 6.2 8.4-8.7zm0-2.6L7 2l11 6.2-2.6 2.5zm4.7.2L22 12l-2 1.1-2.8-2.6 2.9-.6z"/></svg>
-              Google Play
-            </a>
-            <a class="store" href="https://apps.apple.com/in/app/pongz-sg-mahjong/id6755418562" target="_blank" rel="noopener">
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.7-1-2.7-4.1zM13.9 5c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.3 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5z"/></svg>
-              App Store
-            </a>
+      <!-- ---------- OVERVIEW ---------- -->
+      <article class="page" data-page="overview" aria-labelledby="h-overview">
+        <div class="obj-head c-blue">
+          <span class="cube"><svg class="ic" aria-hidden="true"><use href="#i-scene"/></svg></span>
+          <h2 id="h-overview">Gautam</h2>
+          <p class="obj-meta"><span>Tag <b>Developer</b></span><span>Layer <b>Unity</b></span></p>
+        </div>
+        <details class="comp c-blue" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Developer <small>(Script)</small></h3></summary>
+          <div class="comp-b">
+            <div class="field"><span>Role</span><span class="val">Unity Game Developer</span></div>
+            <div class="field"><span>Experience</span><span class="val">3.5+ years of production C#</span></div>
+            <div class="field"><span>Based in</span><span class="val">Mumbai, India</span></div>
+            <div class="field"><span>Status</span><span class="val live">Available immediately</span></div>
+            <div class="prose"><p>I designed and built the client architecture of a live multiplayer game, led development of a photorealistic character creator, and solved real-time hand placement for a 3D scene tool.</p></div>
+            <div class="btn-row">
+              <a class="btn primary" href="assets/Gautam_Resume.pdf" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>Resume (PDF)</a>
+              <a class="btn" href="mailto:gautamc3080@gmail.com"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg>Email</a>
+            </div>
           </div>
-        </aside>
+        </details>
+        <details class="comp c-blue" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Key Numbers <small>(Script)</small></h3></summary>
+          <div class="comp-b">
+            <div class="stats">
+              <div><b>3.5+</b><span>Years of production C#</span></div>
+              <div><b>3</b><span>Professional Unity projects</span></div>
+              <div><b>50x</b><span>Faster character exports</span></div>
+              <div><b>40K+</b><span>Pongz downloads</span></div>
+            </div>
+          </div>
+        </details>
+        <details class="comp c-blue" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Projects <small>(Array, size 3)</small></h3></summary>
+          <div class="comp-b">
+            <div class="prose"><p>One is a live mobile game you can download today. The other two are Windows 3D tools that were never released publicly, and that is where most of my years went.</p></div>
+            <div class="picks">
+              <a class="pick c-green" href="#pongz" data-select="pongz">
+                <span class="t">Pongz – SG Mahjong <span class="badge live">LIVE</span></span>
+                <span class="m">iOS · Android · 2025 – 26</span>
+                <span class="h">Real-time multiplayer Mahjong. Client architecture, bot opponents, the full UI.</span>
+                <span class="h"><b>HARDEST</b>Offline bot opponents for a full game</span>
+              </a>
+              <a class="pick c-red" href="#character-creator" data-select="cc">
+                <span class="t">Character Creator <span class="badge nda">NDA</span></span>
+                <span class="m">Windows · 2022 – 24 · Led development</span>
+                <span class="h">Photorealistic humans shaped head to toe in real time.</span>
+                <span class="h"><b>HARDEST</b>Merging 4K textures on export, 50x faster</span>
+              </a>
+              <a class="pick c-blue" href="#movie-studio" data-select="ms">
+                <span class="t">Movie Studio 3D <span class="badge nda">NDA</span></span>
+                <span class="m">Windows · 2022 – 24 · 3D tools</span>
+                <span class="h">Compose and preview 3D scenes: assets, lighting, cameras, a timeline.</span>
+                <span class="h"><b>HARDEST</b>IK hand placement, open for over a year</span>
+              </a>
+            </div>
+          </div>
+        </details>
+      </article>
 
-        <div class="content">
-          <figure class="frame">
-            <video src="assets/pongz-gameplay.mp4" poster="assets/pongz-gameplay-poster.jpg" muted autoplay loop playsinline preload="metadata" aria-label="Pongz gameplay: the final turns of a ranked hand through to the win screen"></video>
-            <figcaption>Ranked match, final turns of the hand through to the win screen.</figcaption>
-          </figure>
-
-          <div class="boss-fight">
-            <p class="hp">Boss fight <i></i> <em>Cleared</em></p>
-            <h3>AI Practice Mode, built end to end</h3>
+      <!-- ---------- PONGZ ---------- -->
+      <article class="page" data-page="pongz" aria-labelledby="h-pongz" hidden>
+        <div class="obj-head c-green">
+          <span class="cube"><svg class="ic" aria-hidden="true"><use href="#i-prefab"/></svg></span>
+          <h2 id="h-pongz">Pongz – SG Mahjong</h2>
+          <p class="obj-meta"><span>Tag <b>Live</b></span><span>Layer <b>Mobile game</b></span></p>
+        </div>
+        <details class="comp c-green" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Project <small>(Script)</small></h3></summary>
+          <div class="comp-b">
+            <div class="prose">
+              <p class="lead">Live on both stores, played by about 3,400 people a day.</p>
+              <p>A live, real-time multiplayer Mahjong game for iOS and Android. I designed and built its core client-side architecture and its entire UI.</p>
+            </div>
+            <div class="field"><span>Role</span><span class="val">Unity Game Developer</span></div>
+            <div class="field"><span>When</span><span class="val">Mar 2025 – Jun 2026</span></div>
+            <div class="field"><span>Platforms</span><span class="val">iOS, Android</span></div>
+            <div class="field"><span>Status</span><span class="val live">Live</span></div>
+            <div class="field"><span>Players</span><span class="val">40K+ downloads · ~3.4K daily active</span></div>
+            <div class="field"><span>Stack</span><span class="val">Unity, C#, Socket.IO, Spine, Addressables, UGUI, TextMeshPro</span></div>
+            <div class="btn-row">
+              <a class="btn primary" href="https://play.google.com/store/apps/details?id=com.pixelstackstudios.pongz" target="_blank" rel="noopener"><svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 2.5v19l10-9.5L4 2.5zm11.4 10.8 2.6 2.5-11 6.2 8.4-8.7zm0-2.6L7 2l11 6.2-2.6 2.5zm4.7.2L22 12l-2 1.1-2.8-2.6 2.9-.6z"/></svg>Google Play</a>
+              <a class="btn primary" href="https://apps.apple.com/in/app/pongz-sg-mahjong/id6755418562" target="_blank" rel="noopener"><svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.7-1-2.7-4.1zM13.9 5c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.3 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5z"/></svg>App Store</a>
+            </div>
+          </div>
+        </details>
+        <details class="comp c-green" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-video"/></svg><h3>Video Player</h3></summary>
+          <div class="comp-b">
+            <button class="vplayer" type="button" data-play aria-label="Play the gameplay capture in the Game view"><img src="assets/pongz-gameplay-poster.jpg" alt="" loading="lazy"><span><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg>Play in Game view</span></button>
+            <p class="vcap">Ranked match, final turns of the hand through to the win screen.</p>
+          </div>
+        </details>
+        <details class="comp c-green" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Hardest Problem <small>(Script)</small></h3></summary>
+          <div class="comp-b prose">
+            <h4>AI Practice Mode, built end to end</h4>
             <p>Designed and built an offline bot-opponent mode <strong>end to end</strong>: turn-based decision logic for the bots and the full gameplay flow around them, so a player can practice a complete game with no one else online.</p>
           </div>
-
-          <div class="gallery">
-            <figure class="shot"><button type="button" data-zoom="assets/pongz-practice.jpg" aria-label="Enlarge: AI Practice Mode"><img src="assets/pongz-practice.jpg" alt="Pongz AI Practice Mode: the player at a Mahjong table against three robot bots" loading="lazy"></button><figcaption>AI Practice Mode vs three bots</figcaption></figure>
-            <figure class="shot"><button type="button" data-zoom="assets/pongz-tutorial-claim.jpg" aria-label="Enlarge: tutorial on claiming tiles"><img src="assets/pongz-tutorial-claim.jpg" alt="Pongz tutorial step explaining how to claim a discarded tile with Chi, Pon, Kan and Hu buttons" loading="lazy"></button><figcaption>Interactive tutorial: claiming a discard</figcaption></figure>
-            <figure class="shot"><button type="button" data-zoom="assets/pongz-tutorial-winds.jpg" aria-label="Enlarge: tutorial on the winds"><img src="assets/pongz-tutorial-winds.jpg" alt="Pongz tutorial overlay highlighting the round number and prevalent wind" loading="lazy"></button><figcaption>Tutorial spotlighting the HUD</figcaption></figure>
+        </details>
+        <details class="comp c-green" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg><h3>Screenshots <small>(3)</small></h3></summary>
+          <div class="comp-b">
+            <div class="gallery">
+              <figure class="shot"><button type="button" data-zoom="assets/pongz-practice.jpg" aria-label="Enlarge: AI Practice Mode"><img src="assets/pongz-practice.jpg" alt="Pongz AI Practice Mode: the player at a Mahjong table against three robot bots" loading="lazy"></button><figcaption>AI Practice Mode vs three bots</figcaption></figure>
+              <figure class="shot"><button type="button" data-zoom="assets/pongz-tutorial-claim.jpg" aria-label="Enlarge: tutorial on claiming tiles"><img src="assets/pongz-tutorial-claim.jpg" alt="Pongz tutorial step explaining how to claim a discarded tile with Chi, Pon, Kan and Hu buttons" loading="lazy"></button><figcaption>Interactive tutorial: claiming a discard</figcaption></figure>
+              <figure class="shot"><button type="button" data-zoom="assets/pongz-tutorial-winds.jpg" aria-label="Enlarge: tutorial on the winds"><img src="assets/pongz-tutorial-winds.jpg" alt="Pongz tutorial overlay highlighting the round number and prevalent wind" loading="lazy"></button><figcaption>Tutorial spotlighting the HUD</figcaption></figure>
+            </div>
           </div>
-
-          <div class="abilities">
-            <article class="ability wide">
-              <h3><span class="k">CORE</span>Client architecture</h3>
-              <p>Designed and built the core client-side architecture from the ground up, plus the gameplay systems behind the rules, player interaction, and game flow.</p>
-            </article>
-            <article class="ability">
-              <h3><span class="k">NET</span>Multiplayer, client side</h3>
-              <p>Implemented the client-side multiplayer layer over Socket.IO, synchronizing against an authoritative server.</p>
-            </article>
-            <article class="ability">
-              <h3><span class="k">UI</span>The complete UI layer</h3>
-              <p>Built the complete UI layer: screens, HUD, in-game flow, and UI-to-systems integration. Also the interactive tutorial and onboarding, localization, and the rank and progression presentation.</p>
-            </article>
-            <article class="ability">
-              <h3><span class="k">ANIM</span>2D and 3D animation</h3>
-              <p>Designed and built the 2D and 3D animation systems, including Spine skeletal animation and gameplay-animation integration.</p>
-            </article>
-            <article class="ability">
-              <h3><span class="k">PERF</span>Mobile performance</h3>
-              <p>Optimized mobile performance across live releases: fewer draw calls and SetPass calls via LOD groups and texture atlasing, profiled with the Unity Profiler. Managed asset delivery through Addressables.</p>
-            </article>
+        </details>
+        <details class="comp c-green" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Systems Built <small>(Script)</small></h3></summary>
+          <div class="comp-b">
+            <div class="list">
+              <article><span class="k">CORE</span><div><h4>Client architecture</h4><p>Designed and built the core client-side architecture from the ground up, plus the gameplay systems behind the rules, player interaction, and game flow.</p></div></article>
+              <article><span class="k">NET</span><div><h4>Multiplayer, client side</h4><p>Implemented the client-side multiplayer layer over Socket.IO, synchronizing against an authoritative server.</p></div></article>
+              <article><span class="k">UI</span><div><h4>The complete UI layer</h4><p>Built the complete UI layer: screens, HUD, in-game flow, and UI-to-systems integration. Also the interactive tutorial and onboarding, localization, and the rank and progression presentation.</p></div></article>
+              <article><span class="k">ANIM</span><div><h4>2D and 3D animation</h4><p>Designed and built the 2D and 3D animation systems, including Spine skeletal animation and gameplay-animation integration.</p></div></article>
+              <article><span class="k">PERF</span><div><h4>Mobile performance</h4><p>Optimized mobile performance across live releases: fewer draw calls and SetPass calls via LOD groups and texture atlasing, profiled with the Unity Profiler. Managed asset delivery through Addressables.</p></div></article>
+            </div>
           </div>
-
-          <div class="credits">
-            <b>Credits</b>
+        </details>
+        <details class="comp c-green" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Credits <small>(Script)</small></h3></summary>
+          <div class="comp-b prose">
             <p>Built at Roothoot Private Limited as client work for Pixel Stack Studios, who own the game. Server-side netcode and the rank-point calculation were my teammates' work; I built the client that talks to them.</p>
           </div>
-          <div class="egg-slot"><button class="egg" data-egg="pongz" aria-label="Hidden collectible">中</button></div>
+        </details>
+      </article>
+
+      <!-- ---------- CHARACTER CREATOR ---------- -->
+      <article class="page" data-page="cc" aria-labelledby="h-cc" hidden>
+        <div class="obj-head c-red">
+          <span class="cube"><svg class="ic" aria-hidden="true"><use href="#i-prefab"/></svg></span>
+          <h2 id="h-cc">Character Creator</h2>
+          <p class="obj-meta"><span>Tag <b>Confidential</b></span><span>Layer <b>Windows 3D tool</b></span></p>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== CHARACTER CREATOR ===================== -->
-  <section id="character-creator" class="case coral" aria-labelledby="cc-title">
-    <div class="wrap">
-      <div class="case-head">
-        <p class="eyebrow">Project 02 · Windows 3D tool · Led development</p>
-        <h2 id="cc-title">Character Creator</h2>
-        <p class="tag">Photoreal humans from sliders, and an export pipeline made 50x faster.</p>
-        <p class="lede">A photorealistic character creation tool for Windows, built in Unity. Users shape a realistic human head to toe in real time, from facial structure and body shape to skin, hair, and clothing. I led development and designed its core architecture.</p>
-      </div>
-      <div class="case-body">
-        <aside class="sheet" aria-label="Character Creator stat sheet">
-          <h3>Stat sheet</h3>
-          <dl>
-            <dt>Role</dt><dd>Unity Developer, led development</dd>
-            <dt>When</dt><dd>2022 – 2024</dd>
-            <dt>Platform</dt><dd>Windows</dd>
-            <dt>Status</dt><dd>Unreleased, confidential</dd>
-            <dt>Stack</dt><dd>Unity, C#, Unity Jobs System, multithreading, 3D math</dd>
-          </dl>
-        </aside>
-        <div class="content">
-          <figure class="schematic">
-            <svg viewBox="0 0 720 360" role="img" aria-labelledby="cc-svg-t">
-              <title id="cc-svg-t">Schematic of a character creator: a panel of sliders on the left driving a 3D head and body in the viewport</title>
-              <rect x="0" y="0" width="720" height="360" fill="#0e1017"/>
-              <rect x="16" y="16" width="230" height="328" rx="8" fill="#1a1d29" stroke="#2e3348"/>
-              <text class="ttl" x="32" y="42">FACE · BODY · SKIN · HAIR · CLOTHES</text>
-              <g class="lbl">
-                <text x="32" y="78">Jaw width</text><text x="32" y="120">Cheekbones</text><text x="32" y="162">Nose bridge</text><text x="32" y="204">Shoulders</text><text x="32" y="246">Body mass</text><text x="32" y="288">Skin tone</text>
-              </g>
-              <g stroke="#2e3348" stroke-width="4" stroke-linecap="round">
-                <line x1="32" y1="92" x2="228" y2="92"/><line x1="32" y1="134" x2="228" y2="134"/><line x1="32" y1="176" x2="228" y2="176"/><line x1="32" y1="218" x2="228" y2="218"/><line x1="32" y1="260" x2="228" y2="260"/><line x1="32" y1="302" x2="228" y2="302"/>
-              </g>
-              <g stroke="#ff7a5c" stroke-width="4" stroke-linecap="round">
-                <line x1="32" y1="92" x2="150" y2="92"/><line x1="32" y1="134" x2="186" y2="134"/><line x1="32" y1="176" x2="96" y2="176"/><line x1="32" y1="218" x2="170" y2="218"/><line x1="32" y1="260" x2="120" y2="260"/><line x1="32" y1="302" x2="200" y2="302"/>
-              </g>
-              <g fill="#ecebf3"><circle cx="150" cy="92" r="7"/><circle cx="186" cy="134" r="7"/><circle cx="96" cy="176" r="7"/><circle cx="170" cy="218" r="7"/><circle cx="120" cy="260" r="7"/><circle cx="200" cy="302" r="7"/></g>
-              <g fill="none" stroke="#ecebf3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".9">
-                <path d="M486 64c-34 0-56 28-56 66 0 44 26 78 56 78s56-34 56-78c0-38-22-66-56-66z"/>
-                <path d="M462 120h14M496 120h14M486 128v26l-8 6M472 176c8 6 20 6 28 0"/>
-                <path d="M452 200l-6 30M520 200l6 30"/>
-                <path d="M446 230c-60 10-100 30-118 110M526 230c60 10 100 30 118 110"/>
-              </g>
-              <g fill="none" stroke="#ff7a5c" stroke-width="1.5" stroke-dasharray="4 5" opacity=".8">
-                <path d="M412 130h-30M560 130h30M486 46v-16"/>
-              </g>
-              <path d="M250 180h80" stroke="#ff7a5c" stroke-width="2" stroke-dasharray="6 6"/>
-              <path d="M330 180l-10-6v12z" fill="#ff7a5c"/>
-              <text class="lblc" x="440" y="340">real-time preview</text>
-            </svg>
-            <figcaption>Schematic, not a screenshot. The real tool is confidential, so this shows the idea: sliders on one side, a photoreal human on the other.</figcaption>
-          </figure>
-
-          <div class="boss-fight">
-            <p class="hp">Boss fight <i></i> <em>Cleared</em></p>
-            <h3>50x faster character exports</h3>
-            <p>Every character starts from a base model that ships with many 4K textures, several of them layered for effects, such as multiple normal maps. On export, the tool has to bake the model and keep only the textures this character actually uses, each merged into a single map. Shaders can't hand back that final texture, so the merge runs on the CPU.</p>
-            <p style="margin-top:10px">I built it both ways. The first version used the classic path: read pixels, copy the texture, multiply on one thread, apply. The second <strong>rebuilt the merge on the Unity Jobs System</strong>, running the per-pixel math across cores on pixel data in NativeArrays with no texture copies. I chose the Jobs version for the export path, and it <strong>raised export throughput 50x</strong>.</p>
+        <div class="comp"><div class="comp-b">
+          <div class="helpbox"><svg aria-hidden="true"><use href="#i-warn"/></svg><p><b>Confidential.</b> Unreleased and confidential, so this page uses schematics instead of screenshots. The head in the Scene view is a web demo built for this page. I can walk through the implementation in an interview.</p></div>
+        </div></div>
+        <details class="comp c-red" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Project <small>(Script)</small></h3></summary>
+          <div class="comp-b">
+            <div class="prose">
+              <p class="lead">Photoreal humans from sliders, and an export pipeline made 50x faster.</p>
+              <p>A photorealistic character creation tool for Windows, built in Unity. Users shape a realistic human head to toe in real time, from facial structure and body shape to skin, hair, and clothing. I led development and designed its core architecture.</p>
+            </div>
+            <div class="field"><span>Role</span><span class="val">Unity Developer, led development</span></div>
+            <div class="field"><span>When</span><span class="val">2022 – 2024</span></div>
+            <div class="field"><span>Platform</span><span class="val">Windows</span></div>
+            <div class="field"><span>Status</span><span class="val nda">Unreleased, confidential</span></div>
+            <div class="field"><span>Stack</span><span class="val">Unity, C#, Unity Jobs System, multithreading, 3D math</span></div>
           </div>
-
-          <div class="speed" aria-label="Export throughput, relative">
-            <div class="row"><span>One thread</span><span class="bar"><i style="width:2%"></i></span><b>1x</b></div>
-            <div class="row"><span>Jobs System</span><span class="bar"><i style="width:100%"></i></span><b>50x</b></div>
-            <small>Character export throughput, relative to the original pipeline. Bars drawn to scale.</small>
+        </details>
+        <details class="comp c-red" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Hardest Problem <small>(Script)</small></h3></summary>
+          <div class="comp-b">
+            <div class="prose">
+              <h4>50x faster character exports</h4>
+              <p>Every character starts from a base model that ships with many 4K textures, several of them layered for effects, such as multiple normal maps. On export, the tool has to bake the model and keep only the textures this character actually uses, each merged into a single map. Shaders can't hand back that final texture, so the merge runs on the CPU.</p>
+              <p>I built it both ways. The first version used the classic path: read pixels, copy the texture, multiply on one thread, apply. The second <strong>rebuilt the merge on the Unity Jobs System</strong>, running the per-pixel math across cores on pixel data in NativeArrays with no texture copies. I chose the Jobs version for the export path, and it <strong>raised export throughput 50x</strong>.</p>
+            </div>
+            <div class="speed" role="img" aria-label="Export throughput, relative: one thread 1x, Jobs System 50x">
+              <div class="row"><span>One thread</span><span class="bar"><i style="width:2%"></i></span><b>1x</b></div>
+              <div class="row"><span>Jobs System</span><span class="bar"><i style="width:100%"></i></span><b>50x</b></div>
+              <small>Character export throughput, relative to the original pipeline. Bars drawn to scale.</small>
+            </div>
           </div>
-
-          <div class="abilities">
-            <article class="ability">
-              <h3><span class="k">LEAD</span>Ran development</h3>
-              <p>Led development and designed the core architecture. Planned the work from client requirements, ran client calls, assigned tasks to teammates, and made technical decisions with the design team, while writing code myself.</p>
-            </article>
-            <article class="ability">
-              <h3><span class="k">3D</span>Face and body structure</h3>
-              <p>Built the customizable facial and body structure systems behind photorealistic character generation.</p>
-            </article>
+        </details>
+        <details class="comp c-red" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Responsibilities <small>(Script)</small></h3></summary>
+          <div class="comp-b">
+            <div class="list">
+              <article><span class="k">LEAD</span><div><h4>Ran development</h4><p>Led development and designed the core architecture. Planned the work from client requirements, ran client calls, assigned tasks to teammates, and made technical decisions with the design team, while writing code myself.</p></div></article>
+              <article><span class="k">3D</span><div><h4>Face and body structure</h4><p>Built the customizable facial and body structure systems behind photorealistic character generation.</p></div></article>
+            </div>
           </div>
-
-          <div class="confidential">
-            <span class="stamp">CONFIDENTIAL</span>
-            <p>Unreleased and confidential, so this page uses schematics instead of screenshots. I can walk through the implementation in an interview.</p>
+        </details>
+        <details class="comp c-red" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg><h3>Schematic</h3></summary>
+          <div class="comp-b">
+            <figure class="schematic c-red" id="ccSchematic">
+              <svg viewBox="0 0 720 360" role="img" aria-labelledby="cc-svg-t">
+                <title id="cc-svg-t">Schematic of a character creator: a panel of sliders on the left driving a 3D head and body in the viewport</title>
+                <rect x="0" y="0" width="720" height="360" fill="#1e1e1e"/>
+                <rect x="16" y="16" width="230" height="328" rx="4" fill="#282828" stroke="#3c3c3c"/>
+                <text class="ttl" x="32" y="42">FACE · BODY · SKIN · HAIR · CLOTHES</text>
+                <g class="lbl"><text x="32" y="78">Jaw width</text><text x="32" y="120">Cheekbones</text><text x="32" y="162">Nose bridge</text><text x="32" y="204">Shoulders</text><text x="32" y="246">Body mass</text><text x="32" y="288">Skin tone</text></g>
+                <g stroke="#3c3c3c" stroke-width="4" stroke-linecap="round"><line x1="32" y1="92" x2="228" y2="92"/><line x1="32" y1="134" x2="228" y2="134"/><line x1="32" y1="176" x2="228" y2="176"/><line x1="32" y1="218" x2="228" y2="218"/><line x1="32" y1="260" x2="228" y2="260"/><line x1="32" y1="302" x2="228" y2="302"/></g>
+                <g stroke="#e8564a" stroke-width="4" stroke-linecap="round"><line x1="32" y1="92" x2="150" y2="92"/><line x1="32" y1="134" x2="186" y2="134"/><line x1="32" y1="176" x2="96" y2="176"/><line x1="32" y1="218" x2="170" y2="218"/><line x1="32" y1="260" x2="120" y2="260"/><line x1="32" y1="302" x2="200" y2="302"/></g>
+                <g fill="#d2d2d2"><circle cx="150" cy="92" r="7"/><circle cx="186" cy="134" r="7"/><circle cx="96" cy="176" r="7"/><circle cx="170" cy="218" r="7"/><circle cx="120" cy="260" r="7"/><circle cx="200" cy="302" r="7"/></g>
+                <g fill="none" stroke="#d2d2d2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"><path d="M486 64c-34 0-56 28-56 66 0 44 26 78 56 78s56-34 56-78c0-38-22-66-56-66z"/><path d="M462 120h14M496 120h14M486 128v26l-8 6M472 176c8 6 20 6 28 0"/><path d="M452 200l-6 30M520 200l6 30"/><path d="M446 230c-60 10-100 30-118 110M526 230c60 10 100 30 118 110"/></g>
+                <g fill="none" stroke="#e8564a" stroke-width="1.5" stroke-dasharray="4 5" opacity=".8"><path d="M412 130h-30M560 130h30M486 46v-16"/></g>
+                <path d="M250 180h80" stroke="#e8564a" stroke-width="2" stroke-dasharray="6 6"/><path d="M330 180l-10-6v12z" fill="#e8564a"/>
+                <text class="lblc" x="440" y="340">real-time preview</text>
+              </svg>
+              <figcaption>Schematic, not a screenshot. The real tool is confidential, so this shows the idea: sliders on one side, a photoreal human on the other.</figcaption>
+            </figure>
           </div>
-          <div class="egg-slot"><button class="egg" data-egg="cc" aria-label="Hidden collectible"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="8" x2="14" y2="8"/><circle cx="9" cy="8" r="2.5" fill="currentColor"/></svg></button></div>
+        </details>
+      </article>
+
+      <!-- ---------- MOVIE STUDIO 3D ---------- -->
+      <article class="page" data-page="ms" aria-labelledby="h-ms" hidden>
+        <div class="obj-head c-blue">
+          <span class="cube"><svg class="ic" aria-hidden="true"><use href="#i-prefab"/></svg></span>
+          <h2 id="h-ms">Movie Studio 3D</h2>
+          <p class="obj-meta"><span>Tag <b>Confidential</b></span><span>Layer <b>Windows 3D tool</b></span></p>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== MOVIE STUDIO 3D ===================== -->
-  <section id="movie-studio" class="case amber" aria-labelledby="ms-title">
-    <div class="wrap">
-      <div class="case-head">
-        <p class="eyebrow">Project 03 · Windows 3D tool</p>
-        <h2 id="ms-title">Movie Studio 3D</h2>
-        <p class="tag">Real-time hand placement on imported characters, solved after a year open.</p>
-        <p class="lede">A Windows tool for composing and previewing 3D scenes, built in Unity. It works like a small game editor inside the app: a scene hierarchy, a properties panel with lighting and time of day, an asset inventory, cameras, and a timeline. I built several of its core modules.</p>
-      </div>
-      <div class="case-body">
-        <aside class="sheet" aria-label="Movie Studio 3D stat sheet">
-          <h3>Stat sheet</h3>
-          <dl>
-            <dt>Role</dt><dd>Unity Developer</dd>
-            <dt>When</dt><dd>2022 – 2024</dd>
-            <dt>Platform</dt><dd>Windows</dd>
-            <dt>Status</dt><dd>Unreleased; development halted in 2024</dd>
-            <dt>Stack</dt><dd>Unity, C#, 3D math, UGUI</dd>
-          </dl>
-        </aside>
-        <div class="content">
-          <figure class="schematic">
-            <svg viewBox="0 0 720 380" role="img" aria-labelledby="ms-svg-t">
-              <title id="ms-svg-t">Schematic of the scene tool layout: hierarchy, 3D viewport, properties panel, asset inventory and timeline</title>
-              <rect width="720" height="380" fill="#0e1017"/>
-              <rect x="14" y="14" width="140" height="236" rx="6" fill="#1a1d29" stroke="#2e3348"/>
-              <text class="ttl" x="26" y="36" style="fill:#ffc145">HIERARCHY</text>
-              <g fill="#2e3348"><rect x="26" y="50" width="100" height="8" rx="3"/><rect x="38" y="66" width="90" height="8" rx="3"/><rect x="38" y="82" width="70" height="8" rx="3"/><rect x="50" y="98" width="80" height="8" rx="3"/><rect x="50" y="114" width="60" height="8" rx="3"/><rect x="38" y="130" width="96" height="8" rx="3"/><rect x="26" y="146" width="84" height="8" rx="3"/></g>
-              <rect x="164" y="14" width="390" height="236" rx="6" fill="#1b2233" stroke="#2e3348"/>
-              <text class="ttl" x="176" y="36">SCENE</text>
-              <path d="M164 210 L260 150 L330 190 L420 130 L554 210 V250 H164Z" fill="#232a3d"/>
-              <g stroke="#ffc145" stroke-width="2" fill="none"><path d="M330 200 v-34 l10 -6"/><circle cx="330" cy="150" r="10"/><path d="M314 186 l16 -14 l16 14"/></g>
-              <g stroke="#ecebf3" stroke-width="1.5" opacity=".6"><line x1="420" y1="96" x2="460" y2="96"/><line x1="420" y1="96" x2="420" y2="56"/><line x1="420" y1="96" x2="396" y2="118"/></g>
-              <rect x="564" y="14" width="142" height="236" rx="6" fill="#1a1d29" stroke="#2e3348"/>
-              <text class="ttl" x="576" y="36" style="fill:#ffc145">PROPERTIES</text>
-              <g class="lbl" style="font-size:11px"><text x="576" y="62">Position</text><text x="576" y="98">Rotation</text><text x="576" y="134">Time of day</text><text x="576" y="170">Lights · Lux</text><text x="576" y="206">Skybox</text></g>
-              <g fill="#2e3348"><rect x="576" y="68" width="118" height="10" rx="3"/><rect x="576" y="104" width="118" height="10" rx="3"/><rect x="576" y="140" width="118" height="10" rx="3"/><rect x="576" y="176" width="118" height="10" rx="3"/><rect x="576" y="212" width="118" height="10" rx="3"/></g>
-              <rect x="14" y="260" width="692" height="106" rx="6" fill="#1a1d29" stroke="#2e3348"/>
-              <text class="ttl" x="26" y="282">INVENTORY · TIMELINE</text>
-              <g fill="#2e3348"><rect x="26" y="294" width="90" height="16" rx="3"/><rect x="26" y="316" width="90" height="16" rx="3"/><rect x="26" y="338" width="90" height="16" rx="3"/></g>
-              <g fill="#232a3d" stroke="#2e3348"><rect x="130" y="294" width="54" height="58" rx="5"/><rect x="194" y="294" width="54" height="58" rx="5"/><rect x="258" y="294" width="54" height="58" rx="5"/><rect x="322" y="294" width="54" height="58" rx="5"/><rect x="386" y="294" width="54" height="58" rx="5"/></g>
-              <g stroke="#ffc145" stroke-width="3" stroke-linecap="round"><line x1="460" y1="306" x2="560" y2="306"/><line x1="500" y1="324" x2="680" y2="324"/><line x1="470" y1="342" x2="610" y2="342"/></g>
-              <line x1="590" y1="292" x2="590" y2="356" stroke="#ff7a5c" stroke-width="2"/>
-              <g class="lblc" style="font-size:12px"><text x="466" y="372" fill="#ffc145">Timeline: rebuilt</text><text x="130" y="372">Asset Manager</text><text x="576" y="244">Custom attributes</text></g>
-            </svg>
-            <figcaption>Schematic of the tool's layout, not a screenshot. Highlighted labels mark the parts I built: hierarchy, properties, asset manager, timeline, and the UI around them.</figcaption>
-          </figure>
-
-          <div class="boss-fight">
-            <p class="hp">Boss fight <i></i> <em>Cleared</em></p>
-            <h3>Hands that grip, from any direction</h3>
+        <div class="comp"><div class="comp-b">
+          <div class="helpbox"><svg aria-hidden="true"><use href="#i-warn"/></svg><p><b>Confidential.</b> Unreleased and confidential, so this page uses schematics instead of screenshots. The hand in the Scene view is a web demo built for this page.</p></div>
+        </div></div>
+        <details class="comp c-blue" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Project <small>(Script)</small></h3></summary>
+          <div class="comp-b">
+            <div class="prose">
+              <p class="lead">Real-time hand placement on imported characters, solved after a year open.</p>
+              <p>A Windows tool for composing and previewing 3D scenes, built in Unity. It works like a small game editor inside the app: a scene hierarchy, a properties panel with lighting and time of day, an asset inventory, cameras, and a timeline. I built several of its core modules.</p>
+            </div>
+            <div class="field"><span>Role</span><span class="val">Unity Developer</span></div>
+            <div class="field"><span>When</span><span class="val">2022 – 2024</span></div>
+            <div class="field"><span>Platform</span><span class="val">Windows</span></div>
+            <div class="field"><span>Status</span><span class="val nda">Unreleased; development halted in 2024</span></div>
+            <div class="field"><span>Stack</span><span class="val">Unity, C#, 3D math, UGUI</span></div>
+          </div>
+        </details>
+        <details class="comp c-blue" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Hardest Problem <small>(Script)</small></h3></summary>
+          <div class="comp-b prose">
+            <h4>Hands that grip, from any direction</h4>
             <p>Automatic finger and hand placement on imported rigged characters had been <strong>open on the project for over a year</strong>. I solved it with math rather than raycasts: the solver reads the object's shape from its surface tangents, spaces each finger joint's target along the surface according to the model's bone structure, and follows the object's rotation. Those computed positions and rotations drive IK through Unity's <strong>Animation Rigging</strong> package, in real time.</p>
-            <svg class="hand-anim" viewBox="0 0 320 110" width="100%" style="max-width:420px;margin-top:14px;display:block" aria-hidden="true">
-              <g stroke="#2e3348" stroke-width="3" fill="none" stroke-linecap="round">
-                <path d="M30 90 L80 70 L120 60"/><path d="M120 60 L160 40 L190 34"/><path d="M120 60 L166 56 L198 56"/><path d="M120 60 L164 70 L194 76"/><path d="M120 60 L156 82 L180 94"/>
-              </g>
-              <rect x="200" y="20" width="24" height="86" rx="12" fill="#232a3d" stroke="#ffc145" stroke-width="2"/>
-              <g fill="#ffc145">
-                <circle class="j" cx="190" cy="34" r="5" style="--dx:-18px;--dy:-14px"/>
-                <circle class="j" cx="198" cy="56" r="5" style="--dx:-22px;--dy:4px"/>
-                <circle class="j" cx="194" cy="76" r="5" style="--dx:-20px;--dy:12px"/>
-                <circle class="j" cx="180" cy="94" r="5" style="--dx:-16px;--dy:-6px"/>
-              </g>
-              <circle cx="120" cy="60" r="6" fill="#ecebf3"/>
-            </svg>
           </div>
+        </details>
+        <details class="comp c-blue" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Modules Built <small>(Script)</small></h3></summary>
+          <div class="comp-b">
+            <div class="list">
+              <article><span class="k">TOOL</span><div><h4>A better timeline</h4><p>Rebuilt the Timeline system with a horizontal layout, finer timestep control, and a more stable sequencing model.</p></div></article>
+              <article><span class="k">SYS</span><div><h4>Core modules</h4><p>Built the Asset Manager, UI, and Graphics modules, including the in-app hierarchy panel.</p></div></article>
+              <article><span class="k">C#</span><div><h4>Properties, editable</h4><p>Built custom C# property attributes that expose object properties as editable fields in the application's UI.</p></div></article>
+            </div>
+          </div>
+        </details>
+        <details class="comp c-blue" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg><h3>Schematic</h3></summary>
+          <div class="comp-b">
+            <figure class="schematic c-blue" id="msSchematic">
+              <svg viewBox="0 0 720 380" role="img" aria-labelledby="ms-svg-t">
+                <title id="ms-svg-t">Schematic of the scene tool layout: hierarchy, 3D viewport, properties panel, asset inventory and timeline</title>
+                <rect width="720" height="380" fill="#1e1e1e"/>
+                <rect x="14" y="14" width="140" height="236" rx="4" fill="#282828" stroke="#3c3c3c"/>
+                <text class="ttl" x="26" y="36" style="fill:#4a8ee8">HIERARCHY</text>
+                <g fill="#3c3c3c"><rect x="26" y="50" width="100" height="8" rx="2"/><rect x="38" y="66" width="90" height="8" rx="2"/><rect x="38" y="82" width="70" height="8" rx="2"/><rect x="50" y="98" width="80" height="8" rx="2"/><rect x="50" y="114" width="60" height="8" rx="2"/><rect x="38" y="130" width="96" height="8" rx="2"/><rect x="26" y="146" width="84" height="8" rx="2"/></g>
+                <rect x="164" y="14" width="390" height="236" rx="4" fill="#2a2a2a" stroke="#3c3c3c"/>
+                <text class="ttl" x="176" y="36">SCENE</text>
+                <path d="M164 210 L260 150 L330 190 L420 130 L554 210 V250 H164Z" fill="#333"/>
+                <g stroke="#4a8ee8" stroke-width="2" fill="none"><path d="M330 200 v-34 l10 -6"/><circle cx="330" cy="150" r="10"/><path d="M314 186 l16 -14 l16 14"/></g>
+                <g stroke-width="1.5"><line x1="420" y1="96" x2="460" y2="96" stroke="#e8564a"/><line x1="420" y1="96" x2="420" y2="56" stroke="#8fd14f"/><line x1="420" y1="96" x2="396" y2="118" stroke="#4a8ee8"/></g>
+                <rect x="564" y="14" width="142" height="236" rx="4" fill="#282828" stroke="#3c3c3c"/>
+                <text class="ttl" x="576" y="36" style="fill:#4a8ee8">PROPERTIES</text>
+                <g class="lbl" style="font-size:11px"><text x="576" y="62">Position</text><text x="576" y="98">Rotation</text><text x="576" y="134">Time of day</text><text x="576" y="170">Lights · Lux</text><text x="576" y="206">Skybox</text></g>
+                <g fill="#3c3c3c"><rect x="576" y="68" width="118" height="10" rx="2"/><rect x="576" y="104" width="118" height="10" rx="2"/><rect x="576" y="140" width="118" height="10" rx="2"/><rect x="576" y="176" width="118" height="10" rx="2"/><rect x="576" y="212" width="118" height="10" rx="2"/></g>
+                <rect x="14" y="260" width="692" height="106" rx="4" fill="#282828" stroke="#3c3c3c"/>
+                <text class="ttl" x="26" y="282">INVENTORY · TIMELINE</text>
+                <g fill="#3c3c3c"><rect x="26" y="294" width="90" height="16" rx="2"/><rect x="26" y="316" width="90" height="16" rx="2"/><rect x="26" y="338" width="90" height="16" rx="2"/></g>
+                <g fill="#333" stroke="#3c3c3c"><rect x="130" y="294" width="54" height="58" rx="3"/><rect x="194" y="294" width="54" height="58" rx="3"/><rect x="258" y="294" width="54" height="58" rx="3"/><rect x="322" y="294" width="54" height="58" rx="3"/><rect x="386" y="294" width="54" height="58" rx="3"/></g>
+                <g stroke="#4a8ee8" stroke-width="3" stroke-linecap="round"><line x1="460" y1="306" x2="560" y2="306"/><line x1="500" y1="324" x2="680" y2="324"/><line x1="470" y1="342" x2="610" y2="342"/></g>
+                <line x1="590" y1="292" x2="590" y2="356" stroke="#e8564a" stroke-width="2"/>
+                <g class="lblc" style="font-size:12px"><text x="466" y="372">Timeline: rebuilt</text><text x="130" y="372">Asset Manager</text><text x="576" y="244">Custom attributes</text></g>
+              </svg>
+              <figcaption>Schematic of the tool's layout, not a screenshot. Highlighted labels mark the parts I built: hierarchy, properties, asset manager, timeline, and the UI around them.</figcaption>
+            </figure>
+          </div>
+        </details>
+      </article>
 
-          <div class="abilities">
-            <article class="ability">
-              <h3><span class="k">TOOL</span>A better timeline</h3>
-              <p>Rebuilt the Timeline system with a horizontal layout, finer timestep control, and a more stable sequencing model.</p>
-            </article>
-            <article class="ability">
-              <h3><span class="k">SYS</span>Core modules</h3>
-              <p>Built the Asset Manager, UI, and Graphics modules, including the in-app hierarchy panel.</p>
-            </article>
-            <article class="ability wide">
-              <h3><span class="k">C#</span>Properties, editable</h3>
-              <p>Built custom C# property attributes that expose object properties as editable fields in the application's UI.</p>
-            </article>
-          </div>
-
-          <div class="confidential">
-            <span class="stamp">CONFIDENTIAL</span>
-            <p>Unreleased and confidential, so this page uses schematics instead of screenshots.</p>
-          </div>
-          <div class="egg-slot"><button class="egg" data-egg="ms" aria-label="Hidden collectible"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 6h12v8H2zM2 6l1-4h11v4"/></svg></button></div>
+      <!-- ---------- SIDE QUESTS ---------- -->
+      <article class="page" data-page="quests" aria-labelledby="h-quests" hidden>
+        <div class="obj-head c-amber">
+          <span class="cube"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg></span>
+          <h2 id="h-quests">Side quests: smaller tools</h2>
+          <p class="obj-meta"><span>Tag <b>Tools</b></span><span>Layer <b>Editor</b></span></p>
         </div>
-      </div>
-    </div>
-  </section>
+        <details class="comp c-amber" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Passthrough Raycaster <small>(Script)</small></h3></summary>
+          <div class="comp-b prose"><p>An invisible UI element that registers input without blocking raycasts to the 3D objects behind it.</p></div>
+        </details>
+        <details class="comp c-amber" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>UI Text Extractor <small>(Editor Tool)</small></h3></summary>
+          <div class="comp-b prose"><p>A Unity editor tool to extract and manage in-project UI text.</p></div>
+        </details>
+      </article>
 
-  <!-- ===================== SIDE QUESTS ===================== -->
-  <section id="tools" class="case amber" aria-labelledby="tools-title">
-    <div class="wrap">
-      <div class="sec-head">
-        <p class="eyebrow">Side quests</p>
-        <h2 id="tools-title">Smaller tools</h2>
-      </div>
-      <div class="quests">
-        <article class="quest">
-          <span class="ico" aria-hidden="true">⌖</span>
-          <div><h3>Passthrough raycaster</h3><p>An invisible UI element that registers input without blocking raycasts to the 3D objects behind it.</p></div>
-        </article>
-        <article class="quest">
-          <span class="ico" aria-hidden="true">Aa</span>
-          <div><h3>UI text extractor</h3><p>A Unity editor tool to extract and manage in-project UI text.</p></div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== EXPERIENCE ===================== -->
-  <section id="experience" class="case" aria-labelledby="exp-title">
-    <div class="wrap">
-      <div class="sec-head">
-        <p class="eyebrow">Experience</p>
-        <h2 id="exp-title">Where the years went</h2>
-      </div>
-      <div class="timeline">
-        <article class="job jade">
-          <p class="when"><b>2025 – 26</b>Mar 2025 – Jun 2026</p>
-          <div>
-            <h3>Unity Game Developer</h3>
-            <p class="co">Roothoot Private Limited · Hyderabad · client work for Pixel Stack Studios</p>
-            <p>Pongz – SG Mahjong, live on iOS and Android.</p>
+      <!-- ---------- EXPERIENCE ---------- -->
+      <article class="page" data-page="exp" aria-labelledby="h-exp" hidden>
+        <div class="obj-head c-blue">
+          <span class="cube"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg></span>
+          <h2 id="h-exp">Experience: where the years went</h2>
+          <p class="obj-meta"><span>Tag <b>Timeline</b></span><span>Layer <b>Work</b></span></p>
+        </div>
+        <details class="comp job c-green" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Unity Game Developer <small>· 2025 – 26</small></h3></summary>
+          <div class="comp-b">
+            <div class="field"><span>Company</span><span class="val">Roothoot Private Limited</span></div>
+            <div class="field"><span>When</span><span class="val">Mar 2025 – Jun 2026</span></div>
+            <div class="field"><span>Where</span><span class="val">Hyderabad · client work for Pixel Stack Studios</span></div>
+            <div class="field"><span>Project</span><span class="val">Pongz – SG Mahjong, live on iOS and Android.</span></div>
             <span class="dur" style="width:55%" aria-hidden="true"><i style="width:100%"></i></span>
           </div>
-        </article>
-        <article class="job coral">
-          <p class="when"><b>2022 – 24</b>Jun 2022 – Oct 2024</p>
-          <div>
-            <h3>Unity Developer</h3>
-            <p class="co">Live Deftsoft Informatics Pvt. Ltd. · Mohali</p>
-            <p>Character Creator (led development) and Movie Studio 3D, plus editor tooling. About 2 years 4 months, the larger share of my experience.</p>
+        </details>
+        <details class="comp job c-red" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Unity Developer <small>· 2022 – 24</small></h3></summary>
+          <div class="comp-b">
+            <div class="field"><span>Company</span><span class="val">Live Deftsoft Informatics Pvt. Ltd.</span></div>
+            <div class="field"><span>When</span><span class="val">Jun 2022 – Oct 2024</span></div>
+            <div class="field"><span>Where</span><span class="val">Mohali</span></div>
+            <div class="field"><span>Projects</span><span class="val">Character Creator (led development) and Movie Studio 3D, plus editor tooling.</span></div>
+            <div class="prose"><p>About 2 years 4 months, the larger share of my experience.</p></div>
             <span class="dur" style="width:100%" aria-hidden="true"><i style="width:100%"></i></span>
           </div>
-        </article>
-      </div>
-    </div>
-  </section>
+        </details>
+      </article>
 
-  <!-- ===================== ABOUT ===================== -->
-  <section id="about" class="about case coral" aria-labelledby="about-title">
-    <div class="wrap">
-      <div>
-        <div class="sec-head">
-          <p class="eyebrow">Character bio</p>
-          <h2 id="about-title">About Gautam</h2>
+      <!-- ---------- ABOUT ---------- -->
+      <article class="page" data-page="about" aria-labelledby="h-about" hidden>
+        <div class="obj-head c-blue">
+          <span class="cube"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg></span>
+          <h2 id="h-about">About Gautam</h2>
+          <p class="obj-meta"><span>Tag <b>Bio</b></span><span>Layer <b>Systems</b></span></p>
         </div>
-        <div class="bio">
-          <p>I'm a Unity developer who works best in the systems layer: architecture, gameplay systems, and the code that connects them. Over 3.5+ years I've worked across gameplay, bot AI, client-side multiplayer, UI, animation, 3D tools, and performance on Android, iOS, and Windows.</p>
-          <p>I spent two years building Windows 3D tools in Unity, including a character creator I led development on, then moved to mobile and helped ship Pongz – SG Mahjong to both app stores. I work directly with artists, animators, sound engineers, and clients, and I like problems that need math as much as code.</p>
+        <details class="comp c-blue" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Bio <small>(Script)</small></h3></summary>
+          <div class="comp-b prose">
+            <p>I'm a Unity developer who works best in the systems layer: architecture, gameplay systems, and the code that connects them. Over 3.5+ years I've worked across gameplay, bot AI, client-side multiplayer, UI, animation, 3D tools, and performance on Android, iOS, and Windows.</p>
+            <p>I spent two years building Windows 3D tools in Unity, including a character creator I led development on, then moved to mobile and helped ship Pongz – SG Mahjong to both app stores. I work directly with artists, animators, sound engineers, and clients, and I like problems that need math as much as code.</p>
+          </div>
+        </details>
+        <details class="comp c-blue" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Skills <small>(Script)</small></h3></summary>
+          <div class="comp-b">
+            <div class="skill-g"><h4>Core</h4><ul class="tags"><li class="key">Unity</li><li class="key">C#</li><li>Client architecture</li><li>Gameplay systems</li></ul></div>
+            <div class="skill-g"><h4>AI, multiplayer, UI</h4><ul class="tags"><li>Bot opponent AI</li><li>Socket.IO (client)</li><li>UGUI / TextMeshPro</li><li>Tutorials &amp; onboarding</li><li>Localization</li></ul></div>
+            <div class="skill-g"><h4>3D, animation, tools</h4><ul class="tags"><li>3D math</li><li>Spine 2D</li><li>Unity Timeline</li><li>Animation Rigging (IK)</li><li>Texture baking</li><li>Editor tooling</li><li>Custom C# attributes</li></ul></div>
+            <div class="skill-g"><h4>Performance</h4><ul class="tags"><li>Unity Jobs System</li><li>Multithreading</li><li>NativeArray</li><li>Unity Profiler</li><li>Addressables</li><li>URP / HDRP</li></ul></div>
+            <div class="skill-g"><h4>Platforms</h4><ul class="tags"><li>Android</li><li>iOS</li><li>Windows</li></ul></div>
+          </div>
+        </details>
+      </article>
+
+      <!-- ---------- CONTACT ---------- -->
+      <article class="page" data-page="contact" aria-labelledby="h-contact" hidden>
+        <div class="obj-head c-green">
+          <span class="cube"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg></span>
+          <h2 id="h-contact">Contact</h2>
+          <p class="obj-meta"><span>Tag <b>Open to work</b></span><span>Layer <b>Mumbai, India</b></span></p>
         </div>
-      </div>
-      <div class="inv">
-        <div class="sec-head" style="margin-bottom:0"><p class="eyebrow">Inventory</p><h2 style="font-size:var(--step-2)">Equipped skills</h2></div>
-        <div><h3>Core</h3><ul class="slots"><li class="slot rare">Unity</li><li class="slot rare">C#</li><li class="slot">Client architecture</li><li class="slot">Gameplay systems</li></ul></div>
-        <div><h3>AI, multiplayer, UI</h3><ul class="slots"><li class="slot">Bot opponent AI</li><li class="slot">Socket.IO (client)</li><li class="slot">UGUI / TextMeshPro</li><li class="slot">Tutorials &amp; onboarding</li><li class="slot">Localization</li></ul></div>
-        <div><h3>3D, animation, tools</h3><ul class="slots"><li class="slot">3D math</li><li class="slot">Spine 2D</li><li class="slot">Unity Timeline</li><li class="slot">Animation Rigging (IK)</li><li class="slot">Texture baking</li><li class="slot">Editor tooling</li><li class="slot">Custom C# attributes</li></ul></div>
-        <div><h3>Performance</h3><ul class="slots"><li class="slot">Unity Jobs System</li><li class="slot">Multithreading</li><li class="slot">NativeArray</li><li class="slot">Unity Profiler</li><li class="slot">Addressables</li><li class="slot">URP / HDRP</li></ul></div>
-        <div><h3>Platforms</h3><ul class="slots"><li class="slot">Android</li><li class="slot">iOS</li><li class="slot">Windows</li></ul></div>
-      </div>
+        <details class="comp c-green" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg><h3>Contact <small>(Script)</small></h3></summary>
+          <div class="comp-b">
+            <p class="contact-h">Hiring a Unity developer? Let's talk.</p>
+            <div class="field"><span>Email</span><span class="email-box"><code id="email">gautamc3080@gmail.com</code><button type="button" id="copy-email">Copy</button></span></div>
+            <div class="field"><span>Location</span><span class="val">Mumbai, India</span></div>
+            <div class="field"><span>Availability</span><span class="val live">Available immediately</span></div>
+            <div class="btn-row">
+              <a class="btn primary" href="mailto:gautamc3080@gmail.com"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg>Email me</a>
+              <a class="btn" href="https://linkedin.com/in/gautam-chaudhary-g3080" target="_blank" rel="noopener">LinkedIn</a>
+              <a class="btn" href="assets/Gautam_Resume.pdf" download="Gautam_Resume.pdf"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>Download resume</a>
+            </div>
+          </div>
+        </details>
+      </article>
+
+    </div>
+  </aside>
+
+  <!-- ===================== CONSOLE ===================== -->
+  <section class="panel cons" aria-label="Console">
+    <div class="tabs"><span class="tab on">Console</span></div>
+    <div class="cons-bar">
+      <span class="grow"></span>
+      <button class="cnt" type="button" data-filter="info" aria-pressed="true" title="Show info messages"><svg aria-hidden="true"><use href="#i-info"/></svg><span id="nInfo">7</span><span class="sr"> info messages</span></button>
+      <button class="cnt" type="button" data-filter="warn" aria-pressed="true" title="Show warnings"><svg aria-hidden="true"><use href="#i-warn"/></svg><span>1</span><span class="sr"> warning</span></button>
+      <button class="cnt" type="button" disabled title="No errors"><svg aria-hidden="true"><use href="#i-err"/></svg><span>0</span><span class="sr"> errors</span></button>
+    </div>
+    <div class="scroll">
+      <ul class="logs" id="logs">
+        <li class="info"><button type="button" data-select="pongz"><svg aria-hidden="true"><use href="#i-info"/></svg><span class="src">Pongz_SGMahjong</span><span class="msg">Live on iOS and Android: 40K+ downloads, ~3.4K daily active players.</span></button></li>
+        <li class="info"><button type="button" data-select="pongz"><svg aria-hidden="true"><use href="#i-info"/></svg><span class="src">Pongz_SGMahjong</span><span class="msg">AI Practice Mode built end to end: bot decision logic plus the full game flow around it.</span></button></li>
+        <li class="info"><button type="button" data-select="cc"><svg aria-hidden="true"><use href="#i-info"/></svg><span class="src">CharacterCreator</span><span class="msg">Export throughput raised 50x by rebuilding the 4K texture merge on the Unity Jobs System.</span></button></li>
+        <li class="info"><button type="button" data-select="ms"><svg aria-hidden="true"><use href="#i-info"/></svg><span class="src">MovieStudio3D</span><span class="msg">Automatic hand placement on rigged characters solved after being open over a year.</span></button></li>
+        <li class="info"><button type="button" data-select="ms"><svg aria-hidden="true"><use href="#i-info"/></svg><span class="src">MovieStudio3D</span><span class="msg">Timeline rebuilt: horizontal layout, finer timestep control, more stable sequencing.</span></button></li>
+        <li class="warn"><button type="button" data-select="cc"><svg aria-hidden="true"><use href="#i-warn"/></svg><span class="src">NDA</span><span class="msg">CharacterCreator and MovieStudio3D are unreleased and confidential, so they are shown as schematics, not screenshots.</span></button></li>
+        <li class="info"><button type="button" data-select="about"><svg aria-hidden="true"><use href="#i-info"/></svg><span class="src">Gautam</span><span class="msg">3.5+ years of production Unity and C# across Android, iOS and Windows.</span></button></li>
+        <li class="info"><button type="button" data-select="contact"><svg aria-hidden="true"><use href="#i-info"/></svg><span class="src">Gautam</span><span class="msg">Based in Mumbai, India. Available immediately.</span></button></li>
+      </ul>
     </div>
   </section>
 
-  <!-- ===================== CONTACT ===================== -->
-  <section id="contact" class="contact case" aria-labelledby="contact-title">
-    <div class="wrap">
-      <p class="cont">Continue?</p>
-      <h2 id="contact-title">Hiring a Unity developer? Let's talk.</h2>
-      <div class="contact-row">
-        <span class="email-box"><code id="email">gautamc3080@gmail.com</code><button type="button" id="copy-email">Copy</button></span>
-        <a class="btn btn-primary" href="mailto:gautamc3080@gmail.com">Email me</a>
-        <a class="btn btn-ghost" href="https://linkedin.com/in/gautam-chaudhary-g3080" target="_blank" rel="noopener">LinkedIn</a>
-        <a class="btn btn-ghost" href="assets/Gautam_Resume.pdf" download="Gautam_Resume.pdf">Download resume</a>
-      </div>
-      <p class="meta">Mumbai, India · Available immediately</p>
-    </div>
-  </section>
-</main>
+  <footer class="status">
+    <span class="l" id="statusL">Loading 3D scene…</span>
+    <span class="r">Site design and 3D demos built for this page; project work described is Gautam's. © 2026 Gautam</span>
+  </footer>
+</div>
 
-<footer>
-  <div class="wrap">
-    <span>© 2026 Gautam · Unity Game Developer</span>
-    <span>One collectible hides in each project.</span>
-  </div>
-</footer>
-
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<noscript><style>.page[hidden]{display:block}.fallback{display:grid}#sceneCanvas,.ovl{display:none}</style></noscript>
 
 <script>
 (function () {
-  // Collectibles: one hidden in each project.
-  var names = { pongz: "a Mahjong tile", cc: "a face slider", ms: "a clapperboard" };
-  var found = {};
-  var toast = document.getElementById("toast");
-  var counter = document.getElementById("counter");
-  var timer;
-  function say(msg, win) {
-    toast.textContent = msg;
-    toast.classList.toggle("win", !!win);
-    toast.classList.add("show");
-    clearTimeout(timer);
-    timer = setTimeout(function () { toast.classList.remove("show"); }, win ? 4500 : 2600);
+  var html = document.documentElement;
+  var OBJS = {
+    overview: { hash: "", title: "Scene", label: "Portfolio" },
+    pongz: { hash: "pongz", title: "Pongz_SGMahjong", label: "Pongz – SG Mahjong" },
+    cc: { hash: "character-creator", title: "Blend Shapes (demo)", label: "Character Creator" },
+    ms: { hash: "movie-studio", title: "Grip IK (demo)", label: "Movie Studio 3D" },
+    quests: { hash: "side-quests", title: "Scene", label: "Side quests" },
+    exp: { hash: "experience", title: "Scene", label: "Experience" },
+    about: { hash: "about", title: "Scene", label: "About" },
+    contact: { hash: "contact", title: "Scene", label: "Contact" }
+  };
+  var ALIAS = { "": "overview", top: "overview", projects: "overview", tools: "quests" };
+  Object.keys(OBJS).forEach(function (k) { if (OBJS[k].hash) ALIAS[OBJS[k].hash] = k; });
+  var ORDER = ["overview", "pongz", "cc", "ms", "quests", "exp", "about", "contact"];
+
+  var tree = document.getElementById("tree");
+  var hero = document.getElementById("hero");
+  var insp = document.getElementById("inspScroll");
+  var ovlTitle = document.getElementById("ovlTitle");
+  var sceneView = document.getElementById("sceneView");
+  var current = null;
+
+  function fromHash() { return ALIAS[decodeURIComponent(location.hash.replace(/^#/, ""))] || "overview"; }
+
+  function select(id, opts) {
+    opts = opts || {};
+    if (!OBJS[id]) id = "overview";
+    var changed = id !== current;
+    current = id;
+    html.dataset.sel = id;
+    tree.querySelectorAll("a[data-obj]").forEach(function (a) {
+      var on = a.dataset.obj === id;
+      if (on) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
+      if (on && opts.scrollTree !== false) {
+        var strip = tree; // keep the selected tab visible in the phone strip
+        if (strip.scrollWidth > strip.clientWidth) strip.scrollTo({ left: a.parentNode.offsetLeft - 16, behavior: "auto" });
+      }
+    });
+    document.querySelectorAll(".page").forEach(function (p) { p.hidden = p.dataset.page !== id; });
+    var proj = id === "pongz" || id === "cc" || id === "ms";
+    hero.classList.toggle("compact", proj);
+    document.querySelectorAll("#ovl [data-for]").forEach(function (d) {
+      var f = d.dataset.for.split(" ");
+      d.hidden = !(f.indexOf(id) >= 0 || (f.indexOf("other") >= 0 && !proj));
+    });
+    ovlTitle.textContent = OBJS[id].title;
+    document.title = id === "overview" ? "Gautam | Unity Game Developer" : OBJS[id].label + " | Gautam";
+    if (changed) {
+      insp.scrollTop = 0;
+      if (opts.push) {
+        var url = OBJS[id].hash ? "#" + OBJS[id].hash : location.pathname + location.search;
+        history.pushState({ sel: id }, "", url);
+      }
+      if (opts.fromUser && window.matchMedia("(max-width: 1023px)").matches) {
+        // phone: if the reader is already past the scene, bring the new inspector page into view
+        var ip = document.querySelector(".insp");
+        var stripH = document.querySelector(".hier").offsetHeight;
+        var top = ip.getBoundingClientRect().top;
+        if (top < stripH) window.scrollTo({ top: window.scrollY + top - stripH, behavior: "auto" });
+      }
+      updateFallback();
+      document.dispatchEvent(new CustomEvent("objselect", { detail: id }));
+    }
   }
-  document.querySelectorAll("[data-egg]").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var id = btn.dataset.egg;
-      if (found[id]) return;
-      found[id] = true;
-      btn.classList.add("found");
-      var n = Object.keys(found).length;
-      counter.textContent = "★ " + n + "/3";
-      if (n === 3) say("Full set. You found one in every project.", true);
-      else say("You found " + names[id] + ". " + (3 - n) + " to go.");
+  window.__getSel = function () { return current; };
+
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest("[data-obj], [data-select]");
+    if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault();
+    select(a.dataset.obj || a.dataset.select, { push: true, fromUser: true });
+  });
+  tree.addEventListener("keydown", function (e) {
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    var i = ORDER.indexOf(current) + (e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : -1);
+    if (i < 0 || i >= ORDER.length) return;
+    e.preventDefault();
+    select(ORDER[i], { push: true });
+    var next = tree.querySelector('[data-obj="' + ORDER[i] + '"]');
+    if (next) next.focus();
+  });
+  window.addEventListener("popstate", function () { select(fromHash()); });
+  window.addEventListener("hashchange", function () { select(fromHash()); });
+
+  // ---------- Play mode: the Game tab plays the Pongz capture ----------
+  var video = document.getElementById("gameVideo");
+  var btnPlay = document.getElementById("btnPlay"), btnPause = document.getElementById("btnPause"), btnStep = document.getElementById("btnStep");
+  var tabScene = document.getElementById("tabScene"), tabGame = document.getElementById("tabGame");
+  var gameView = document.getElementById("gameView");
+  var playing = false;
+  function showTab(game) {
+    gameView.hidden = !game; sceneView.hidden = game;
+    tabGame.classList.toggle("on", game); tabScene.classList.toggle("on", !game);
+    tabGame.setAttribute("aria-selected", game); tabScene.setAttribute("aria-selected", !game);
+    document.getElementById("sceneBar").style.visibility = game ? "hidden" : "";
+    document.dispatchEvent(new CustomEvent("viewtab", { detail: game ? "game" : "scene" }));
+  }
+  function enterPlay() {
+    playing = true; btnPlay.setAttribute("aria-pressed", "true"); btnPause.setAttribute("aria-pressed", "false");
+    showTab(true);
+    var p = video.play(); if (p && p.catch) p.catch(function () {});
+  }
+  function exitPlay() {
+    playing = false; btnPlay.setAttribute("aria-pressed", "false"); btnPause.setAttribute("aria-pressed", "false");
+    video.pause(); try { video.currentTime = 0; } catch (e) {}
+    showTab(false);
+  }
+  btnPlay.addEventListener("click", function () { playing ? exitPlay() : enterPlay(); });
+  btnPause.addEventListener("click", function () {
+    if (!playing) { enterPlay(); video.pause(); btnPause.setAttribute("aria-pressed", "true"); return; }
+    if (video.paused) { video.play(); btnPause.setAttribute("aria-pressed", "false"); }
+    else { video.pause(); btnPause.setAttribute("aria-pressed", "true"); }
+  });
+  btnStep.addEventListener("click", function () {
+    if (!playing) { enterPlay(); }
+    video.pause(); btnPause.setAttribute("aria-pressed", "true");
+    try { video.currentTime = Math.min((video.duration || 1e9) - 0.01, video.currentTime + 1 / 30); } catch (e) {}
+  });
+  tabGame.addEventListener("click", function () { if (!playing) enterPlay(); });
+  tabScene.addEventListener("click", function () { if (playing) exitPlay(); });
+  document.querySelectorAll("[data-play]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      enterPlay();
+      if (window.matchMedia("(max-width: 1023px)").matches) document.querySelector(".center").scrollIntoView({ block: "start" });
     });
   });
 
-  // Screenshot lightbox
+  // ---------- Console filters ----------
+  document.querySelectorAll(".cnt[data-filter]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var on = b.getAttribute("aria-pressed") !== "true";
+      b.setAttribute("aria-pressed", on);
+      document.querySelectorAll("#logs li." + b.dataset.filter).forEach(function (li) { li.hidden = !on; });
+    });
+  });
+
+  // ---------- Static fallback when WebGL / three.js is unavailable ----------
+  var fbArt = document.getElementById("fallbackArt");
+  var fbOn = false, fbReason = "";
+  function updateFallback() {
+    if (!fbOn) return;
+    var id = current, node;
+    fbArt.innerHTML = "";
+    if (id === "cc" || id === "ms") {
+      node = document.querySelector(id === "cc" ? "#ccSchematic svg" : "#msSchematic svg").cloneNode(true);
+      node.removeAttribute("aria-labelledby"); node.setAttribute("aria-hidden", "true");
+      node.querySelectorAll("[id]").forEach(function (n) { n.removeAttribute("id"); });
+      node.style.setProperty("--c", id === "cc" ? "#e8564a" : "#4a8ee8");
+    } else {
+      node = document.createElement("img");
+      node.src = "assets/pongz-gameplay-poster.jpg"; node.alt = "Pongz gameplay frame";
+    }
+    fbArt.appendChild(node);
+    var p = document.createElement("p");
+    p.textContent = "3D view unavailable (" + fbReason + "). Showing a static " + (id === "cc" || id === "ms" ? "schematic." : "frame from the Pongz capture.");
+    fbArt.appendChild(p);
+  }
+  function showFallback(reason) {
+    if (window.__sceneReady) return;
+    fbOn = true; fbReason = reason || "WebGL unavailable";
+    sceneView.classList.add("scene-fallback");
+    document.getElementById("sceneBar").querySelectorAll(".live-only").forEach(function (b) { b.hidden = true; });
+    document.getElementById("statusL").textContent = "3D scene unavailable: static fallback shown.";
+    updateFallback();
+  }
+  window.__sceneFallback = showFallback;
+  document.addEventListener("sceneready", function () {
+    fbOn = false; sceneView.classList.remove("scene-fallback");
+    document.getElementById("sceneBar").querySelectorAll(".live-only").forEach(function (b) { b.hidden = false; });
+  });
+  setTimeout(function () { if (!window.__sceneReady) showFallback("three.js did not load"); }, 10000);
+
+  // ---------- Lightbox ----------
   document.querySelectorAll("[data-zoom]").forEach(function (b) {
     b.addEventListener("click", function () {
-      var box = document.createElement("div");
-      box.className = "lightbox";
-      box.setAttribute("role", "dialog");
-      box.setAttribute("aria-label", "Screenshot, tap to close");
-      var img = document.createElement("img");
-      img.src = b.dataset.zoom;
-      img.alt = b.querySelector("img").alt;
-      box.appendChild(img);
+      var box = document.createElement("figure");
+      box.className = "lightbox"; box.setAttribute("role", "dialog"); box.setAttribute("aria-modal", "true");
+      box.setAttribute("aria-label", "Screenshot viewer");
+      var img = document.createElement("img"); img.src = b.dataset.zoom; img.alt = b.querySelector("img").alt;
+      var cap = document.createElement("figcaption"); cap.textContent = b.parentNode.querySelector("figcaption").textContent + " · Esc or tap to close";
+      var x = document.createElement("button"); x.type = "button"; x.className = "btn x"; x.textContent = "Close";
+      var wrap = document.createElement("div"); wrap.appendChild(img); wrap.appendChild(cap);
+      box.appendChild(wrap); box.appendChild(x);
       function close() { box.remove(); document.removeEventListener("keydown", esc); b.focus(); }
       function esc(e) { if (e.key === "Escape") close(); }
       box.addEventListener("click", close);
       document.addEventListener("keydown", esc);
-      document.body.appendChild(box);
+      document.body.appendChild(box); x.focus();
     });
   });
 
-  // Copy email
+  // ---------- Copy email ----------
   var copyBtn = document.getElementById("copy-email");
   copyBtn.addEventListener("click", function () {
     var el = document.getElementById("email");
-    function selectIt() {
-      var r = document.createRange(); r.selectNodeContents(el);
-      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
-    }
+    function selectIt() { var r = document.createRange(); r.selectNodeContents(el); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
     try {
       navigator.clipboard.writeText(el.textContent).then(function () {
         copyBtn.textContent = "Copied";
@@ -795,7 +1077,440 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
       }, selectIt);
     } catch (err) { selectIt(); }
   });
+
+  // F = frame selected (like Unity)
+  document.addEventListener("keydown", function (e) {
+    if (e.target.closest("input, textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "f" || e.key === "F") document.dispatchEvent(new CustomEvent("frameselected"));
+  });
+
+  select(fromHash(), { scrollTree: true });
 })();
+</script>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+// Scene view: procedural three.js demos built for this page (not Gautam's Unity project code).
+const fail = (why) => window.__sceneFallback && window.__sceneFallback(why);
+main().catch((e) => { console.warn("Scene view:", e && e.message); fail(e && e.code === "webgl" ? "WebGL is not available" : "three.js could not be loaded"); });
+async function main() {
+const THREE = await import("three");
+const { OrbitControls } = await import("three/addons/controls/OrbitControls.js");
+
+const view = document.getElementById("sceneView");
+const canvas = document.getElementById("sceneCanvas");
+const statusL = document.getElementById("statusL");
+const reduceMQ = matchMedia("(prefers-reduced-motion: reduce)");
+let reduce = reduceMQ.matches;
+reduceMQ.addEventListener?.("change", (e) => { reduce = e.matches; });
+
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "low-power" });
+  if (!renderer.getContext()) throw new Error("no context");
+} catch (e) { const err = new Error("WebGL is not available"); err.code = "webgl"; throw err; }
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+
+const BG = 0x2a2a2a;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(BG);
+scene.fog = new THREE.Fog(BG, 20, 46);
+const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 120);
+camera.position.set(3, 8, 19);
+scene.add(new THREE.HemisphereLight(0xe4e9ef, 0x3a3832, 1.15));
+const sun = new THREE.DirectionalLight(0xffffff, 1.7); sun.position.set(6, 10, 7); scene.add(sun);
+
+// Unity-style grid: minor and major lines on XZ, fading with fog
+function grid(size, div, color, op) {
+  const g = new THREE.GridHelper(size, div, color, color);
+  g.material.transparent = true; g.material.opacity = op; g.material.depthWrite = false;
+  return g;
+}
+scene.add(grid(96, 96, 0x5c5c5c, 0.45));
+scene.add(grid(96, 12, 0x7a7a7a, 0.55));
+
+const POS = { pongz: new THREE.Vector3(-5.2, 0, 0), cc: new THREE.Vector3(0, 0, 0), ms: new THREE.Vector3(5.2, 0, 0) };
+const sm = (a, b, v) => { let t = (v - a) / (b - a); t = Math.min(1, Math.max(0, t)); return t * t * (3 - 2 * t); };
+const allMats = [];
+const std = (color, extra = {}) => { const m = new THREE.MeshStandardMaterial({ color, flatShading: true, roughness: 0.75, metalness: 0.0, ...extra }); allMats.push(m); return m; };
+
+/* ---------------- Pongz: low-poly Mahjong tiles ---------------- */
+function tileTexture(draw) {
+  const c = document.createElement("canvas"); c.width = 128; c.height = 176;
+  const x = c.getContext("2d");
+  x.fillStyle = "#efe7d2"; x.fillRect(0, 0, 128, 176);
+  x.lineCap = "round"; x.lineJoin = "round";
+  draw(x);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+  return t;
+}
+const dot = (x, cx, cy, r, col) => { x.fillStyle = col; x.beginPath(); x.arc(cx, cy, r, 0, 7); x.fill(); x.fillStyle = "#efe7d2"; x.beginPath(); x.arc(cx, cy, r * 0.55, 0, 7); x.fill(); x.fillStyle = col; x.beginPath(); x.arc(cx, cy, r * 0.25, 0, 7); x.fill(); };
+const FACES = [
+  (x) => { x.strokeStyle = "#c8372b"; x.lineWidth = 13; x.strokeRect(28, 58, 72, 52); x.beginPath(); x.moveTo(64, 24); x.lineTo(64, 152); x.stroke(); }, // red dragon, drawn as strokes
+  (x) => { dot(x, 36, 40, 17, "#2f63b8"); dot(x, 64, 88, 17, "#c8372b"); dot(x, 92, 136, 17, "#2c8a52"); }, // 3 dots
+  (x) => { x.strokeStyle = "#2c8a52"; x.lineWidth = 12; [44, 84].forEach((cx) => { x.beginPath(); x.moveTo(cx, 30); x.lineTo(cx, 146); x.stroke(); x.fillStyle = "#2c8a52"; [56, 88, 120].forEach((cy) => x.fillRect(cx - 9, cy - 3, 18, 6)); }); }, // 2 bamboo
+  (x) => { x.strokeStyle = "#2f63b8"; x.lineWidth = 8; x.strokeRect(22, 26, 84, 124); x.lineWidth = 3; x.strokeRect(34, 38, 60, 100); }, // white dragon
+  (x) => { dot(x, 38, 42, 15, "#2f63b8"); dot(x, 90, 42, 15, "#2c8a52"); dot(x, 64, 88, 15, "#c8372b"); dot(x, 38, 134, 15, "#2c8a52"); dot(x, 90, 134, 15, "#2f63b8"); } // 5 dots
+];
+const pongz = new THREE.Group(); pongz.position.copy(POS.pongz); scene.add(pongz);
+const tiles = [];
+const ivory = std(0xefe7d2), jade = std(0x2f8a57);
+const bodyGeo = new THREE.BoxGeometry(0.72, 0.98, 0.34), backGeo = new THREE.BoxGeometry(0.72, 0.98, 0.14);
+FACES.forEach((draw, i) => {
+  const t = new THREE.Group();
+  const face = new THREE.MeshStandardMaterial({ map: tileTexture(draw), roughness: 0.6, flatShading: true }); allMats.push(face);
+  const body = new THREE.Mesh(bodyGeo, [ivory, ivory, ivory, ivory, face, ivory]);
+  const back = new THREE.Mesh(backGeo, jade); back.position.z = -0.24;
+  t.add(body, back);
+  const flat = i === 4;
+  if (flat) { t.rotation.x = -Math.PI / 2; t.position.set(0.35, 0.24, 1.35); t.rotation.z = 0.35; }
+  else { const k = i - 1.5; t.position.set(k * 0.8, 0.49, -0.1 + Math.abs(k) * 0.12); t.rotation.y = -k * 0.08; }
+  t.userData.baseY = t.position.y;
+  t.userData.tile = true;
+  body.userData.root = t; back.userData.root = t;
+  pongz.add(t); tiles.push(t);
+});
+
+/* ---------------- Character Creator: wireframe head with live blend sliders ---------------- */
+const cc = new THREE.Group(); cc.position.copy(POS.cc); scene.add(cc);
+const headGeo = new THREE.IcosahedronGeometry(1, 5);
+const basePos = Float32Array.from(headGeo.attributes.position.array);
+for (let i = 0; i < basePos.length; i += 3) { const l = Math.hypot(basePos[i], basePos[i + 1], basePos[i + 2]); basePos[i] /= l; basePos[i + 1] /= l; basePos[i + 2] /= l; }
+const wireMat = new THREE.MeshBasicMaterial({ color: 0x9fc2ea, wireframe: true, transparent: true, opacity: 0.55 });
+const occMat = new THREE.MeshBasicMaterial({ color: 0x262626, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+const head = new THREE.Group(); head.position.y = 1.95; head.scale.setScalar(0.85); cc.add(head);
+head.add(new THREE.Mesh(headGeo, occMat), new THREE.Mesh(headGeo, wireMat));
+const eyeGeo = new THREE.IcosahedronGeometry(0.085, 1);
+const eyeMat = new THREE.MeshBasicMaterial({ color: 0xe8564a, wireframe: true });
+const eyes = [new THREE.Mesh(eyeGeo, eyeMat), new THREE.Mesh(eyeGeo, eyeMat)]; head.add(...eyes);
+const neckGeo = new THREE.CylinderGeometry(0.3, 0.42, 1.05, 14, 3, true);
+const neck = new THREE.Group(); neck.position.y = 0.88;
+neck.add(new THREE.Mesh(neckGeo, occMat), new THREE.Mesh(neckGeo, wireMat)); cc.add(neck);
+const shGeo = new THREE.SphereGeometry(1, 18, 5, 0, Math.PI * 2, Math.PI * 0.3, Math.PI * 0.2);
+const shoulders = new THREE.Group(); shoulders.position.y = -0.05; shoulders.scale.set(1.3, 1.1, 0.6);
+shoulders.add(new THREE.Mesh(shGeo, wireMat)); cc.add(shoulders);
+const P = { jaw: 0.55, cheek: 0.5, eye: 0.45 };
+function morph() {
+  const a = headGeo.attributes.position.array;
+  const jawW = 0.6 + 0.48 * P.jaw;
+  const cy = -0.34 + 0.42 * P.cheek;
+  const ex = 0.2 + 0.2 * P.eye;
+  for (let i = 0; i < a.length; i += 3) {
+    const x0 = basePos[i], y0 = basePos[i + 1], z0 = basePos[i + 2];
+    let x = x0 * 0.8, y = y0 * 1.06, z = z0 * 0.92;
+    const low = sm(-0.05, -0.95, y0);
+    x *= 1 + (jawW - 1) * low;
+    z *= 1 - 0.12 * low * sm(0, -0.8, z0);
+    z += 0.08 * low * Math.max(z0, 0);
+    if (z0 < 0) z *= 1 + 0.14 * sm(0, -0.9, z0) * sm(-0.4, 0.2, y0);
+    const side = sm(0.3, 0.75, Math.abs(x0)) * sm(-0.35, 0.35, z0);
+    x *= 1 + 0.17 * side * Math.exp(-(((y0 - cy) / 0.15) ** 2));
+    const front = sm(0.55, 0.95, z0);
+    z += 0.22 * front * Math.exp(-(x0 * x0) / 0.01) * Math.exp(-((y0 + 0.08) ** 2) / 0.03);
+    z += 0.05 * front * Math.exp(-((y0 - 0.33) ** 2) / 0.006);
+    let ind = 0;
+    for (const s of [-1, 1]) ind += 0.1 * Math.exp(-((x0 - s * ex) ** 2 + (y0 - 0.2) ** 2) / 0.011) * sm(0.45, 0.85, z0);
+    a[i] = x * (1 - ind); a[i + 1] = y * (1 - ind * 0.3); a[i + 2] = z * (1 - ind);
+  }
+  headGeo.attributes.position.needsUpdate = true;
+  headGeo.computeBoundingSphere();
+  const ez = Math.sqrt(Math.max(0, 1 - ex * ex - 0.04));
+  eyes[0].position.set(-ex * 0.8, 0.2 * 1.06, ez * 0.92 - 0.12);
+  eyes[1].position.set(ex * 0.8, 0.2 * 1.06, ez * 0.92 - 0.12);
+}
+morph();
+[["sJaw", "jaw"], ["sCheek", "cheek"], ["sEye", "eye"]].forEach(([id, key]) => {
+  const el = document.getElementById(id), out = el.nextElementSibling;
+  el.addEventListener("input", () => { P[key] = el.value / 100; out.textContent = el.value; morph(); kick(); });
+});
+
+/* ---------------- Movie Studio 3D: jointed hand gripping a bar, with IK targets ---------------- */
+const ms = new THREE.Group(); ms.position.copy(POS.ms); scene.add(ms);
+const PIV = new THREE.Vector3(0, 1.7, 0);
+const R_BAR = 0.35, R_F = 0.055, R = R_BAR + R_F;
+const bar = new THREE.Group(); bar.position.copy(PIV); ms.add(bar);
+const barMesh = new THREE.Mesh(new THREE.CylinderGeometry(R_BAR, R_BAR, 2.8, 20), std(0x5b6f86));
+barMesh.userData.bar = true; bar.add(barMesh);
+const capMat = std(0x8a9bb0);
+[1.4, -1.4].forEach((y) => { const c = new THREE.Mesh(new THREE.CylinderGeometry(R_BAR + 0.04, R_BAR + 0.04, 0.08, 20), capMat); c.position.y = y; c.userData.bar = true; bar.add(c); });
+const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.3, 8), capMat); stand.position.y = 0.15; ms.add(stand);
+const hand = new THREE.Group(); hand.position.copy(PIV); ms.add(hand);
+const HY = 0.15;
+const skin = std(0xbdbdbd), jointMat = std(0x9a9a9a);
+const palm = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.72, 0.64), skin); palm.position.set(R + 0.035, HY, 0.32); hand.add(palm);
+const fore = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.12, 1.2, 10), skin);
+const foreDir = new THREE.Vector3(0.85, -0.25, 0.75).normalize();
+fore.position.set(R + 0.04, HY, 0.6).addScaledVector(foreDir, 0.6);
+fore.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), foreDir); hand.add(fore);
+const segGeo = new THREE.CylinderGeometry(1, 1, 1, 8), jGeo = new THREE.SphereGeometry(1, 8, 6);
+const FINGERS = [
+  { y: 0.255, s: [0.27, 0.19, 0.15] }, { y: 0.085, s: [0.29, 0.2, 0.16] },
+  { y: -0.085, s: [0.27, 0.19, 0.15] }, { y: -0.255, s: [0.22, 0.15, 0.13] }
+].map((f) => {
+  f.segs = f.s.map(() => { const m = new THREE.Mesh(segGeo, skin); m.scale.set(R_F, 1, R_F); hand.add(m); return m; });
+  f.joints = f.s.map(() => { const m = new THREE.Mesh(jGeo, jointMat); m.scale.setScalar(R_F * 1.08); hand.add(m); return m; });
+  return f;
+});
+const THUMB = { root: new THREE.Vector3(R + 0.07, HY + 0.38, 0.46), open: [new THREE.Vector3(0.66, HY + 0.43, 0.4), new THREE.Vector3(0.86, HY + 0.47, 0.3)],
+  grip: [0.95, 1.7].map((p) => new THREE.Vector3((R + 0.01) * Math.cos(p), HY + 0.38, (R + 0.01) * Math.sin(p))) };
+THUMB.segs = [0, 1].map(() => { const m = new THREE.Mesh(segGeo, skin); m.scale.set(R_F * 1.15, 1, R_F * 1.15); hand.add(m); return m; });
+THUMB.joints = [0, 1].map(() => { const m = new THREE.Mesh(jGeo, jointMat); m.scale.setScalar(R_F * 1.2); hand.add(m); return m; });
+// IK target markers live on the bar, so they move with it instantly; the hand catches up and re-grips
+const markMat = new THREE.MeshBasicMaterial({ color: 0xe0b341, depthTest: false, transparent: true });
+const markGeo = new THREE.OctahedronGeometry(0.055);
+function addMark(p) { const m = new THREE.Mesh(markGeo, markMat); m.position.copy(p); m.renderOrder = 10; bar.add(m); return m; }
+FINGERS.forEach((f) => { let phi = 0; f.s.forEach((s) => { phi += 2 * Math.asin(s / (2 * R)); }); addMark(new THREE.Vector3(R * Math.cos(phi), HY + f.y, -R * Math.sin(phi))); });
+addMark(THUMB.grip[1]);
+const handTarget = addMark(new THREE.Vector3(R + 0.12, HY, 0.32)); handTarget.scale.setScalar(1.6);
+const up = new THREE.Vector3(0, 1, 0), tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3();
+function placeSeg(mesh, a, b) {
+  tmpA.subVectors(b, a); const len = tmpA.length();
+  mesh.position.copy(a).addScaledVector(tmpA, 0.5);
+  mesh.quaternion.setFromUnitVectors(up, tmpA.multiplyScalar(1 / len));
+  mesh.scale.y = len;
+}
+let curl = 1;
+function poseHand() {
+  // finger chain FK; at curl=1 every joint lands exactly on the bar's surface circle
+  FINGERS.forEach((f) => {
+    let p = new THREE.Vector3(R, HY + f.y, 0), cum = 0;
+    f.s.forEach((s, k) => {
+      const d = 2 * Math.asin(s / (2 * R));
+      const a = curl * (cum + d / 2); cum += d;
+      const q = new THREE.Vector3(p.x - s * Math.sin(a), p.y, p.z - s * Math.cos(a));
+      placeSeg(f.segs[k], p, q); f.joints[k].position.copy(q); p = q;
+    });
+  });
+  let prev = THUMB.root;
+  [0, 1].forEach((k) => {
+    const q = new THREE.Vector3().lerpVectors(THUMB.open[k], THUMB.grip[k], curl);
+    placeSeg(THUMB.segs[k], prev, q); THUMB.joints[k].position.copy(q); prev = q;
+  });
+}
+poseHand();
+const tilt = { x: 0, z: 0 };
+const sTiltZ = document.getElementById("sTiltZ"), sTiltX = document.getElementById("sTiltX");
+function applyTilt(fromSlider) {
+  tilt.z = Math.max(-0.87, Math.min(0.87, tilt.z)); tilt.x = Math.max(-0.7, Math.min(0.7, tilt.x));
+  bar.rotation.set(tilt.x, 0, tilt.z);
+  if (!fromSlider) {
+    sTiltZ.value = Math.round(THREE.MathUtils.radToDeg(tilt.z)); sTiltX.value = Math.round(THREE.MathUtils.radToDeg(tilt.x));
+  }
+  sTiltZ.nextElementSibling.textContent = sTiltZ.value + "°"; sTiltX.nextElementSibling.textContent = sTiltX.value + "°";
+  lastTouch = performance.now(); kick();
+}
+let lastTouch = performance.now();
+sTiltZ.addEventListener("input", () => { tilt.z = THREE.MathUtils.degToRad(+sTiltZ.value); applyTilt(true); });
+sTiltX.addEventListener("input", () => { tilt.x = THREE.MathUtils.degToRad(+sTiltX.value); applyTilt(true); });
+
+/* ---------------- move gizmo on the selected object ---------------- */
+const moveGizmo = new THREE.Group(); scene.add(moveGizmo);
+[[1, 0, 0, 0xe8564a], [0, 1, 0, 0x8fd14f], [0, 0, 1, 0x4a8ee8]].forEach(([x, y, z, c]) => {
+  const a = new THREE.ArrowHelper(new THREE.Vector3(x, y, z), new THREE.Vector3(), 1.1, c, 0.24, 0.11);
+  a.traverse((o) => { if (o.material) { o.material.depthTest = false; o.material.transparent = true; } o.renderOrder = 20; });
+  moveGizmo.add(a);
+});
+
+/* ---------------- camera, controls, interaction ---------------- */
+const SHOTS = {
+  overview: { t: [0, 1.0, 0], p: [1.6, 5.6, 13.2] },
+  pongz: { t: [-5.2, 0.45, 0.35], p: [-3.9, 3.1, 5.1] },
+  cc: { t: [0, 1.6, 0], p: [1.9, 2.4, 4.8] },
+  ms: { t: [5.2, 1.7, 0], p: [8.2, 2.9, -2.6] }
+};
+let sel = window.__getSel ? window.__getSel() : "overview";
+const shotFor = (id) => SHOTS[id] || SHOTS.overview;
+
+// our pointer handler is registered BEFORE OrbitControls so it can veto orbiting when grabbing an object
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+const floor = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+let drag = null;
+function pick(e, list) {
+  const r = canvas.getBoundingClientRect();
+  ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  return ray.intersectObjects(list, true)[0];
+}
+const grabbables = () => sel === "pongz" ? tiles : sel === "ms" ? [bar] : [];
+canvas.addEventListener("pointerdown", (e) => {
+  const list = grabbables(); if (!list.length) return;
+  const hit = pick(e, list); if (!hit) return;
+  controls.enabled = false;
+  canvas.setPointerCapture(e.pointerId);
+  if (sel === "pongz") {
+    let root = hit.object; while (root && !root.userData.tile) root = root.parent;
+    const p = new THREE.Vector3(); ray.ray.intersectPlane(floor, p);
+    const local = pongz.worldToLocal(p.clone());
+    drag = { kind: "tile", obj: root, off: new THREE.Vector3().subVectors(root.position, local), x: e.clientX, y: e.clientY, moved: false };
+  } else {
+    drag = { kind: "bar", x: e.clientX, y: e.clientY, moved: false };
+  }
+  kick();
+});
+canvas.addEventListener("pointermove", (e) => {
+  if (!drag) {
+    if (e.pointerType === "mouse" && !e.buttons) { const list = grabbables(); canvas.style.cursor = list.length && pick(e, list) ? "grab" : ""; }
+    return;
+  }
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
+  canvas.style.cursor = "grabbing";
+  if (drag.kind === "tile") {
+    pick(e, []);
+    const p = new THREE.Vector3();
+    if (ray.ray.intersectPlane(floor, p) && drag.moved) {
+      const local = pongz.worldToLocal(p).add(drag.off);
+      local.y = drag.obj.userData.baseY + 0.18;
+      local.x = Math.max(-3.5, Math.min(3.5, local.x)); local.z = Math.max(-2.5, Math.min(3, local.z));
+      drag.obj.position.copy(local);
+    }
+  } else {
+    tilt.z -= dx * 0.005; tilt.x += dy * 0.005; drag.x = e.clientX; drag.y = e.clientY; applyTilt(false);
+  }
+  kick();
+});
+function endDrag(e) {
+  if (!drag) return;
+  if (drag.kind === "tile") {
+    const t = drag.obj;
+    t.position.y = t.userData.baseY;
+    if (!drag.moved) t.userData.spinTo = (t.userData.spinTo ?? (t.rotation.x < -1 ? t.rotation.z : t.rotation.y)) + Math.PI / 2;
+  }
+  drag = null; controls.enabled = true; canvas.style.cursor = "";
+  try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
+  kick();
+}
+canvas.addEventListener("pointerup", endDrag);
+canvas.addEventListener("pointercancel", endDrag);
+
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = !reduce; controls.dampingFactor = 0.12;
+controls.minDistance = 2.2; controls.maxDistance = 30; controls.maxPolarAngle = Math.PI * 0.49;
+controls.target.set(...SHOTS.overview.t);
+if (matchMedia("(pointer: coarse)").matches) canvas.style.touchAction = "pan-y"; // vertical swipes keep scrolling the page
+controls.addEventListener("change", kick);
+
+let fly = null;
+function frame(id, instant) {
+  const s = shotFor(id);
+  const to = { t: new THREE.Vector3(...s.t), p: new THREE.Vector3(...s.p) };
+  const fit = Math.max(1, (id === "overview" || !SHOTS[id] ? 1.75 : 1.15) / camera.aspect);
+  to.p.sub(to.t).multiplyScalar(fit).add(to.t);
+  if (instant || reduce) { controls.target.copy(to.t); camera.position.copy(to.p); controls.update(); fly = null; kick(); return; }
+  fly = { from: { t: controls.target.clone(), p: camera.position.clone() }, to, t0: performance.now(), dur: 750 };
+  kick();
+}
+function placeGizmo() {
+  const g = POS[sel];
+  moveGizmo.visible = !!g;
+  if (g) moveGizmo.position.copy(g).add(new THREE.Vector3(0, 0.02, sel === "pongz" ? 0.9 : 0.9));
+}
+document.addEventListener("objselect", (e) => { sel = e.detail; placeGizmo(); frame(sel); lastTouch = performance.now(); });
+document.addEventListener("frameselected", () => frame(sel));
+document.getElementById("btnFrame").addEventListener("click", () => frame(sel));
+const btnWire = document.getElementById("btnWire");
+btnWire.addEventListener("click", () => {
+  const on = btnWire.getAttribute("aria-pressed") !== "true";
+  btnWire.setAttribute("aria-pressed", on);
+  allMats.forEach((m) => { m.wireframe = on; });
+  kick();
+});
+
+/* ---------------- axis gizmo (top right, like Unity's scene gizmo) ---------------- */
+const gz = document.getElementById("gizmo");
+const AX = [["x", new THREE.Vector3(1, 0, 0), "#e8564a"], ["y", new THREE.Vector3(0, 1, 0), "#8fd14f"], ["z", new THREE.Vector3(0, 0, 1), "#4a8ee8"]];
+const qInv = new THREE.Quaternion(), v = new THREE.Vector3();
+function drawGizmo() {
+  qInv.copy(camera.quaternion).invert();
+  const items = [];
+  AX.forEach(([n, a, c]) => {
+    v.copy(a).applyQuaternion(qInv);
+    items.push({ x: v.x * 30, y: -v.y * 30, z: v.z, c, n, pos: true });
+    items.push({ x: -v.x * 30, y: v.y * 30, z: -v.z, c: "#9a9a9a", n: "", pos: false });
+  });
+  items.sort((a, b) => a.z - b.z);
+  let s = '<circle r="11" fill="#3c3c3c" stroke="#121212"/>';
+  items.forEach((it) => {
+    if (it.pos) s += `<line x1="0" y1="0" x2="${it.x.toFixed(1)}" y2="${it.y.toFixed(1)}" stroke="${it.c}" stroke-width="3"/>`;
+    s += `<circle cx="${it.x.toFixed(1)}" cy="${it.y.toFixed(1)}" r="${it.pos ? 8 : 5}" fill="${it.c}" opacity="${it.pos ? 1 : .8}"/>`;
+    if (it.pos) s += `<text x="${it.x.toFixed(1)}" y="${(it.y + 3.8).toFixed(1)}" text-anchor="middle" fill="#191919">${it.n}</text>`;
+  });
+  s += '<text x="0" y="58" text-anchor="middle" fill="#a0a0a0">◂ Persp</text>';
+  gz.innerHTML = s;
+}
+
+/* ---------------- render loop (only runs while something changes) ---------------- */
+const info = document.getElementById("sceneInfo");
+let running = false, visible = true, onScene = true, last = performance.now();
+let idleUntil = 0;
+function kick() { idleUntil = performance.now() + 1200; if (!running && visible && onScene && !document.hidden) { running = true; last = performance.now(); requestAnimationFrame(tick); } }
+function resize() {
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  if (!w || !h) return;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  // nudge content right of the headline on wide views
+  if (w > 760 && matchMedia("(min-width: 1024px)").matches) camera.setViewOffset(w, h, -w * 0.09, 0, w, h); else camera.clearViewOffset();
+  camera.updateProjectionMatrix();
+  kick();
+}
+new ResizeObserver(resize).observe(canvas);
+new IntersectionObserver((en) => { visible = en[0].isIntersecting; if (visible) kick(); }).observe(view);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) kick(); });
+document.addEventListener("viewtab", (e) => { onScene = e.detail === "scene"; if (onScene) { resize(); kick(); } });
+
+function tick(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  let busy = false;
+  if (fly) {
+    const k = Math.min(1, (now - fly.t0) / fly.dur), e = k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
+    controls.target.lerpVectors(fly.from.t, fly.to.t, e); camera.position.lerpVectors(fly.from.p, fly.to.p, e);
+    if (k >= 1) fly = null; busy = true;
+  }
+  // tiles: turn toward their target spin
+  tiles.forEach((t) => {
+    if (t.userData.spinTo == null) return;
+    const flat = t.rotation.x < -1, cur = flat ? t.rotation.z : t.rotation.y;
+    const d = t.userData.spinTo - cur;
+    const nv = Math.abs(d) < 0.002 || reduce ? t.userData.spinTo : cur + d * Math.min(1, dt * 10);
+    if (flat) t.rotation.z = nv; else t.rotation.y = nv;
+    if (nv !== t.userData.spinTo) busy = true;
+  });
+  // hand: follow the bar's orientation with lag; loosen the fingers while re-gripping
+  if (sel === "ms" && !reduce && !drag && now - lastTouch > 5200) {
+    tilt.z = THREE.MathUtils.degToRad((Math.random() * 2 - 1) * 38); tilt.x = THREE.MathUtils.degToRad((Math.random() * 2 - 1) * 26);
+    applyTilt(false);
+  }
+  const ang = hand.quaternion.angleTo(bar.quaternion);
+  if (reduce) { hand.quaternion.copy(bar.quaternion); curl = 1; }
+  else {
+    if (ang > 0.002) { hand.quaternion.slerp(bar.quaternion, Math.min(1, dt * (ang > 0.15 ? 2.6 : 5))); busy = true; }
+    else hand.quaternion.copy(bar.quaternion);
+    const want = ang > 0.06 ? 0.3 : 1;
+    if (Math.abs(curl - want) > 0.002) { curl += (want - curl) * Math.min(1, dt * 7); busy = true; } else curl = want;
+  }
+  poseHand();
+  if (sel === "ms" && !reduce) busy = true; // keeps the idle re-grip demo ticking while the hand is on screen
+  if (controls.update()) busy = true;
+  renderer.render(scene, camera);
+  drawGizmo();
+  const d = camera.position.distanceTo(controls.target);
+  info.textContent = `Persp · dist ${d.toFixed(1)} · ${renderer.info.render.triangles} tris`;
+  if ((busy || now < idleUntil) && visible && onScene && !document.hidden) requestAnimationFrame(tick); else running = false;
+}
+
+placeGizmo();
+frame(sel, true);
+resize();
+window.__sceneReady = true;
+document.dispatchEvent(new CustomEvent("sceneready"));
+statusL.textContent = "Scene view: three.js r160, procedural geometry. Drag to orbit, select objects in the Hierarchy.";
+}
 </script>
 </body>
 </html>
