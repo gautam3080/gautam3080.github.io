@@ -130,7 +130,7 @@ button.tab:not(.on):hover { color: var(--text); background: #222; }
 .hero h1 span { display: block; padding-left: 14px; position: relative; }
 .hero h1 span::before { content: ""; position: absolute; left: 0; top: .2em; bottom: .2em; width: 4px; border-radius: 1px; background: var(--c); }
 .hero .sub { margin-top: 10px; font-size: 13px; color: var(--text); font-family: var(--f-mono); text-shadow: 0 1px 0 rgba(0,0,0,.6); }
-.hero.compact { transform: scale(.6); opacity: .92; }
+.hero.compact { opacity: 0; transform: translateY(-6px); }
 .hero.compact .sub, .hero.compact .eyebrow { visibility: hidden; }
 .gizmo { position: absolute; right: 8px; top: 8px; width: 92px; height: 108px; pointer-events: none; z-index: 2; }
 .gizmo text { font-family: var(--f-mono); font-size: 11px; font-weight: 500; }
@@ -322,7 +322,6 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
   .hero { left: 12px; top: 10px; max-width: calc(100% - 100px); }
   .hero h1 { font-size: clamp(1.25rem, 6vw, 1.9rem); }
   .hero .sub { font-size: 11.5px; }
-  .hero.compact { transform: scale(.7); }
   .gizmo { transform: scale(.8); transform-origin: 100% 0; }
   .ovl { position: static; width: auto; max-width: none; border-radius: 0; border: 0; border-top: 1px solid var(--sep); box-shadow: none; }
   .ovl-h { border-radius: 0; }
@@ -386,7 +385,7 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
       <button class="tbtn" id="btnStep" type="button" title="Step one frame"><svg aria-hidden="true"><use href="#i-step"/></svg><span class="sr">Step</span></button>
     </div>
     <div class="tb-right">
-      <a class="btn resume-btn" href="assets/Gautam_Resume.pdf" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>Resume<span>&nbsp;PDF</span></a>
+      <a class="btn resume-btn" href="assets/Gautam_Resume.pdf" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>Resume<span>PDF</span></a>
     </div>
   </header>
 
@@ -471,7 +470,7 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
         <div class="obj-head c-blue">
           <span class="cube"><svg class="ic" aria-hidden="true"><use href="#i-scene"/></svg></span>
           <h2 id="h-overview">Gautam</h2>
-          <p class="obj-meta"><span>Tag <b>Developer</b></span><span>Layer <b>Unity</b></span></p>
+          <p class="obj-meta"><span>Tag <b>Developer</b></span></p>
         </div>
         <details class="comp c-blue" open>
           <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Developer <small>(Script)</small></h3></summary>
@@ -747,7 +746,7 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
         <div class="obj-head c-amber">
           <span class="cube"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg></span>
           <h2 id="h-quests">Side quests: smaller tools</h2>
-          <p class="obj-meta"><span>Tag <b>Tools</b></span><span>Layer <b>Editor</b></span></p>
+          <p class="obj-meta"><span>Tag <b>Tools</b></span></p>
         </div>
         <details class="comp c-amber" open>
           <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Passthrough Raycaster <small>(Script)</small></h3></summary>
@@ -764,7 +763,7 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
         <div class="obj-head c-blue">
           <span class="cube"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg></span>
           <h2 id="h-exp">Experience: where the years went</h2>
-          <p class="obj-meta"><span>Tag <b>Timeline</b></span><span>Layer <b>Work</b></span></p>
+          <p class="obj-meta"><span>Tag <b>Timeline</b></span></p>
         </div>
         <details class="comp job c-green" open>
           <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Unity Game Developer <small>· 2025 – 26</small></h3></summary>
@@ -794,7 +793,7 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
         <div class="obj-head c-blue">
           <span class="cube"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg></span>
           <h2 id="h-about">About Gautam</h2>
-          <p class="obj-meta"><span>Tag <b>Bio</b></span><span>Layer <b>Systems</b></span></p>
+          <p class="obj-meta"><span>Tag <b>Bio</b></span></p>
         </div>
         <details class="comp c-blue" open>
           <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Bio <small>(Script)</small></h3></summary>
@@ -820,7 +819,7 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
         <div class="obj-head c-green">
           <span class="cube"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg></span>
           <h2 id="h-contact">Contact</h2>
-          <p class="obj-meta"><span>Tag <b>Open to work</b></span><span>Layer <b>Mumbai, India</b></span></p>
+          <p class="obj-meta"><span>Tag <b>Open to work</b></span></p>
         </div>
         <details class="comp c-green" open>
           <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg><h3>Contact <small>(Script)</small></h3></summary>
@@ -1119,7 +1118,7 @@ renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
 const BG = 0x2a2a2a;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(BG);
-scene.fog = new THREE.Fog(BG, 20, 46);
+scene.fog = new THREE.Fog(BG, 14, 34);
 const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 120);
 camera.position.set(3, 8, 19);
 scene.add(new THREE.HemisphereLight(0xe4e9ef, 0x3a3832, 1.15));
@@ -1131,7 +1130,7 @@ function grid(size, div, color, op) {
   g.material.transparent = true; g.material.opacity = op; g.material.depthWrite = false;
   return g;
 }
-scene.add(grid(96, 96, 0x5c5c5c, 0.45));
+scene.add(grid(96, 96, 0x5c5c5c, 0.28));
 scene.add(grid(96, 12, 0x7a7a7a, 0.55));
 
 const POS = { pongz: new THREE.Vector3(-5.2, 0, 0), cc: new THREE.Vector3(0, 0, 0), ms: new THREE.Vector3(5.2, 0, 0) };
