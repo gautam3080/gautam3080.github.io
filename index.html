@@ -3,241 +3,278 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta property="og:title" content="Gautam | Unity Game Developer">
-<meta property="og:description" content="Unity game developer. 3.5+ years of production C# across mobile and Windows.">
 <title>Gautam | Unity Game Developer</title>
-<meta name="description" content="Gautam, Unity game developer. 3.5+ years of production C# across mobile and Windows. Pongz – SG Mahjong, Character Creator, Movie Studio 3D.">
+<meta name="description" content="Gautam, Unity game developer. 3.5+ years of production C#: a live multiplayer Mahjong game, a photorealistic character creator, and a 3D scene composition tool.">
+<meta property="og:title" content="Gautam | Unity Game Developer">
+<meta property="og:description" content="Mahjong bots. Photoreal humans. Movie sets in a box. 3.5+ years of production Unity and C#.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
-/* Layout: a Mahjong table. Felt background, projects are tiles you pick from a "level select",
-   a HUD carries the real numbers, and three hidden tiles make a pong. One deliberate dark look. */
+/* Layout: a game-engine viewport. Grid-lined scene background, three project "cartridges" of equal
+   weight, each with its own color, a stat sheet, a boss fight, and a schematic where screenshots can't go. */
 :root {
-  --felt: #0f3d33;
-  --felt-deep: #0a2a23;
-  --felt-line: #1f5c4c;
-  --ivory: #f4ecd8;
-  --ivory-edge: #d9ccab;
-  --ink: #1d1b16;
-  --ink-soft: #5a5446;
-  --jade: #2e8a57;
-  --red: #d23a2c;
-  --gold: #f4b93a;
-  --text: #eaf2ed;
-  --muted: #a3c2b5;
+  --bg: #12141c;
+  --panel: #1a1d29;
+  --panel-2: #222637;
+  --line: #2e3348;
+  --text: #ecebf3;
+  --muted: #a3a7c2;
+  --jade: #3cc58e;
+  --coral: #ff7a5c;
+  --amber: #ffc145;
+  --ink: #12141c;
+  --c: var(--coral);
   --f-display: "Bungee", "Arial Black", Impact, sans-serif;
   --f-body: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
   --f-cjk: "Noto Serif SC", "Songti SC", "SimSun", "Noto Serif CJK SC", serif;
-  --step--1: .85rem; --step-0: 1rem; --step-1: 1.25rem; --step-2: 1.6rem; --step-3: 2.2rem; --step-4: clamp(2.2rem, 6vw, 3.9rem);
-  --radius: 10px;
+  --step--1: .85rem; --step-0: 1rem; --step-1: 1.22rem; --step-2: 1.55rem; --step-3: clamp(1.7rem, 3.4vw, 2.3rem); --step-4: clamp(2.2rem, 6vw, 4rem);
+  --radius: 12px;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 80px; }
 body {
   margin: 0;
-  background-color: var(--felt);
+  background-color: var(--bg);
   background-image:
-    radial-gradient(ellipse at 50% -10%, rgba(255,255,255,.08), transparent 60%),
-    repeating-linear-gradient(45deg, rgba(0,0,0,.035) 0 2px, transparent 2px 6px);
+    radial-gradient(ellipse at 70% -10%, rgba(255,122,92,.10), transparent 55%),
+    radial-gradient(ellipse at 0% 30%, rgba(60,197,142,.07), transparent 50%),
+    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: auto, auto, 40px 40px, 40px 40px;
   color: var(--text);
   font-family: var(--f-body);
   font-size: var(--step-0);
   line-height: 1.6;
 }
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--felt-deep); }
-a { color: var(--gold); }
-:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
-.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
+a { color: var(--c); }
+:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; border-radius: 4px; }
+.wrap { max-width: 1160px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 h1, h2, h3 { text-wrap: balance; margin: 0; }
 p { margin: 0; }
-.eyebrow { font-family: var(--f-mono); font-size: var(--step--1); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+ul { margin: 0; padding: 0; list-style: none; }
+.eyebrow { font-family: var(--f-mono); font-size: var(--step--1); letter-spacing: .14em; text-transform: uppercase; color: var(--c); }
+.jade { --c: var(--jade); } .coral { --c: var(--coral); } .amber { --c: var(--amber); }
 
 /* ---------- top bar ---------- */
-.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: rgba(10,42,35,.92); backdrop-filter: blur(6px); border-bottom: 2px solid var(--felt-line); }
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: rgba(18,20,28,.9); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
 .topbar .wrap { display: flex; align-items: center; gap: 16px; padding-block: 10px; }
 .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-family: var(--f-display); font-size: 1.05rem; }
-.logo .mini-tile { width: 28px; height: 36px; font-size: 1.1rem; }
-.nav { display: flex; gap: 4px; margin-left: auto; flex-wrap: wrap; }
+.logo b { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: var(--coral); color: var(--ink); box-shadow: 3px 3px 0 var(--amber); font-weight: 400; }
+.nav { display: flex; gap: 2px; margin-left: auto; flex-wrap: wrap; }
 .nav a { color: var(--muted); text-decoration: none; font-family: var(--f-mono); font-size: var(--step--1); padding: 6px 10px; border-radius: 6px; }
-.nav a:hover { color: var(--text); background: var(--felt-line); }
-.counter { font-family: var(--f-mono); font-size: var(--step--1); color: var(--gold); border: 1px dashed var(--gold); padding: 4px 8px; border-radius: 6px; white-space: nowrap; }
-
-/* ---------- tiles (the core motif) ---------- */
-.mini-tile, .tile {
-  display: inline-grid; place-items: center;
-  background: linear-gradient(180deg, #fffaf0, var(--ivory));
-  color: var(--ink);
-  border-radius: 6px;
-  box-shadow: 0 4px 0 var(--jade), 0 6px 0 #1b5a39, 0 10px 18px rgba(0,0,0,.35);
-  font-family: var(--f-cjk); font-weight: 700; line-height: 1;
-}
-.c-red { color: var(--red); }
-.c-jade { color: var(--jade); }
-.dots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-.dots i { width: 16px; height: 16px; border-radius: 50%; border: 3px solid var(--jade); box-shadow: inset 0 0 0 3px var(--ivory), inset 0 0 0 8px var(--red); }
+.nav a:hover { color: var(--text); background: var(--panel-2); }
+.counter { font-family: var(--f-mono); font-size: var(--step--1); color: var(--amber); border: 1px dashed var(--amber); padding: 4px 8px; border-radius: 6px; white-space: nowrap; }
 
 /* ---------- hero ---------- */
-.hero .wrap { display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: center; padding-block: 64px 48px; }
-.hero h1 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-4); line-height: 1.05; margin-block: 14px 18px; }
-.hero h1 .hl { color: var(--gold); }
-.hero .sub { font-size: var(--step-1); color: var(--muted); max-width: 52ch; }
+.hero .wrap { display: grid; grid-template-columns: 1.25fr 1fr; gap: 40px; align-items: center; padding-block: 64px 52px; }
+.hero h1 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-4); line-height: 1.04; margin-block: 14px 20px; }
+.hero h1 span { display: block; }
+.hero h1 .w1 { color: var(--jade); } .hero h1 .w2 { color: var(--coral); } .hero h1 .w3 { color: var(--amber); }
+.hero .sub { font-size: var(--step-1); color: var(--muted); max-width: 54ch; }
+.hero .sub b { color: var(--text); font-weight: 600; }
 .btns { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-.btn { font-family: var(--f-display); font-size: .95rem; letter-spacing: .03em; text-decoration: none; padding: 14px 20px; border-radius: 8px; border: 0; cursor: pointer; transition: transform .12s ease, box-shadow .12s ease; display: inline-flex; align-items: center; gap: 8px; }
-.btn-primary { background: var(--gold); color: var(--ink); box-shadow: 0 5px 0 #a87412; }
-.btn-ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 2px var(--muted); }
+.btn { font-family: var(--f-display); font-size: .95rem; letter-spacing: .03em; text-decoration: none; padding: 14px 20px; border-radius: 10px; border: 0; cursor: pointer; transition: transform .12s ease, box-shadow .12s ease; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary { background: var(--coral); color: var(--ink); box-shadow: 0 5px 0 #b44a31; }
+.btn-ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 2px var(--line); }
 .btn:hover { transform: translateY(-2px); }
-.btn-primary:active { transform: translateY(4px); box-shadow: 0 1px 0 #a87412; }
-.press { font-family: var(--f-mono); font-size: var(--step--1); color: var(--muted); margin-top: 22px; }
-.press b { color: var(--gold); animation: blink 1.2s steps(2, start) infinite; }
-@keyframes blink { to { visibility: hidden; } }
+.btn-primary:active { transform: translateY(4px); box-shadow: 0 1px 0 #b44a31; }
 
-.hand { position: relative; height: 300px; }
-.hand .tile { position: absolute; width: 112px; height: 148px; font-size: 4.2rem; transition: transform .25s ease; }
-.hand .t1 { left: 4%; top: 40px; transform: rotate(-10deg); }
-.hand .t2 { left: 34%; top: 10px; transform: rotate(3deg); z-index: 2; }
-.hand .t3 { left: 64%; top: 52px; transform: rotate(12deg); }
-.hand .tile:hover { transform: translateY(-14px) rotate(0); }
-@media (prefers-reduced-motion: no-preference) {
-  .hand .t2 { animation: bob 3.2s ease-in-out infinite; }
-  @keyframes bob { 50% { transform: translateY(-10px) rotate(3deg); } }
+.carts { position: relative; height: 340px; }
+.cart {
+  position: absolute; width: 190px; height: 250px; border-radius: 16px 16px 10px 10px;
+  background: var(--panel); border: 2px solid var(--c); color: var(--text); text-decoration: none;
+  display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 10px 0 color-mix(in srgb, var(--c) 45%, #000), 0 22px 40px rgba(0,0,0,.45);
+  transition: transform .25s ease;
 }
+.cart .label { flex: 1; display: grid; place-items: center; background: linear-gradient(160deg, color-mix(in srgb, var(--c) 30%, var(--panel)), var(--panel)); }
+.cart .label svg { width: 92px; height: 92px; }
+.cart .name { font-family: var(--f-display); font-size: .82rem; padding: 10px 12px 2px; line-height: 1.2; }
+.cart .kind { font-family: var(--f-mono); font-size: .7rem; color: var(--muted); padding: 0 12px 12px; text-transform: uppercase; letter-spacing: .08em; }
+.cart .notch { height: 12px; background: repeating-linear-gradient(90deg, var(--c) 0 10px, transparent 10px 16px); opacity: .7; }
+.cart.k1 { left: 0; top: 50px; transform: rotate(-9deg); }
+.cart.k2 { left: 30%; top: 0; transform: rotate(2deg); z-index: 2; }
+.cart.k3 { left: 60%; top: 62px; transform: rotate(10deg); }
+.cart:hover, .cart:focus-visible { transform: translateY(-16px) rotate(0); z-index: 3; }
 
 /* ---------- HUD ---------- */
-.hud { background: var(--felt-deep); border-block: 2px solid var(--felt-line); }
-.hud .wrap { display: grid; grid-template-columns: repeat(4, 1fr); padding-block: 0; }
-.stat { padding: 20px 18px; border-right: 1px solid var(--felt-line); min-width: 0; }
+.hud { background: var(--panel); border-block: 1px solid var(--line); }
+.hud .wrap { display: grid; grid-template-columns: repeat(4, 1fr); }
+.stat { padding: 20px 18px; border-right: 1px solid var(--line); min-width: 0; }
 .stat:last-child { border-right: 0; }
-.stat .v { font-family: var(--f-display); font-size: var(--step-3); color: var(--gold); line-height: 1.1; font-variant-numeric: tabular-nums; }
-.stat .k { font-family: var(--f-mono); font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+.stat .v { font-family: var(--f-display); font-size: var(--step-3); color: var(--c); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat .k { font-family: var(--f-mono); font-size: .76rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
 
 /* ---------- sections ---------- */
-section { padding-block: 72px; }
+section { padding-block: 76px; }
 .sec-head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
 .sec-head h2 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-3); line-height: 1.1; }
+.sec-head p.note { color: var(--muted); max-width: 64ch; }
 
-/* level select */
-.levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-.level {
-  display: flex; flex-direction: column; gap: 14px; text-decoration: none;
-  background: linear-gradient(180deg, #fffaf0, var(--ivory)); color: var(--ink);
-  border-radius: 14px; padding: 22px 20px 24px;
-  box-shadow: 0 6px 0 var(--jade), 0 10px 0 #1b5a39, 0 18px 28px rgba(0,0,0,.35);
-  transition: transform .18s ease, box-shadow .18s ease; min-width: 0;
-}
-.level:hover { transform: translateY(-8px) rotate(-1deg); box-shadow: 0 6px 0 var(--jade), 0 10px 0 #1b5a39, 0 28px 36px rgba(0,0,0,.4); }
-.level .art { height: 120px; display: grid; place-items: center; background: #ebe0c4; border-radius: 10px; }
-.level .art svg { width: 84px; height: 84px; }
-.level h3 { font-family: var(--f-display); font-weight: 400; font-size: 1.2rem; line-height: 1.15; }
-.level p { color: var(--ink-soft); font-size: .95rem; }
-.level .go { margin-top: auto; font-family: var(--f-mono); font-size: var(--step--1); font-weight: 700; color: var(--jade); }
-.chip { align-self: flex-start; font-family: var(--f-mono); font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; }
-.chip.live { background: var(--jade); color: #fff; }
-.chip.live::before { content: "● "; }
-.chip.locked { background: var(--ink); color: var(--ivory); }
+/* project select */
+.select { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.pick { display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-top: 6px solid var(--c); border-radius: var(--radius); padding: 22px 20px; transition: transform .18s ease, border-color .18s ease; min-width: 0; }
+.pick:hover { transform: translateY(-6px); border-color: var(--c); }
+.pick h3 { font-family: var(--f-display); font-weight: 400; font-size: 1.15rem; line-height: 1.2; }
+.pick p { color: var(--muted); font-size: .96rem; }
+.pick .boss { font-size: .92rem; color: var(--text); }
+.pick .boss b { font-family: var(--f-mono); font-size: .72rem; color: var(--c); letter-spacing: .1em; margin-right: 6px; }
+.pick .go { margin-top: auto; font-family: var(--f-mono); font-size: var(--step--1); font-weight: 700; color: var(--c); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--f-mono); font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 4px 8px; border-radius: 5px; background: var(--panel-2); color: var(--muted); }
+.chip.on { background: var(--c); color: var(--ink); }
 
 /* case studies */
-.case { border-top: 2px dashed var(--felt-line); }
-.case-head { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center; margin-bottom: 28px; }
-.case-head .badge { width: 92px; height: 120px; font-size: 3.4rem; }
-.case-head .badge svg { width: 60px; height: 60px; }
+.case { border-top: 1px solid var(--line); }
+.case-head { margin-bottom: 30px; display: flex; flex-direction: column; gap: 10px; }
 .case-head h2 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-3); line-height: 1.1; }
-.case-head .lede { color: var(--muted); font-size: var(--step-1); margin-top: 10px; max-width: 62ch; }
-.case-body { display: grid; grid-template-columns: 300px 1fr; gap: 32px; align-items: start; }
-.sheet { background: var(--felt-deep); border: 2px solid var(--felt-line); border-radius: var(--radius); padding: 18px; position: sticky; top: 90px; min-width: 0; }
-.sheet h3 { font-family: var(--f-mono); font-size: var(--step--1); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+.case-head .tag { font-size: var(--step-2); font-weight: 800; line-height: 1.25; color: var(--text); max-width: 34ch; }
+.case-head .lede { color: var(--muted); font-size: var(--step-1); max-width: 64ch; }
+.case-body { display: grid; grid-template-columns: 290px 1fr; gap: 32px; align-items: start; }
+.sheet { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: var(--radius); padding: 18px; position: sticky; top: 90px; min-width: 0; }
+.sheet h3 { font-family: var(--f-mono); font-size: var(--step--1); letter-spacing: .14em; text-transform: uppercase; color: var(--c); margin-bottom: 10px; }
 .sheet dl { display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; margin: 0; font-size: .92rem; }
-.sheet dt { font-family: var(--f-mono); color: var(--muted); font-size: .8rem; text-transform: uppercase; padding-top: 2px; }
+.sheet dt { font-family: var(--f-mono); color: var(--muted); font-size: .76rem; text-transform: uppercase; padding-top: 2px; }
 .sheet dd { margin: 0; min-width: 0; }
-.sheet .stores { display: grid; gap: 10px; margin-top: 18px; }
-.store { display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; font-family: var(--f-display); font-size: .85rem; padding: 12px; border-radius: 8px; background: var(--gold); color: var(--ink); box-shadow: 0 4px 0 #a87412; }
+.stores { display: grid; gap: 10px; margin-top: 18px; }
+.store { display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; font-family: var(--f-display); font-size: .85rem; padding: 12px; border-radius: 8px; background: var(--c); color: var(--ink); box-shadow: 0 4px 0 color-mix(in srgb, var(--c) 50%, #000); }
 .store:hover { transform: translateY(-2px); }
 .store svg { width: 18px; height: 18px; }
-.content { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
-.abilities { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
-.ability { background: rgba(244,236,216,.06); border: 1px solid var(--felt-line); border-radius: var(--radius); padding: 18px 18px 20px; min-width: 0; }
-.ability h3 { font-family: var(--f-body); font-weight: 800; font-size: 1.08rem; color: var(--text); margin-bottom: 6px; display: flex; gap: 10px; align-items: baseline; }
-.ability h3 .k { font-family: var(--f-mono); font-size: .72rem; color: var(--ink); background: var(--gold); padding: 1px 6px; border-radius: 3px; flex: none; }
+.content { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+
+.frame { margin: 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); background: #000; }
+.frame video, .frame img { display: block; width: 100%; height: auto; }
+.frame figcaption, .shot figcaption, .schematic figcaption { font-family: var(--f-mono); font-size: .78rem; color: var(--muted); padding: 10px 12px; background: var(--panel); }
+.gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.shot { margin: 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: var(--panel); min-width: 0; }
+.shot button { display: block; padding: 0; border: 0; background: none; cursor: zoom-in; width: 100%; }
+.shot img { display: block; width: 100%; aspect-ratio: 2000 / 923; object-fit: cover; }
+
+.boss-fight { position: relative; background: linear-gradient(135deg, color-mix(in srgb, var(--c) 18%, var(--panel)), var(--panel) 70%); border: 2px solid var(--c); border-radius: var(--radius); padding: 22px 22px 22px; }
+.boss-fight .hp { display: flex; align-items: center; gap: 10px; font-family: var(--f-mono); font-size: .76rem; letter-spacing: .1em; text-transform: uppercase; color: var(--c); margin-bottom: 8px; }
+.boss-fight .hp i { flex: 1; max-width: 160px; height: 8px; border-radius: 4px; background: var(--panel-2); position: relative; overflow: hidden; }
+.boss-fight .hp i::after { content: ""; position: absolute; inset: 0 100% 0 0; background: var(--c); }
+.boss-fight .hp em { font-style: normal; color: var(--text); }
+.boss-fight h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
+.boss-fight p { color: var(--muted); }
+.boss-fight p strong { color: var(--text); }
+
+.abilities { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.ability { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 18px 20px; min-width: 0; }
+.ability h3 { font-weight: 800; font-size: 1.05rem; color: var(--text); margin-bottom: 6px; display: flex; gap: 10px; align-items: baseline; }
+.ability h3 .k { font-family: var(--f-mono); font-size: .7rem; color: var(--ink); background: var(--c); padding: 1px 6px; border-radius: 3px; flex: none; }
 .ability p { color: var(--muted); font-size: .96rem; }
 .ability.wide { grid-column: 1 / -1; }
 
-.media { margin: 0; border-radius: var(--radius); background: repeating-linear-gradient(-45deg, var(--felt-deep) 0 14px, #0d332b 14px 28px); border: 2px dashed var(--felt-line); aspect-ratio: 16 / 9; max-width: 100%; display: grid; place-items: center; text-align: center; color: var(--muted); font-family: var(--f-mono); font-size: var(--step--1); overflow: hidden; }
-.media img, .media video { width: 100%; height: 100%; object-fit: cover; display: block; }
-.media.has-src { border-style: solid; background: #000; }
-.media-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
-.media .ph span { display: block; font-family: var(--f-display); font-size: 1rem; color: var(--text); margin-bottom: 4px; }
+.credits { border-left: 4px solid var(--c); background: var(--panel); padding: 16px 18px; border-radius: 0 var(--radius) var(--radius) 0; }
+.credits b { font-family: var(--f-mono); font-size: .76rem; letter-spacing: .1em; text-transform: uppercase; color: var(--c); display: block; margin-bottom: 4px; }
+.credits p { color: var(--muted); }
 
-.credits { border-left: 4px solid var(--gold); background: rgba(244,185,58,.08); padding: 16px 18px; border-radius: 0 var(--radius) var(--radius) 0; color: var(--text); }
-.credits b { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 4px; }
+.schematic { margin: 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); background: #0e1017; }
+.schematic svg { display: block; width: 100%; height: auto; }
+.schematic .lbl { font-family: var(--f-mono); font-size: 13px; fill: var(--muted); }
+.schematic .lblc { font-family: var(--f-mono); font-size: 13px; font-weight: 700; fill: var(--c); }
+.schematic .ttl { font-family: var(--f-mono); font-size: 12px; fill: #6d728f; letter-spacing: .08em; }
+.stamp { display: inline-block; font-family: var(--f-display); color: var(--c); border: 3px solid var(--c); padding: 2px 10px; border-radius: 6px; transform: rotate(-3deg); font-size: .82rem; letter-spacing: .05em; }
+.confidential { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; color: var(--muted); font-size: .94rem; border: 1px dashed var(--line); border-radius: var(--radius); padding: 14px 16px; }
+.confidential p { flex: 1 1 260px; }
 
-.classified { position: relative; border: 2px dashed var(--muted); border-radius: var(--radius); padding: 16px 18px; color: var(--muted); font-size: .96rem; }
-.stamp { display: inline-block; font-family: var(--f-display); color: var(--red); border: 3px solid var(--red); padding: 2px 10px; border-radius: 6px; transform: rotate(-4deg); font-size: .9rem; letter-spacing: .05em; margin-bottom: 10px; background: rgba(210,58,44,.08); }
+.speed { display: grid; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+.speed .row { display: grid; grid-template-columns: 74px 1fr 52px; gap: 12px; align-items: center; font-family: var(--f-mono); font-size: .8rem; color: var(--muted); }
+.speed .bar { height: 16px; border-radius: 4px; background: var(--panel-2); position: relative; overflow: hidden; }
+.speed .bar i { position: absolute; inset: 0 auto 0 0; background: var(--c); border-radius: 4px; }
+.speed .row b { color: var(--text); text-align: right; font-variant-numeric: tabular-nums; }
+.speed small { font-family: var(--f-mono); font-size: .74rem; color: #6d728f; }
 
 /* side quests */
-.quests { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
-.quest { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start; background: var(--felt-deep); border: 2px solid var(--felt-line); border-radius: var(--radius); padding: 18px; min-width: 0; }
-.quest .mini-tile { width: 40px; height: 52px; font-size: 1.4rem; }
+.quests { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.quest { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; min-width: 0; }
+.quest .ico { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; background: var(--panel-2); color: var(--amber); font-family: var(--f-mono); font-weight: 700; }
 .quest h3 { font-weight: 800; font-size: 1.05rem; margin-bottom: 4px; }
 .quest p { color: var(--muted); font-size: .95rem; }
 
+/* experience */
+.timeline { display: grid; gap: 16px; }
+.job { display: grid; grid-template-columns: 220px 1fr; gap: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.job .when { font-family: var(--f-mono); font-size: .82rem; color: var(--muted); }
+.job .when b { display: block; font-family: var(--f-display); font-weight: 400; font-size: 1.4rem; color: var(--c); }
+.job h3 { font-weight: 800; font-size: 1.12rem; }
+.job .co { color: var(--muted); font-size: .95rem; margin-bottom: 10px; }
+.dur { height: 10px; border-radius: 5px; background: var(--panel-2); margin-top: 12px; position: relative; max-width: 100%; }
+.dur i { position: absolute; inset: 0 auto 0 0; border-radius: 5px; background: var(--c); }
+
 /* about + inventory */
-.about .wrap { display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items: start; position: relative; }
-.about .bio { display: flex; flex-direction: column; gap: 16px; font-size: 1.08rem; max-width: 62ch; }
-.about .bio p:first-of-type::first-letter { font-family: var(--f-display); color: var(--gold); font-size: 2.6em; float: left; line-height: .9; margin: 6px 8px 0 0; }
-.inventory { display: flex; flex-wrap: wrap; gap: 10px; }
-.slot { font-family: var(--f-mono); font-size: .82rem; padding: 8px 12px; border-radius: 6px; background: var(--felt-deep); border: 2px solid var(--felt-line); color: var(--text); }
-.slot.rare { border-color: var(--gold); color: var(--gold); }
+.about .wrap { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: start; }
+.bio { display: flex; flex-direction: column; gap: 16px; font-size: 1.08rem; max-width: 62ch; }
+.inv { display: grid; gap: 16px; }
+.inv h3 { font-family: var(--f-mono); font-size: .76rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.slots { display: flex; flex-wrap: wrap; gap: 8px; }
+.slot { font-family: var(--f-mono); font-size: .8rem; padding: 7px 11px; border-radius: 6px; background: var(--panel); border: 1px solid var(--line); color: var(--text); }
+.slot.rare { border-color: var(--amber); color: var(--amber); }
 
 /* contact */
 .contact { text-align: center; }
 .contact .wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
-.contact h2 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-4); line-height: 1.05; max-width: 18ch; }
-.contact .cont { font-family: var(--f-display); color: var(--gold); font-size: var(--step-2); }
+.contact h2 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-4); line-height: 1.05; max-width: 17ch; }
+.contact .cont { font-family: var(--f-display); color: var(--amber); font-size: var(--step-2); }
 .contact-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
-.email-box { display: inline-flex; align-items: center; gap: 0; border-radius: 8px; overflow: hidden; box-shadow: inset 0 0 0 2px var(--felt-line); max-width: 100%; }
+.email-box { display: inline-flex; align-items: stretch; border-radius: 10px; overflow: hidden; box-shadow: inset 0 0 0 2px var(--line); max-width: 100%; }
 .email-box code { font-family: var(--f-mono); padding: 12px 14px; user-select: all; overflow-wrap: anywhere; }
-.email-box button { font: inherit; font-family: var(--f-mono); font-size: var(--step--1); border: 0; background: var(--felt-line); color: var(--text); padding: 12px 14px; cursor: pointer; align-self: stretch; }
-.email-box button:hover { background: var(--jade); }
+.email-box button { font-family: var(--f-mono); font-size: var(--step--1); border: 0; background: var(--panel-2); color: var(--text); padding: 12px 14px; cursor: pointer; }
+.email-box button:hover { background: var(--line); }
 .meta { font-family: var(--f-mono); font-size: var(--step--1); color: var(--muted); }
 
-footer { border-top: 2px solid var(--felt-line); background: var(--felt-deep); }
+footer { border-top: 1px solid var(--line); background: var(--panel); }
 footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding-block: 22px; font-family: var(--f-mono); font-size: var(--step--1); color: var(--muted); }
 
-/* easter egg tiles */
-.egg { position: absolute; width: 30px; height: 40px; font-size: 1.1rem; cursor: pointer; border: 0; padding: 0; opacity: .55; transition: opacity .2s, transform .2s; }
-.egg:hover, .egg:focus-visible { opacity: 1; transform: translateY(-4px) rotate(-6deg); }
-.egg.found { opacity: 1; box-shadow: 0 4px 0 var(--gold), 0 6px 0 #a87412; pointer-events: none; }
-.egg-about { right: 16px; bottom: -40px; }
-.egg-foot { position: static; }
-.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(140%); background: var(--ivory); color: var(--ink); font-family: var(--f-body); font-weight: 600; padding: 14px 18px; border-radius: 10px; box-shadow: 0 5px 0 var(--jade), 0 16px 30px rgba(0,0,0,.45); z-index: 50; transition: transform .3s ease, visibility .3s; max-width: calc(100vw - 32px); visibility: hidden; }
+/* collectibles */
+.egg { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; border: 1px dashed var(--line); background: transparent; color: var(--muted); cursor: pointer; padding: 0; opacity: .6; transition: opacity .2s, transform .2s, color .2s; font-family: var(--f-cjk); font-size: 1rem; }
+.egg:hover, .egg:focus-visible { opacity: 1; transform: rotate(-10deg) scale(1.1); color: var(--c); }
+.egg.found { opacity: 1; color: var(--ink); background: var(--c); border-color: var(--c); pointer-events: none; }
+.egg svg { width: 16px; height: 16px; }
+.egg-slot { display: flex; justify-content: flex-end; margin-top: -8px; }
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(150%); visibility: hidden; background: var(--text); color: var(--ink); font-weight: 600; padding: 14px 18px; border-radius: 10px; box-shadow: 0 5px 0 var(--coral), 0 16px 30px rgba(0,0,0,.45); z-index: 50; transition: transform .3s ease, visibility .3s; max-width: calc(100vw - 32px); }
 .toast.show { transform: translateX(-50%) translateY(0); visibility: visible; }
-.toast.pong { background: var(--gold); box-shadow: 0 5px 0 #a87412, 0 16px 30px rgba(0,0,0,.45); }
+.toast.win { background: var(--amber); box-shadow: 0 5px 0 #a87412, 0 16px 30px rgba(0,0,0,.45); }
+
+/* lightbox */
+.lightbox { position: fixed; inset: 0; z-index: 60; background: rgba(8,9,13,.92); display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); cursor: zoom-out; }
+.lightbox img { max-width: 100%; max-height: 100%; border-radius: 10px; }
 
 /* ---------- responsive ---------- */
-@media (max-width: 900px) {
-  .hero .wrap { grid-template-columns: 1fr; padding-block: 40px 32px; }
-  .hand { height: 190px; max-width: 360px; }
-  .hand .tile { width: 82px; height: 108px; font-size: 3rem; }
+@media (max-width: 960px) {
+  .hero .wrap { grid-template-columns: 1fr; padding-block: 40px 36px; }
+  .carts { height: 250px; max-width: 420px; }
+  .cart { width: 140px; height: 186px; }
+  .cart .label svg { width: 64px; height: 64px; }
   .hud .wrap { grid-template-columns: repeat(2, 1fr); }
   .stat:nth-child(2) { border-right: 0; }
-  .stat:nth-child(-n+2) { border-bottom: 1px solid var(--felt-line); }
-  .levels { grid-template-columns: 1fr; max-width: 520px; }
+  .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .select { grid-template-columns: 1fr; max-width: 560px; }
   .case-body { grid-template-columns: 1fr; }
   .sheet { position: static; }
-  .about .wrap { grid-template-columns: 1fr; gap: 28px; }
+  .about .wrap { grid-template-columns: 1fr; gap: 32px; }
 }
 @media (max-width: 640px) {
   .nav { display: none; }
   .counter { margin-left: auto; }
-  section { padding-block: 52px; }
-  .abilities, .media-row, .quests { grid-template-columns: 1fr; }
-  .case-head { grid-template-columns: 1fr; gap: 14px; }
-  .case-head .badge { width: 64px; height: 84px; font-size: 2.4rem; }
-  .case-head .badge svg { width: 42px; height: 42px; }
+  section { padding-block: 54px; }
+  .abilities, .quests, .gallery { grid-template-columns: 1fr; }
+  .job { grid-template-columns: 1fr; gap: 10px; }
+  .cart .name { font-size: .7rem; }
   .stat { padding: 16px 12px; }
-  .egg-about { bottom: -48px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cart.k2 { animation: bob 3.4s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translateY(-10px) rotate(2deg); } }
+  .boss-fight .hp i::after { animation: hp 2.4s ease-out .3s both; }
+  @keyframes hp { from { inset: 0 0 0 0; } to { inset: 0 100% 0 0; } }
+  .hand-anim .j { animation: settle 3s ease-in-out infinite alternate; }
+  @keyframes settle { from { transform: translate(var(--dx), var(--dy)); } to { transform: none; } }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -246,15 +283,17 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
 </style>
 </head>
 <body>
+
 <header class="topbar">
   <div class="wrap">
-    <a class="logo" href="#top"><span class="mini-tile c-red" aria-hidden="true">中</span>Gautam</a>
+    <a class="logo" href="#top"><b aria-hidden="true">G</b>Gautam</a>
     <nav class="nav" aria-label="Sections">
-      <a href="#levels">Levels</a>
+      <a href="#projects">Projects</a>
+      <a href="#experience">Experience</a>
       <a href="#about">About</a>
       <a href="#contact">Contact</a>
     </nav>
-    <span class="counter" id="counter" title="There are three tiles hidden on this page">Tiles 0/3</span>
+    <span class="counter" id="counter" title="One collectible is hidden in each project">★ 0/3</span>
   </div>
 </header>
 
@@ -263,80 +302,84 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
     <div class="wrap">
       <div>
         <p class="eyebrow">Player 1 · Unity Game Developer</p>
-        <h1 id="hero-title">I make tiles <span class="hl">click</span>, bots <span class="hl">think</span>, and frame rates <span class="hl">behave</span>.</h1>
-        <p class="sub">Unity game developer with 3.5+ years of production C# across mobile and Windows. Based in Mumbai. Available immediately.</p>
+        <h1 id="hero-title"><span class="w1">Mahjong bots.</span> <span class="w2">Photoreal humans.</span> <span class="w3">Movie sets in a box.</span></h1>
+        <p class="sub">I'm Gautam, a Unity developer with <b>3.5+ years of production C#</b>. I designed and built the client architecture of a live multiplayer game, led development of a photorealistic character creator, and solved real-time hand placement for a 3D scene tool. Based in Mumbai. Available immediately.</p>
         <div class="btns">
-          <a class="btn btn-primary" href="#pongz">See Pongz ▸</a>
+          <a class="btn btn-primary" href="#projects">Pick a project ▸</a>
           <a class="btn btn-ghost" href="#contact">Get in touch</a>
         </div>
-        <p class="press">Press <b>ENTER</b> to start. Or just scroll, that works too.</p>
       </div>
-      <div class="hand">
-        <span class="tile t1 c-jade" aria-hidden="true">發</span>
-        <span class="tile t2" aria-hidden="true"><span class="dots"><i></i><i></i><i></i><i></i></span></span>
-        <button class="tile t3 c-red egg-hero" data-egg="1" aria-label="A hidden tile" style="cursor:pointer;border:0;padding:0;font-family:var(--f-cjk);font-weight:700">中</button>
+      <div class="carts" aria-label="Projects">
+        <a class="cart k1 jade" href="#pongz">
+          <span class="label" aria-hidden="true"><svg viewBox="0 0 64 64"><rect x="14" y="6" width="36" height="50" rx="5" fill="#f4ecd8"/><rect x="14" y="52" width="36" height="6" rx="3" fill="#3cc58e"/><text x="32" y="42" text-anchor="middle" font-size="28" font-weight="700" fill="#d23a2c" font-family="serif">中</text></svg></span>
+          <span class="notch"></span><span class="name">Pongz – SG Mahjong</span><span class="kind">Live mobile game</span>
+        </a>
+        <a class="cart k2 coral" href="#character-creator">
+          <span class="label" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="#ecebf3" stroke-width="3" stroke-linecap="round"><ellipse cx="22" cy="24" rx="10" ry="12"/><path d="M8 56c2-10 7-15 14-15s12 5 14 15"/><line x1="42" y1="16" x2="58" y2="16"/><line x1="42" y1="32" x2="58" y2="32"/><line x1="42" y1="48" x2="58" y2="48"/><circle cx="47" cy="16" r="3.5" fill="#ff7a5c" stroke="none"/><circle cx="54" cy="32" r="3.5" fill="#ffc145" stroke="none"/><circle cx="46" cy="48" r="3.5" fill="#3cc58e" stroke="none"/></svg></span>
+          <span class="notch"></span><span class="name">Character Creator</span><span class="kind">Windows 3D tool</span>
+        </a>
+        <a class="cart k3 amber" href="#movie-studio">
+          <span class="label" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="#ecebf3" stroke-width="3" stroke-linejoin="round"><rect x="6" y="24" width="52" height="32" rx="3"/><path d="M6 24 L10 10 L58 10 L58 24" fill="#ecebf3"/><path d="M18 10 L14 24 M30 10 L26 24 M42 10 L38 24 M54 10 L50 24" stroke="#1a1d29" stroke-width="3"/><path d="M27 33 L40 40 L27 47 Z" fill="#ffc145" stroke="none"/></svg></span>
+          <span class="notch"></span><span class="name">Movie Studio 3D</span><span class="kind">Windows 3D tool</span>
+        </a>
       </div>
     </div>
   </section>
 
   <div class="hud" role="list" aria-label="Key numbers">
     <div class="wrap">
-      <div class="stat" role="listitem"><div class="v">3.5+</div><div class="k">Years of production C#</div></div>
-      <div class="stat" role="listitem"><div class="v">40K+</div><div class="k">Pongz downloads</div></div>
-      <div class="stat" role="listitem"><div class="v">~3.4K</div><div class="k">Pongz daily players</div></div>
-      <div class="stat" role="listitem"><div class="v">50x</div><div class="k">Faster exports, Character Creator</div></div>
+      <div class="stat coral" role="listitem"><div class="v">3.5+</div><div class="k">Years of production C#</div></div>
+      <div class="stat amber" role="listitem"><div class="v">3</div><div class="k">Professional Unity projects</div></div>
+      <div class="stat coral" role="listitem"><div class="v">50x</div><div class="k">Faster character exports</div></div>
+      <div class="stat jade" role="listitem"><div class="v">40K+</div><div class="k">Pongz downloads</div></div>
     </div>
   </div>
 
-  <section id="levels" aria-labelledby="levels-title">
+  <!-- ===================== PROJECT SELECT ===================== -->
+  <section id="projects" aria-labelledby="projects-title">
     <div class="wrap">
       <div class="sec-head">
-        <p class="eyebrow">Level select</p>
-        <h2 id="levels-title">Pick a project</h2>
+        <p class="eyebrow">Select a project</p>
+        <h2 id="projects-title">Three projects, three very different bosses</h2>
+        <p class="note">One is a live mobile game you can download today. The other two are Windows 3D tools that never went public, which is where most of my years went.</p>
       </div>
-      <div class="levels">
-        <a class="level" href="#pongz">
-          <span class="chip live">Live on both stores</span>
-          <div class="art" aria-hidden="true"><span class="mini-tile c-red" style="width:62px;height:82px;font-size:2.6rem">中</span></div>
+      <div class="select">
+        <a class="pick jade" href="#pongz">
+          <div class="chips"><span class="chip on">● Live</span><span class="chip">iOS · Android</span><span class="chip">2025 – 26</span></div>
           <h3>Pongz – SG Mahjong</h3>
-          <p>Real-time multiplayer Mahjong for iOS and Android. Client architecture, bot AI, all of the UI.</p>
+          <p>Real-time multiplayer Mahjong. Client architecture, bot opponents, every screen.</p>
+          <p class="boss"><b>BOSS</b>Bots that can play a full game of Mahjong</p>
           <span class="go">Play level ▸</span>
         </a>
-        <a class="level" href="#character-creator">
-          <span class="chip locked">Classified · Unreleased</span>
-          <div class="art" aria-hidden="true">
-            <svg viewBox="0 0 64 64" fill="none" stroke="#1d1b16" stroke-width="3.5" stroke-linecap="round"><circle cx="20" cy="20" r="9" fill="#f4ecd8"/><path d="M6 50c2-10 8-15 14-15s12 5 14 15" fill="#f4ecd8"/><line x1="40" y1="16" x2="58" y2="16"/><line x1="40" y1="32" x2="58" y2="32"/><line x1="40" y1="48" x2="58" y2="48"/><circle cx="46" cy="16" r="3.5" fill="#d23a2c" stroke="none"/><circle cx="53" cy="32" r="3.5" fill="#2e8a57" stroke="none"/><circle cx="44" cy="48" r="3.5" fill="#d23a2c" stroke="none"/></svg>
-          </div>
+        <a class="pick coral" href="#character-creator">
+          <div class="chips"><span class="chip on">Led development</span><span class="chip">Windows</span><span class="chip">2022 – 24</span></div>
           <h3>Character Creator</h3>
-          <p>A photorealistic character creation tool for Windows. I led development and the architecture.</p>
-          <span class="go">Read the briefing ▸</span>
+          <p>Photorealistic humans built from sliders, head to toe, in real time.</p>
+          <p class="boss"><b>BOSS</b>An export pipeline that needed to be 50x faster</p>
+          <span class="go">Play level ▸</span>
         </a>
-        <a class="level" href="#movie-studio">
-          <span class="chip locked">Classified · Unreleased</span>
-          <div class="art" aria-hidden="true">
-            <svg viewBox="0 0 64 64" fill="none" stroke="#1d1b16" stroke-width="3.5" stroke-linejoin="round"><rect x="6" y="24" width="52" height="32" rx="3" fill="#f4ecd8"/><path d="M6 24 L10 10 L58 10 L58 24" fill="#1d1b16"/><path d="M18 10 L14 24 M30 10 L26 24 M42 10 L38 24 M54 10 L50 24" stroke="#f4ecd8" stroke-width="3"/><path d="M27 33 L40 40 L27 47 Z" fill="#d23a2c" stroke="none"/></svg>
-          </div>
+        <a class="pick amber" href="#movie-studio">
+          <div class="chips"><span class="chip on">3D tools</span><span class="chip">Windows</span><span class="chip">2022 – 24</span></div>
           <h3>Movie Studio 3D</h3>
-          <p>A Windows tool for composing 3D scenes. I solved a problem that was open for over a year.</p>
-          <span class="go">Read the briefing ▸</span>
+          <p>Compose and preview 3D scenes: assets, lighting, cameras, a timeline.</p>
+          <p class="boss"><b>BOSS</b>A hand placement problem open for over a year</p>
+          <span class="go">Play level ▸</span>
         </a>
       </div>
     </div>
   </section>
 
   <!-- ===================== PONGZ ===================== -->
-  <section id="pongz" class="case" aria-labelledby="pongz-title">
+  <section id="pongz" class="case jade" aria-labelledby="pongz-title">
     <div class="wrap">
       <div class="case-head">
-        <span class="tile badge c-red" aria-hidden="true">中</span>
-        <div>
-          <p class="eyebrow">Level 1 · The live one</p>
-          <h2 id="pongz-title">Pongz – SG Mahjong: live on both stores, and on about 3,400 phones a day.</h2>
-          <p class="lede">A live, real-time multiplayer Mahjong game for iOS and Android. I designed and built its core client-side architecture and its entire UI.</p>
-        </div>
+        <p class="eyebrow">Project 01 · Live mobile game</p>
+        <h2 id="pongz-title">Pongz – SG Mahjong</h2>
+        <p class="tag">Live on both stores, and on about 3,400 phones a day.</p>
+        <p class="lede">A live, real-time multiplayer Mahjong game for iOS and Android. I designed and built its core client-side architecture and its entire UI.</p>
       </div>
       <div class="case-body">
-        <aside class="sheet" aria-label="Pongz stats">
+        <aside class="sheet" aria-label="Pongz stat sheet">
           <h3>Stat sheet</h3>
           <dl>
             <dt>Role</dt><dd>Unity Game Developer</dd>
@@ -359,9 +402,22 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
         </aside>
 
         <div class="content">
-          <figure class="media" data-media="pongz-hero">
-            <figcaption class="ph"><span>Gameplay clip</span>Shuffling the tiles…</figcaption>
+          <figure class="frame">
+            <video src="assets/pongz-gameplay.mp4" poster="assets/pongz-gameplay-poster.jpg" muted autoplay loop playsinline preload="metadata" aria-label="Pongz gameplay: the final turns of a ranked hand through to the win screen"></video>
+            <figcaption>Ranked match, final turns of the hand through to the win screen.</figcaption>
           </figure>
+
+          <div class="boss-fight">
+            <p class="hp">Boss fight <i></i> <em>Defeated</em></p>
+            <h3>AI Practice Mode: opponents who never rage-quit</h3>
+            <p>Designed and built an offline bot-opponent mode <strong>end to end</strong>: turn-based decision logic for the bots and the full gameplay flow around them, so a player can practice a complete game with no one else online.</p>
+          </div>
+
+          <div class="gallery">
+            <figure class="shot"><button type="button" data-zoom="assets/pongz-practice.jpg" aria-label="Enlarge: AI Practice Mode"><img src="assets/pongz-practice.jpg" alt="Pongz AI Practice Mode: the player at a Mahjong table against three robot bots" loading="lazy"></button><figcaption>AI Practice Mode vs three bots</figcaption></figure>
+            <figure class="shot"><button type="button" data-zoom="assets/pongz-tutorial-claim.jpg" aria-label="Enlarge: tutorial on claiming tiles"><img src="assets/pongz-tutorial-claim.jpg" alt="Pongz tutorial step explaining how to claim a discarded tile with Chi, Pon, Kan and Hu buttons" loading="lazy"></button><figcaption>Interactive tutorial: claiming a discard</figcaption></figure>
+            <figure class="shot"><button type="button" data-zoom="assets/pongz-tutorial-winds.jpg" aria-label="Enlarge: tutorial on the winds"><img src="assets/pongz-tutorial-winds.jpg" alt="Pongz tutorial overlay highlighting the round number and prevalent wind" loading="lazy"></button><figcaption>Tutorial spotlighting the HUD</figcaption></figure>
+          </div>
 
           <div class="abilities">
             <article class="ability wide">
@@ -369,59 +425,47 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
               <p>Designed and built the core client-side architecture from the ground up, plus the gameplay systems behind the rules, player interaction, and game flow.</p>
             </article>
             <article class="ability">
-              <h3><span class="k">AI</span>AI Practice Mode: opponents who never rage-quit</h3>
-              <p>Designed and built an offline bot-opponent mode end to end, covering turn-based decision logic and the full gameplay flow.</p>
-            </article>
-            <article class="ability">
               <h3><span class="k">NET</span>Multiplayer, client side</h3>
               <p>Implemented the client-side multiplayer layer over Socket.IO, synchronizing against an authoritative server.</p>
             </article>
-            <article class="ability wide">
+            <article class="ability">
               <h3><span class="k">UI</span>Every screen you tap</h3>
-              <p>Built the complete UI layer: screens, HUD, in-game flow, and the integration between UI and game systems. Also built the interactive tutorial and onboarding flow, the localization system for multi-language support, and the presentation layer for rank and progression.</p>
+              <p>Built the complete UI layer: screens, HUD, in-game flow, and UI-to-systems integration. Also the interactive tutorial and onboarding, localization, and the rank and progression presentation.</p>
             </article>
-          </div>
-
-          <div class="media-row">
-            <figure class="media" data-media="pongz-practice"><figcaption class="ph"><span>AI Practice Mode</span>Screenshot incoming</figcaption></figure>
-            <figure class="media" data-media="pongz-tutorial"><figcaption class="ph"><span>Tutorial</span>Screenshot incoming</figcaption></figure>
-          </div>
-
-          <div class="abilities">
             <article class="ability">
               <h3><span class="k">ANIM</span>Tiles with personality</h3>
               <p>Designed and built the 2D and 3D animation systems, including Spine skeletal animation and gameplay-animation integration.</p>
             </article>
             <article class="ability">
-              <h3><span class="k">PERF</span>Running smoothly on real phones</h3>
-              <p>Optimized mobile performance across live releases, reducing draw calls and SetPass calls with LOD groups and texture atlasing, profiled with the Unity Profiler. Managed asset delivery through an Addressables / AssetBundle build pipeline.</p>
+              <h3><span class="k">PERF</span>Smooth on real phones</h3>
+              <p>Optimized mobile performance across live releases: fewer draw calls and SetPass calls via LOD groups and texture atlasing, profiled with the Unity Profiler. Managed asset delivery through Addressables.</p>
             </article>
           </div>
 
-          <p class="credits"><b>Credits, honestly</b>Built at Roothoot Private Limited as client work for Pixel Stack Studios, who own the game. Server-side netcode and the rank-point calculation were my teammates' work; I built the client that talks to them.</p>
+          <div class="credits">
+            <b>Credits, honestly</b>
+            <p>Built at Roothoot Private Limited as client work for Pixel Stack Studios, who own the game. Server-side netcode and the rank-point calculation were my teammates' work; I built the client that talks to them.</p>
+          </div>
+          <div class="egg-slot"><button class="egg" data-egg="pongz" aria-label="Hidden collectible">中</button></div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ===================== CHARACTER CREATOR ===================== -->
-  <section id="character-creator" class="case" aria-labelledby="cc-title">
+  <section id="character-creator" class="case coral" aria-labelledby="cc-title">
     <div class="wrap">
       <div class="case-head">
-        <span class="tile badge" aria-hidden="true">
-          <svg viewBox="0 0 64 64" fill="none" stroke="#1d1b16" stroke-width="3.5" stroke-linecap="round"><circle cx="20" cy="20" r="9"/><path d="M6 50c2-10 8-15 14-15s12 5 14 15"/><line x1="40" y1="16" x2="58" y2="16"/><line x1="40" y1="32" x2="58" y2="32"/><line x1="40" y1="48" x2="58" y2="48"/><circle cx="46" cy="16" r="3.5" fill="#d23a2c" stroke="none"/><circle cx="53" cy="32" r="3.5" fill="#2e8a57" stroke="none"/><circle cx="44" cy="48" r="3.5" fill="#d23a2c" stroke="none"/></svg>
-        </span>
-        <div>
-          <p class="eyebrow">Level 2 · Classified</p>
-          <h2 id="cc-title">Character Creator: faces, bodies, and an export button that got 50x faster.</h2>
-          <p class="lede">A photorealistic character creation tool for Windows, built in Unity. I led development and designed its core architecture.</p>
-        </div>
+        <p class="eyebrow">Project 02 · Windows 3D tool · Led development</p>
+        <h2 id="cc-title">Character Creator</h2>
+        <p class="tag">Faces, bodies, and an export button that got 50x faster.</p>
+        <p class="lede">A photorealistic character creation tool for Windows, built in Unity. Users shape a realistic human head to toe in real time, from facial structure and body shape to skin, hair, and clothing. I led development and designed its core architecture.</p>
       </div>
       <div class="case-body">
-        <aside class="sheet" aria-label="Character Creator stats">
+        <aside class="sheet" aria-label="Character Creator stat sheet">
           <h3>Stat sheet</h3>
           <dl>
-            <dt>Role</dt><dd>Unity Developer (led development)</dd>
+            <dt>Role</dt><dd>Unity Developer, led development</dd>
             <dt>When</dt><dd>2022 – 2024</dd>
             <dt>Platform</dt><dd>Windows</dd>
             <dt>Status</dt><dd>Unreleased, confidential</dd>
@@ -429,44 +473,82 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
           </dl>
         </aside>
         <div class="content">
+          <figure class="schematic">
+            <svg viewBox="0 0 720 360" role="img" aria-labelledby="cc-svg-t">
+              <title id="cc-svg-t">Schematic of a character creator: a panel of sliders on the left driving a 3D head and body in the viewport</title>
+              <rect x="0" y="0" width="720" height="360" fill="#0e1017"/>
+              <rect x="16" y="16" width="230" height="328" rx="8" fill="#1a1d29" stroke="#2e3348"/>
+              <text class="ttl" x="32" y="42">FACE · BODY · SKIN · HAIR · CLOTHES</text>
+              <g class="lbl">
+                <text x="32" y="78">Jaw width</text><text x="32" y="120">Cheekbones</text><text x="32" y="162">Nose bridge</text><text x="32" y="204">Shoulders</text><text x="32" y="246">Body mass</text><text x="32" y="288">Skin tone</text>
+              </g>
+              <g stroke="#2e3348" stroke-width="4" stroke-linecap="round">
+                <line x1="32" y1="92" x2="228" y2="92"/><line x1="32" y1="134" x2="228" y2="134"/><line x1="32" y1="176" x2="228" y2="176"/><line x1="32" y1="218" x2="228" y2="218"/><line x1="32" y1="260" x2="228" y2="260"/><line x1="32" y1="302" x2="228" y2="302"/>
+              </g>
+              <g stroke="#ff7a5c" stroke-width="4" stroke-linecap="round">
+                <line x1="32" y1="92" x2="150" y2="92"/><line x1="32" y1="134" x2="186" y2="134"/><line x1="32" y1="176" x2="96" y2="176"/><line x1="32" y1="218" x2="170" y2="218"/><line x1="32" y1="260" x2="120" y2="260"/><line x1="32" y1="302" x2="200" y2="302"/>
+              </g>
+              <g fill="#ecebf3"><circle cx="150" cy="92" r="7"/><circle cx="186" cy="134" r="7"/><circle cx="96" cy="176" r="7"/><circle cx="170" cy="218" r="7"/><circle cx="120" cy="260" r="7"/><circle cx="200" cy="302" r="7"/></g>
+              <g fill="none" stroke="#ecebf3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".9">
+                <path d="M486 64c-34 0-56 28-56 66 0 44 26 78 56 78s56-34 56-78c0-38-22-66-56-66z"/>
+                <path d="M462 120h14M496 120h14M486 128v26l-8 6M472 176c8 6 20 6 28 0"/>
+                <path d="M452 200l-6 30M520 200l6 30"/>
+                <path d="M446 230c-60 10-100 30-118 110M526 230c60 10 100 30 118 110"/>
+              </g>
+              <g fill="none" stroke="#ff7a5c" stroke-width="1.5" stroke-dasharray="4 5" opacity=".8">
+                <path d="M412 130h-30M560 130h30M486 46v-16"/>
+              </g>
+              <path d="M250 180h80" stroke="#ff7a5c" stroke-width="2" stroke-dasharray="6 6"/>
+              <path d="M330 180l-10-6v12z" fill="#ff7a5c"/>
+              <text class="lblc" x="440" y="340">real-time preview</text>
+            </svg>
+            <figcaption>Schematic, not a screenshot. The real tool is confidential, so this shows the idea: sliders on one side, a photoreal human on the other.</figcaption>
+          </figure>
+
+          <div class="boss-fight">
+            <p class="hp">Boss fight <i></i> <em>Defeated</em></p>
+            <h3>50x faster character exports</h3>
+            <p>Exporting a character runs through a texture merging pipeline. I <strong>rebuilt the texture merging pipeline on the Unity Jobs System</strong>, spreading the work across CPU cores, and raised character export throughput 50x.</p>
+          </div>
+
+          <div class="speed" aria-label="Export throughput, relative">
+            <div class="row"><span>Before</span><span class="bar"><i style="width:2%"></i></span><b>1x</b></div>
+            <div class="row"><span>Jobs System</span><span class="bar"><i style="width:100%"></i></span><b>50x</b></div>
+            <small>Character export throughput, relative to the original pipeline. Bars drawn to scale.</small>
+          </div>
+
           <div class="abilities">
             <article class="ability">
-              <h3><span class="k">ARCH</span>The blueprint</h3>
-              <p>Led development of the tool and designed its core architecture.</p>
+              <h3><span class="k">LEAD</span>The blueprint</h3>
+              <p>Led development of the tool and designed its core architecture, the foundation the rest of the features were built on.</p>
             </article>
             <article class="ability">
-              <h3><span class="k">PERF</span>50x faster exports</h3>
-              <p>Rebuilt the texture merging pipeline on the Unity Jobs System, raising character export throughput 50x.</p>
-            </article>
-            <article class="ability wide">
               <h3><span class="k">3D</span>Sliders for every cheekbone</h3>
               <p>Built the customizable facial and body structure systems behind photorealistic character generation.</p>
             </article>
           </div>
-          <div class="classified">
+
+          <div class="confidential">
             <span class="stamp">CONFIDENTIAL</span>
-            <p>No screenshots here, on purpose: this project is unreleased and confidential, so it gets words instead of pictures. The words are accurate.</p>
+            <p>Unreleased and still under wraps, so you get schematics instead of screenshots. Happy to walk through how it worked in an interview.</p>
           </div>
+          <div class="egg-slot"><button class="egg" data-egg="cc" aria-label="Hidden collectible"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="8" x2="14" y2="8"/><circle cx="9" cy="8" r="2.5" fill="currentColor"/></svg></button></div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ===================== MOVIE STUDIO 3D ===================== -->
-  <section id="movie-studio" class="case" aria-labelledby="ms-title">
+  <section id="movie-studio" class="case amber" aria-labelledby="ms-title">
     <div class="wrap">
       <div class="case-head">
-        <span class="tile badge" aria-hidden="true">
-          <svg viewBox="0 0 64 64" fill="none" stroke="#1d1b16" stroke-width="3.5" stroke-linejoin="round"><rect x="6" y="24" width="52" height="32" rx="3"/><path d="M6 24 L10 10 L58 10 L58 24" fill="#1d1b16"/><path d="M18 10 L14 24 M30 10 L26 24 M42 10 L38 24 M54 10 L50 24" stroke="#f4ecd8" stroke-width="3"/><path d="M27 33 L40 40 L27 47 Z" fill="#d23a2c" stroke="none"/></svg>
-        </span>
-        <div>
-          <p class="eyebrow">Level 3 · Classified</p>
-          <h2 id="ms-title">Movie Studio 3D: I taught imported characters where their fingers go.</h2>
-          <p class="lede">A Windows tool for composing and previewing 3D scenes, built in Unity. I built several of its core modules and cracked a problem that had been open on the project for over a year.</p>
-        </div>
+        <p class="eyebrow">Project 03 · Windows 3D tool</p>
+        <h2 id="ms-title">Movie Studio 3D</h2>
+        <p class="tag">I taught imported characters where their fingers go.</p>
+        <p class="lede">A Windows tool for composing and previewing 3D scenes, built in Unity. It works like a small game editor inside the app: a scene hierarchy, a properties panel with lighting and time of day, an asset inventory, cameras, and a timeline. I built several of its core modules.</p>
       </div>
       <div class="case-body">
-        <aside class="sheet" aria-label="Movie Studio 3D stats">
+        <aside class="sheet" aria-label="Movie Studio 3D stat sheet">
           <h3>Stat sheet</h3>
           <dl>
             <dt>Role</dt><dd>Unity Developer</dd>
@@ -477,11 +559,53 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
           </dl>
         </aside>
         <div class="content">
+          <figure class="schematic">
+            <svg viewBox="0 0 720 380" role="img" aria-labelledby="ms-svg-t">
+              <title id="ms-svg-t">Schematic of the scene tool layout: hierarchy, 3D viewport, properties panel, asset inventory and timeline</title>
+              <rect width="720" height="380" fill="#0e1017"/>
+              <rect x="14" y="14" width="140" height="236" rx="6" fill="#1a1d29" stroke="#2e3348"/>
+              <text class="ttl" x="26" y="36">HIERARCHY</text>
+              <g fill="#2e3348"><rect x="26" y="50" width="100" height="8" rx="3"/><rect x="38" y="66" width="90" height="8" rx="3"/><rect x="38" y="82" width="70" height="8" rx="3"/><rect x="50" y="98" width="80" height="8" rx="3"/><rect x="50" y="114" width="60" height="8" rx="3"/><rect x="38" y="130" width="96" height="8" rx="3"/><rect x="26" y="146" width="84" height="8" rx="3"/></g>
+              <rect x="164" y="14" width="390" height="236" rx="6" fill="#1b2233" stroke="#2e3348"/>
+              <text class="ttl" x="176" y="36">SCENE</text>
+              <path d="M164 210 L260 150 L330 190 L420 130 L554 210 V250 H164Z" fill="#232a3d"/>
+              <g stroke="#ffc145" stroke-width="2" fill="none"><path d="M330 200 v-34 l10 -6"/><circle cx="330" cy="150" r="10"/><path d="M314 186 l16 -14 l16 14"/></g>
+              <g stroke="#ecebf3" stroke-width="1.5" opacity=".6"><line x1="420" y1="96" x2="460" y2="96"/><line x1="420" y1="96" x2="420" y2="56"/><line x1="420" y1="96" x2="396" y2="118"/></g>
+              <rect x="564" y="14" width="142" height="236" rx="6" fill="#1a1d29" stroke="#2e3348"/>
+              <text class="ttl" x="576" y="36">PROPERTIES</text>
+              <g class="lbl" style="font-size:11px"><text x="576" y="62">Position</text><text x="576" y="98">Rotation</text><text x="576" y="134">Time of day</text><text x="576" y="170">Lights · Lux</text><text x="576" y="206">Skybox</text></g>
+              <g fill="#2e3348"><rect x="576" y="68" width="118" height="10" rx="3"/><rect x="576" y="104" width="118" height="10" rx="3"/><rect x="576" y="140" width="118" height="10" rx="3"/><rect x="576" y="176" width="118" height="10" rx="3"/><rect x="576" y="212" width="118" height="10" rx="3"/></g>
+              <rect x="14" y="260" width="692" height="106" rx="6" fill="#1a1d29" stroke="#2e3348"/>
+              <text class="ttl" x="26" y="282">INVENTORY · TIMELINE</text>
+              <g fill="#2e3348"><rect x="26" y="294" width="90" height="16" rx="3"/><rect x="26" y="316" width="90" height="16" rx="3"/><rect x="26" y="338" width="90" height="16" rx="3"/></g>
+              <g fill="#232a3d" stroke="#2e3348"><rect x="130" y="294" width="54" height="58" rx="5"/><rect x="194" y="294" width="54" height="58" rx="5"/><rect x="258" y="294" width="54" height="58" rx="5"/><rect x="322" y="294" width="54" height="58" rx="5"/><rect x="386" y="294" width="54" height="58" rx="5"/></g>
+              <g stroke="#ffc145" stroke-width="3" stroke-linecap="round"><line x1="460" y1="306" x2="560" y2="306"/><line x1="500" y1="324" x2="680" y2="324"/><line x1="470" y1="342" x2="610" y2="342"/></g>
+              <line x1="590" y1="292" x2="590" y2="356" stroke="#ff7a5c" stroke-width="2"/>
+              <g class="lblc" style="font-size:12px"><text x="466" y="372" fill="#ffc145">Timeline: rebuilt</text><text x="130" y="372">Asset Manager</text><text x="576" y="244">Custom attributes</text></g>
+            </svg>
+            <figcaption>Schematic of the tool's layout, not a screenshot. Highlighted labels mark modules I built.</figcaption>
+          </figure>
+
+          <div class="boss-fight">
+            <p class="hp">Boss fight <i></i> <em>Defeated</em></p>
+            <h3>The year-old problem: hands that fit</h3>
+            <p>Placing fingers and hands correctly on imported rigged characters, in real time, had been <strong>open on the project for over a year</strong>. I implemented automatic real-time finger and hand placement for imported rigged characters and closed it.</p>
+            <svg class="hand-anim" viewBox="0 0 320 110" width="100%" style="max-width:420px;margin-top:14px;display:block" aria-hidden="true">
+              <g stroke="#2e3348" stroke-width="3" fill="none" stroke-linecap="round">
+                <path d="M30 90 L80 70 L120 60"/><path d="M120 60 L160 40 L190 34"/><path d="M120 60 L166 56 L198 56"/><path d="M120 60 L164 70 L194 76"/><path d="M120 60 L156 82 L180 94"/>
+              </g>
+              <rect x="200" y="20" width="24" height="86" rx="12" fill="#232a3d" stroke="#ffc145" stroke-width="2"/>
+              <g fill="#ffc145">
+                <circle class="j" cx="190" cy="34" r="5" style="--dx:-18px;--dy:-14px"/>
+                <circle class="j" cx="198" cy="56" r="5" style="--dx:-22px;--dy:4px"/>
+                <circle class="j" cx="194" cy="76" r="5" style="--dx:-20px;--dy:12px"/>
+                <circle class="j" cx="180" cy="94" r="5" style="--dx:-16px;--dy:-6px"/>
+              </g>
+              <circle cx="120" cy="60" r="6" fill="#ecebf3"/>
+            </svg>
+          </div>
+
           <div class="abilities">
-            <article class="ability wide">
-              <h3><span class="k">BOSS</span>The year-old problem</h3>
-              <p>Implemented automatic real-time finger and hand placement for imported rigged characters, resolving a problem that had been open on the project for over a year.</p>
-            </article>
             <article class="ability">
               <h3><span class="k">TOOL</span>A better timeline</h3>
               <p>Rebuilt the Timeline system with a horizontal layout, finer timestep control, and a more stable sequencing model.</p>
@@ -495,17 +619,19 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
               <p>Built custom C# property attributes that expose object properties as editable fields in the application's UI.</p>
             </article>
           </div>
-          <div class="classified">
+
+          <div class="confidential">
             <span class="stamp">CONFIDENTIAL</span>
-            <p>Same deal as Character Creator: unreleased and confidential, so it's text only.</p>
+            <p>Unreleased and confidential, so it's schematics and words. The words are accurate.</p>
           </div>
+          <div class="egg-slot"><button class="egg" data-egg="ms" aria-label="Hidden collectible"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 6h12v8H2zM2 6l1-4h11v4"/></svg></button></div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ===================== SIDE QUESTS ===================== -->
-  <section id="tools" class="case" aria-labelledby="tools-title">
+  <section id="tools" class="case amber" aria-labelledby="tools-title">
     <div class="wrap">
       <div class="sec-head">
         <p class="eyebrow">Side quests</p>
@@ -513,19 +639,49 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
       </div>
       <div class="quests">
         <article class="quest">
-          <span class="mini-tile c-jade" aria-hidden="true">發</span>
+          <span class="ico" aria-hidden="true">⌖</span>
           <div><h3>Passthrough raycaster</h3><p>An invisible UI element that registers input without blocking raycasts to the 3D objects behind it.</p></div>
         </article>
         <article class="quest">
-          <span class="mini-tile" aria-hidden="true" style="font-family:var(--f-mono);font-size:1rem">Aa</span>
+          <span class="ico" aria-hidden="true">Aa</span>
           <div><h3>UI text extractor</h3><p>A Unity editor tool to extract and manage in-project UI text.</p></div>
         </article>
       </div>
     </div>
   </section>
 
+  <!-- ===================== EXPERIENCE ===================== -->
+  <section id="experience" class="case" aria-labelledby="exp-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Save files</p>
+        <h2 id="exp-title">Where the years went</h2>
+      </div>
+      <div class="timeline">
+        <article class="job jade">
+          <p class="when"><b>2025 – 26</b>Mar 2025 – Jun 2026</p>
+          <div>
+            <h3>Unity Game Developer</h3>
+            <p class="co">Roothoot Private Limited · Hyderabad · client work for Pixel Stack Studios</p>
+            <p>Pongz – SG Mahjong, live on iOS and Android.</p>
+            <span class="dur" style="width:55%" aria-hidden="true"><i style="width:100%"></i></span>
+          </div>
+        </article>
+        <article class="job coral">
+          <p class="when"><b>2022 – 24</b>Jun 2022 – Oct 2024</p>
+          <div>
+            <h3>Unity Developer</h3>
+            <p class="co">Live Deftsoft Informatics Pvt. Ltd. · Mohali</p>
+            <p>Character Creator (led development) and Movie Studio 3D, plus editor tooling.</p>
+            <span class="dur" style="width:100%" aria-hidden="true"><i style="width:100%"></i></span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
   <!-- ===================== ABOUT ===================== -->
-  <section id="about" class="about case" aria-labelledby="about-title">
+  <section id="about" class="about case coral" aria-labelledby="about-title">
     <div class="wrap">
       <div>
         <div class="sec-head">
@@ -533,34 +689,18 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
           <h2 id="about-title">About Gautam</h2>
         </div>
         <div class="bio">
-          <p>I'm Gautam, a Unity game developer who likes the unglamorous middle of a game: the architecture, the systems, and the glue that makes them talk to each other. Over 3.5+ years I've worked across gameplay, bot AI, client-side multiplayer, UI, animation, and performance on Android, iOS, and Windows.</p>
-          <p>My latest work, Pongz – SG Mahjong, is live on both app stores. Before that I spent two years building Windows 3D tools in Unity, including a character creator I led development on. I work directly with artists, animators, sound engineers, and clients, and I'm happiest when a feature feels obvious to the player because the hard part is hidden.</p>
+          <p>I'm a Unity developer who likes the unglamorous middle of a game: the architecture, the systems, and the glue that makes them talk to each other. Over 3.5+ years I've worked across gameplay, bot AI, client-side multiplayer, UI, animation, 3D tools, and performance on Android, iOS, and Windows.</p>
+          <p>I spent two years building Windows 3D tools in Unity, including a character creator I led development on, then moved to mobile and helped ship Pongz – SG Mahjong to both app stores. I work directly with artists, animators, sound engineers, and clients, and I'm happiest when a feature feels obvious to the user because the hard part is hidden.</p>
         </div>
       </div>
-      <div>
-        <div class="sec-head">
-          <p class="eyebrow">Inventory</p>
-          <h2 style="font-size:var(--step-2)">Equipped skills</h2>
-        </div>
-        <ul class="inventory" style="list-style:none;padding:0;margin:0">
-          <li class="slot rare">Unity</li>
-          <li class="slot rare">C#</li>
-          <li class="slot">Client architecture</li>
-          <li class="slot">Gameplay systems</li>
-          <li class="slot">Bot AI</li>
-          <li class="slot">Socket.IO (client)</li>
-          <li class="slot">UGUI / TextMeshPro</li>
-          <li class="slot">Spine 2D</li>
-          <li class="slot">Unity Jobs System</li>
-          <li class="slot">Addressables</li>
-          <li class="slot">Unity Profiler</li>
-          <li class="slot">URP / HDRP</li>
-          <li class="slot">Android</li>
-          <li class="slot">iOS</li>
-          <li class="slot">Windows</li>
-        </ul>
+      <div class="inv">
+        <div class="sec-head" style="margin-bottom:0"><p class="eyebrow">Inventory</p><h2 style="font-size:var(--step-2)">Equipped skills</h2></div>
+        <div><h3>Core</h3><ul class="slots"><li class="slot rare">Unity</li><li class="slot rare">C#</li><li class="slot">Client architecture</li><li class="slot">Gameplay systems</li></ul></div>
+        <div><h3>AI, multiplayer, UI</h3><ul class="slots"><li class="slot">Bot opponent AI</li><li class="slot">Socket.IO (client)</li><li class="slot">UGUI / TextMeshPro</li><li class="slot">Tutorials &amp; onboarding</li><li class="slot">Localization</li></ul></div>
+        <div><h3>3D, animation, tools</h3><ul class="slots"><li class="slot">3D math</li><li class="slot">Spine 2D</li><li class="slot">Unity Timeline</li><li class="slot">Rigged characters</li><li class="slot">Editor tooling</li><li class="slot">Custom C# attributes</li></ul></div>
+        <div><h3>Performance</h3><ul class="slots"><li class="slot">Unity Jobs System</li><li class="slot">Multithreading</li><li class="slot">Unity Profiler</li><li class="slot">Addressables</li><li class="slot">URP / HDRP</li></ul></div>
+        <div><h3>Platforms</h3><ul class="slots"><li class="slot">Android</li><li class="slot">iOS</li><li class="slot">Windows</li></ul></div>
       </div>
-      <button class="mini-tile egg egg-about c-jade" data-egg="2" aria-label="A hidden tile">發</button>
     </div>
   </section>
 
@@ -568,7 +708,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
   <section id="contact" class="contact case" aria-labelledby="contact-title">
     <div class="wrap">
       <p class="cont">Continue?</p>
-      <h2 id="contact-title">Need someone to make your tiles click? Let's talk.</h2>
+      <h2 id="contact-title">Need someone for your next boss fight? Let's talk.</h2>
       <div class="contact-row">
         <span class="email-box"><code id="email">gautamc3080@gmail.com</code><button type="button" id="copy-email">Copy</button></span>
         <a class="btn btn-primary" href="mailto:gautamc3080@gmail.com">Email me</a>
@@ -581,8 +721,8 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
 
 <footer>
   <div class="wrap">
-    <span>Built by Gautam. No tiles were harmed.</span>
-    <button class="mini-tile egg egg-foot" data-egg="3" aria-label="A hidden tile"><span class="dots" style="gap:2px"><i style="width:7px;height:7px;border-width:2px;box-shadow:none;background:var(--red)"></i><i style="width:7px;height:7px;border-width:2px;box-shadow:none;background:var(--red)"></i></span></button>
+    <span>Built by Gautam. No tiles, faces, or film sets were harmed.</span>
+    <span>One collectible hides in each project.</span>
   </div>
 </footer>
 
@@ -590,37 +730,18 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
 
 <script>
 (function () {
-  // Media slots: drop files into assets/ and list them here, e.g. "pongz-hero": "assets/pongz-hero.mp4"
-  var MEDIA = {};
-  document.querySelectorAll(".media[data-media]").forEach(function (fig) {
-    var src = MEDIA[fig.dataset.media];
-    if (!src) return;
-    var el;
-    if (/\.(mp4|webm)$/i.test(src)) {
-      el = document.createElement("video");
-      el.muted = true; el.autoplay = true; el.loop = true; el.playsInline = true;
-    } else {
-      el = document.createElement("img");
-      el.loading = "lazy";
-      el.alt = fig.querySelector(".ph span") ? fig.querySelector(".ph span").textContent : "";
-    }
-    el.src = src;
-    fig.innerHTML = "";
-    fig.appendChild(el);
-    fig.classList.add("has-src");
-  });
-
-  // Easter egg: three hidden tiles make a pong.
+  // Collectibles: one hidden in each project.
+  var names = { pongz: "a Mahjong tile", cc: "a face slider", ms: "a clapperboard" };
   var found = {};
   var toast = document.getElementById("toast");
   var counter = document.getElementById("counter");
   var timer;
-  function say(msg, pong) {
+  function say(msg, win) {
     toast.textContent = msg;
-    toast.classList.toggle("pong", !!pong);
+    toast.classList.toggle("win", !!win);
     toast.classList.add("show");
     clearTimeout(timer);
-    timer = setTimeout(function () { toast.classList.remove("show"); }, pong ? 4200 : 2600);
+    timer = setTimeout(function () { toast.classList.remove("show"); }, win ? 4500 : 2600);
   }
   document.querySelectorAll("[data-egg]").forEach(function (btn) {
     btn.addEventListener("click", function () {
@@ -629,29 +750,41 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
       found[id] = true;
       btn.classList.add("found");
       var n = Object.keys(found).length;
-      counter.textContent = "Tiles " + n + "/3";
-      if (n === 3) say("PONG! Three of a kind. You clearly read portfolios properly.", true);
-      else if (n === 1) say("You found a tile. Two more and it's a pong.");
-      else say("Two tiles. One more and it's a pong.");
+      counter.textContent = "★ " + n + "/3";
+      if (n === 3) say("Full set! You read all three projects. That's more than most recruiters.", true);
+      else say("You found " + names[id] + ". " + (3 - n) + " to go.");
     });
   });
 
-  // "Press START": Enter or Space on the page body jumps to the levels.
-  document.addEventListener("keydown", function (e) {
-    if (e.target !== document.body) return;
-    if (e.key === "Enter") { e.preventDefault(); document.getElementById("levels").scrollIntoView(); }
+  // Screenshot lightbox
+  document.querySelectorAll("[data-zoom]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var box = document.createElement("div");
+      box.className = "lightbox";
+      box.setAttribute("role", "dialog");
+      box.setAttribute("aria-label", "Screenshot, tap to close");
+      var img = document.createElement("img");
+      img.src = b.dataset.zoom;
+      img.alt = b.querySelector("img").alt;
+      box.appendChild(img);
+      function close() { box.remove(); document.removeEventListener("keydown", esc); b.focus(); }
+      function esc(e) { if (e.key === "Escape") close(); }
+      box.addEventListener("click", close);
+      document.addEventListener("keydown", esc);
+      document.body.appendChild(box);
+    });
   });
 
   // Copy email
   var copyBtn = document.getElementById("copy-email");
   copyBtn.addEventListener("click", function () {
-    var text = document.getElementById("email").textContent;
+    var el = document.getElementById("email");
     function selectIt() {
-      var r = document.createRange(); r.selectNodeContents(document.getElementById("email"));
+      var r = document.createRange(); r.selectNodeContents(el);
       var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
     }
     try {
-      navigator.clipboard.writeText(text).then(function () {
+      navigator.clipboard.writeText(el.textContent).then(function () {
         copyBtn.textContent = "Copied";
         setTimeout(function () { copyBtn.textContent = "Copy"; }, 1800);
       }, selectIt);
