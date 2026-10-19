@@ -439,7 +439,6 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
         <li><a href="#pongz" data-obj="pongz" style="--ind:1"><svg class="ic" aria-hidden="true"><use href="#i-prefab"/></svg><span class="nm">Pongz_SGMahjong</span><span class="badge live">LIVE</span></a></li>
         <li><a href="#character-creator" data-obj="cc" style="--ind:1"><svg class="ic" aria-hidden="true"><use href="#i-prefab"/></svg><span class="nm">CharacterCreator</span><span class="badge nda">NDA</span></a></li>
         <li><a href="#movie-studio" data-obj="ms" style="--ind:1"><svg class="ic" aria-hidden="true"><use href="#i-prefab"/></svg><span class="nm">MovieStudio3D</span><span class="badge nda">NDA</span></a></li>
-        <li><a href="#side-quests" data-obj="quests" style="--ind:1"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg><span class="nm">SideQuests</span></a></li>
         <li><a href="#experience" data-obj="exp" style="--ind:1"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg><span class="nm">Experience</span></a></li>
         <li><a href="#about" data-obj="about" style="--ind:1"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg><span class="nm">About</span></a></li>
         <li><a href="#contact" data-obj="contact" style="--ind:1"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg><span class="nm">Contact</span></a></li>
@@ -784,23 +783,6 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
         </details>
       </article>
 
-      <!-- ---------- SIDE QUESTS ---------- -->
-      <article class="page" data-page="quests" aria-labelledby="h-quests" hidden>
-        <div class="obj-head c-amber">
-          <span class="cube"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg></span>
-          <h2 id="h-quests">Side quests: smaller tools</h2>
-          <p class="obj-meta"><span>Tag <b>Tools</b></span></p>
-        </div>
-        <details class="comp c-amber" open>
-          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Passthrough Raycaster <small>(Script)</small></h3></summary>
-          <div class="comp-b prose"><p>An invisible UI element that registers input without blocking raycasts to the 3D objects behind it.</p></div>
-        </details>
-        <details class="comp c-amber" open>
-          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>UI Text Extractor <small>(Editor Tool)</small></h3></summary>
-          <div class="comp-b prose"><p>A Unity editor tool to extract and manage in-project UI text.</p></div>
-        </details>
-      </article>
-
       <!-- ---------- EXPERIENCE ---------- -->
       <article class="page" data-page="exp" aria-labelledby="h-exp" hidden>
         <div class="obj-head c-blue">
@@ -1065,14 +1047,13 @@ public class Gautam : MonoBehaviour
     pongz: { hash: "pongz", title: "Pongz_SGMahjong", label: "Pongz – SG Mahjong" },
     cc: { hash: "character-creator", title: "Blend Shapes (demo)", label: "Character Creator" },
     ms: { hash: "movie-studio", title: "Grip IK (demo)", label: "Movie Studio 3D" },
-    quests: { hash: "side-quests", title: "Scene", label: "Side quests" },
     exp: { hash: "experience", title: "Scene", label: "Experience" },
     about: { hash: "about", title: "Scene", label: "About" },
     contact: { hash: "contact", title: "Scene", label: "Contact" }
   };
-  var ALIAS = { "": "overview", top: "overview", projects: "overview", tools: "quests" };
+  var ALIAS = { "": "overview", top: "overview", projects: "overview", tools: "overview", "side-quests": "overview" };
   Object.keys(OBJS).forEach(function (k) { if (OBJS[k].hash) ALIAS[OBJS[k].hash] = k; });
-  var ORDER = ["overview", "pongz", "cc", "ms", "quests", "exp", "about", "contact"];
+  var ORDER = ["overview", "pongz", "cc", "ms", "exp", "about", "contact"];
 
   var tree = document.getElementById("tree");
   var hero = document.getElementById("hero");
