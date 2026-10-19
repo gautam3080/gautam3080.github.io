@@ -475,7 +475,7 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
               <p class="live-only">Drag to rotate the view, scroll or pinch to zoom. Pick an object in the Hierarchy to zoom to it.</p>
             </div>
             <div data-for="pongz" hidden>
-              <p class="live-only">Drag a tile to move it. Tap a tile to turn it. Drag empty space to orbit.</p>
+              <p class="live-only">Drag a tile to move it. Tap a tile to turn it. Drag empty space to rotate the view.</p>
               <button class="btn primary" type="button" data-play><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg>Play gameplay capture</button>
             </div>
             <div data-for="cc" hidden>
@@ -1760,7 +1760,7 @@ frame(sel, true);
 resize();
 window.__sceneReady = true;
 document.dispatchEvent(new CustomEvent("sceneready"));
-statusL.textContent = "Scene view: three.js r160, procedural geometry. Drag to orbit, select objects in the Hierarchy.";
+statusL.textContent = "Scene view: three.js r160, procedural geometry. Drag to rotate the view, select objects in the Hierarchy.";
 }
 </script>
 </body>
