@@ -454,7 +454,7 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
       <button class="tab" type="button" role="tab" id="tabGame" aria-selected="false" aria-controls="gameView">Game</button>
     </div>
     <div class="scene-bar" id="sceneBar">
-      <button class="sbtn live-only" type="button" id="btnFrame" title="Frame selected (F)">Frame selected</button>
+      <button class="sbtn live-only" type="button" id="btnFrame" title="Point the camera back at the selected object (F, like Unity's Frame Selected)">Reset view</button>
       <button class="sbtn live-only" type="button" id="btnWire" aria-pressed="false">Wireframe</button>
       <span class="info" id="sceneInfo">Persp</span>
     </div>
@@ -472,7 +472,7 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
           <div class="ovl-h"><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><span id="ovlTitle">Scene</span></div>
           <div class="ovl-b">
             <div data-for="overview other">
-              <p class="live-only">Drag to orbit, scroll or pinch to zoom. Pick an object in the Hierarchy to frame it.</p>
+              <p class="live-only">Drag to rotate the view, scroll or pinch to zoom. Pick an object in the Hierarchy to zoom to it.</p>
             </div>
             <div data-for="pongz" hidden>
               <p class="live-only">Drag a tile to move it. Tap a tile to turn it. Drag empty space to orbit.</p>
