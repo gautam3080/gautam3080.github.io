@@ -340,29 +340,29 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
     <div class="wrap">
       <div class="sec-head">
         <p class="eyebrow">Select a project</p>
-        <h2 id="projects-title">Three projects, three very different bosses</h2>
-        <p class="note">One is a live mobile game you can download today. The other two are Windows 3D tools that never went public, which is where most of my years went.</p>
+        <h2 id="projects-title">Three projects, three hard problems</h2>
+        <p class="note">One is a live mobile game you can download today. The other two are Windows 3D tools that were never released publicly, and that is where most of my years went.</p>
       </div>
       <div class="select">
         <a class="pick jade" href="#pongz">
           <div class="chips"><span class="chip on">● Live</span><span class="chip">iOS · Android</span><span class="chip">2025 – 26</span></div>
           <h3>Pongz – SG Mahjong</h3>
-          <p>Real-time multiplayer Mahjong. Client architecture, bot opponents, every screen.</p>
-          <p class="boss"><b>BOSS</b>Bots that can play a full game of Mahjong</p>
+          <p>Real-time multiplayer Mahjong. Client architecture, bot opponents, the full UI.</p>
+          <p class="boss"><b>BOSS</b>Offline bot opponents for a full game</p>
           <span class="go">Play level ▸</span>
         </a>
         <a class="pick coral" href="#character-creator">
           <div class="chips"><span class="chip on">Led development</span><span class="chip">Windows</span><span class="chip">2022 – 24</span></div>
           <h3>Character Creator</h3>
-          <p>Photorealistic humans built from sliders, head to toe, in real time.</p>
-          <p class="boss"><b>BOSS</b>An export pipeline that needed to be 50x faster</p>
+          <p>Photorealistic humans shaped head to toe in real time.</p>
+          <p class="boss"><b>BOSS</b>Merging 4K textures on export, 50x faster</p>
           <span class="go">Play level ▸</span>
         </a>
         <a class="pick amber" href="#movie-studio">
           <div class="chips"><span class="chip on">3D tools</span><span class="chip">Windows</span><span class="chip">2022 – 24</span></div>
           <h3>Movie Studio 3D</h3>
           <p>Compose and preview 3D scenes: assets, lighting, cameras, a timeline.</p>
-          <p class="boss"><b>BOSS</b>A hand placement problem open for over a year</p>
+          <p class="boss"><b>BOSS</b>IK hand placement, open for over a year</p>
           <span class="go">Play level ▸</span>
         </a>
       </div>
@@ -375,7 +375,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
       <div class="case-head">
         <p class="eyebrow">Project 01 · Live mobile game</p>
         <h2 id="pongz-title">Pongz – SG Mahjong</h2>
-        <p class="tag">Live on both stores, and on about 3,400 phones a day.</p>
+        <p class="tag">Live on both stores, played by about 3,400 people a day.</p>
         <p class="lede">A live, real-time multiplayer Mahjong game for iOS and Android. I designed and built its core client-side architecture and its entire UI.</p>
       </div>
       <div class="case-body">
@@ -408,8 +408,8 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
           </figure>
 
           <div class="boss-fight">
-            <p class="hp">Boss fight <i></i> <em>Defeated</em></p>
-            <h3>AI Practice Mode: opponents who never rage-quit</h3>
+            <p class="hp">Boss fight <i></i> <em>Cleared</em></p>
+            <h3>AI Practice Mode, built end to end</h3>
             <p>Designed and built an offline bot-opponent mode <strong>end to end</strong>: turn-based decision logic for the bots and the full gameplay flow around them, so a player can practice a complete game with no one else online.</p>
           </div>
 
@@ -421,7 +421,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
 
           <div class="abilities">
             <article class="ability wide">
-              <h3><span class="k">CORE</span>The foundation</h3>
+              <h3><span class="k">CORE</span>Client architecture</h3>
               <p>Designed and built the core client-side architecture from the ground up, plus the gameplay systems behind the rules, player interaction, and game flow.</p>
             </article>
             <article class="ability">
@@ -429,21 +429,21 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
               <p>Implemented the client-side multiplayer layer over Socket.IO, synchronizing against an authoritative server.</p>
             </article>
             <article class="ability">
-              <h3><span class="k">UI</span>Every screen you tap</h3>
+              <h3><span class="k">UI</span>The complete UI layer</h3>
               <p>Built the complete UI layer: screens, HUD, in-game flow, and UI-to-systems integration. Also the interactive tutorial and onboarding, localization, and the rank and progression presentation.</p>
             </article>
             <article class="ability">
-              <h3><span class="k">ANIM</span>Tiles with personality</h3>
+              <h3><span class="k">ANIM</span>2D and 3D animation</h3>
               <p>Designed and built the 2D and 3D animation systems, including Spine skeletal animation and gameplay-animation integration.</p>
             </article>
             <article class="ability">
-              <h3><span class="k">PERF</span>Smooth on real phones</h3>
+              <h3><span class="k">PERF</span>Mobile performance</h3>
               <p>Optimized mobile performance across live releases: fewer draw calls and SetPass calls via LOD groups and texture atlasing, profiled with the Unity Profiler. Managed asset delivery through Addressables.</p>
             </article>
           </div>
 
           <div class="credits">
-            <b>Credits, honestly</b>
+            <b>Credits</b>
             <p>Built at Roothoot Private Limited as client work for Pixel Stack Studios, who own the game. Server-side netcode and the rank-point calculation were my teammates' work; I built the client that talks to them.</p>
           </div>
           <div class="egg-slot"><button class="egg" data-egg="pongz" aria-label="Hidden collectible">中</button></div>
@@ -458,7 +458,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
       <div class="case-head">
         <p class="eyebrow">Project 02 · Windows 3D tool · Led development</p>
         <h2 id="cc-title">Character Creator</h2>
-        <p class="tag">Faces, bodies, and an export button that got 50x faster.</p>
+        <p class="tag">Photoreal humans from sliders, and an export pipeline made 50x faster.</p>
         <p class="lede">A photorealistic character creation tool for Windows, built in Unity. Users shape a realistic human head to toe in real time, from facial structure and body shape to skin, hair, and clothing. I led development and designed its core architecture.</p>
       </div>
       <div class="case-body">
@@ -506,31 +506,32 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
           </figure>
 
           <div class="boss-fight">
-            <p class="hp">Boss fight <i></i> <em>Defeated</em></p>
+            <p class="hp">Boss fight <i></i> <em>Cleared</em></p>
             <h3>50x faster character exports</h3>
-            <p>Exporting a character runs through a texture merging pipeline. I <strong>rebuilt the texture merging pipeline on the Unity Jobs System</strong>, spreading the work across CPU cores, and raised character export throughput 50x.</p>
+            <p>Every character starts from a base model that ships with many 4K textures, several of them layered for effects, such as multiple normal maps. On export, the tool has to bake the model and keep only the textures this character actually uses, each merged into a single map. Shaders can't hand back that final texture, so the merge runs on the CPU.</p>
+            <p style="margin-top:10px">I built it both ways. The first version used the classic path: read pixels, copy the texture, multiply on one thread, apply. The second <strong>rebuilt the merge on the Unity Jobs System</strong>, running the per-pixel math across cores on pixel data in NativeArrays with no texture copies. I chose the Jobs version for the export path, and it <strong>raised export throughput 50x</strong>.</p>
           </div>
 
           <div class="speed" aria-label="Export throughput, relative">
-            <div class="row"><span>Before</span><span class="bar"><i style="width:2%"></i></span><b>1x</b></div>
+            <div class="row"><span>One thread</span><span class="bar"><i style="width:2%"></i></span><b>1x</b></div>
             <div class="row"><span>Jobs System</span><span class="bar"><i style="width:100%"></i></span><b>50x</b></div>
             <small>Character export throughput, relative to the original pipeline. Bars drawn to scale.</small>
           </div>
 
           <div class="abilities">
             <article class="ability">
-              <h3><span class="k">LEAD</span>The blueprint</h3>
-              <p>Led development of the tool and designed its core architecture, the foundation the rest of the features were built on.</p>
+              <h3><span class="k">LEAD</span>Ran development</h3>
+              <p>Led development and designed the core architecture. Planned the work from client requirements, ran client calls, assigned tasks to teammates, and made technical decisions with the design team, while writing code myself.</p>
             </article>
             <article class="ability">
-              <h3><span class="k">3D</span>Sliders for every cheekbone</h3>
+              <h3><span class="k">3D</span>Face and body structure</h3>
               <p>Built the customizable facial and body structure systems behind photorealistic character generation.</p>
             </article>
           </div>
 
           <div class="confidential">
             <span class="stamp">CONFIDENTIAL</span>
-            <p>Unreleased and still under wraps, so you get schematics instead of screenshots. Happy to walk through how it worked in an interview.</p>
+            <p>Unreleased and confidential, so this page uses schematics instead of screenshots. I can walk through the implementation in an interview.</p>
           </div>
           <div class="egg-slot"><button class="egg" data-egg="cc" aria-label="Hidden collectible"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="8" x2="14" y2="8"/><circle cx="9" cy="8" r="2.5" fill="currentColor"/></svg></button></div>
         </div>
@@ -544,7 +545,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
       <div class="case-head">
         <p class="eyebrow">Project 03 · Windows 3D tool</p>
         <h2 id="ms-title">Movie Studio 3D</h2>
-        <p class="tag">I taught imported characters where their fingers go.</p>
+        <p class="tag">Real-time hand placement on imported characters, solved after a year open.</p>
         <p class="lede">A Windows tool for composing and previewing 3D scenes, built in Unity. It works like a small game editor inside the app: a scene hierarchy, a properties panel with lighting and time of day, an asset inventory, cameras, and a timeline. I built several of its core modules.</p>
       </div>
       <div class="case-body">
@@ -564,7 +565,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
               <title id="ms-svg-t">Schematic of the scene tool layout: hierarchy, 3D viewport, properties panel, asset inventory and timeline</title>
               <rect width="720" height="380" fill="#0e1017"/>
               <rect x="14" y="14" width="140" height="236" rx="6" fill="#1a1d29" stroke="#2e3348"/>
-              <text class="ttl" x="26" y="36">HIERARCHY</text>
+              <text class="ttl" x="26" y="36" style="fill:#ffc145">HIERARCHY</text>
               <g fill="#2e3348"><rect x="26" y="50" width="100" height="8" rx="3"/><rect x="38" y="66" width="90" height="8" rx="3"/><rect x="38" y="82" width="70" height="8" rx="3"/><rect x="50" y="98" width="80" height="8" rx="3"/><rect x="50" y="114" width="60" height="8" rx="3"/><rect x="38" y="130" width="96" height="8" rx="3"/><rect x="26" y="146" width="84" height="8" rx="3"/></g>
               <rect x="164" y="14" width="390" height="236" rx="6" fill="#1b2233" stroke="#2e3348"/>
               <text class="ttl" x="176" y="36">SCENE</text>
@@ -572,7 +573,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
               <g stroke="#ffc145" stroke-width="2" fill="none"><path d="M330 200 v-34 l10 -6"/><circle cx="330" cy="150" r="10"/><path d="M314 186 l16 -14 l16 14"/></g>
               <g stroke="#ecebf3" stroke-width="1.5" opacity=".6"><line x1="420" y1="96" x2="460" y2="96"/><line x1="420" y1="96" x2="420" y2="56"/><line x1="420" y1="96" x2="396" y2="118"/></g>
               <rect x="564" y="14" width="142" height="236" rx="6" fill="#1a1d29" stroke="#2e3348"/>
-              <text class="ttl" x="576" y="36">PROPERTIES</text>
+              <text class="ttl" x="576" y="36" style="fill:#ffc145">PROPERTIES</text>
               <g class="lbl" style="font-size:11px"><text x="576" y="62">Position</text><text x="576" y="98">Rotation</text><text x="576" y="134">Time of day</text><text x="576" y="170">Lights · Lux</text><text x="576" y="206">Skybox</text></g>
               <g fill="#2e3348"><rect x="576" y="68" width="118" height="10" rx="3"/><rect x="576" y="104" width="118" height="10" rx="3"/><rect x="576" y="140" width="118" height="10" rx="3"/><rect x="576" y="176" width="118" height="10" rx="3"/><rect x="576" y="212" width="118" height="10" rx="3"/></g>
               <rect x="14" y="260" width="692" height="106" rx="6" fill="#1a1d29" stroke="#2e3348"/>
@@ -583,13 +584,13 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
               <line x1="590" y1="292" x2="590" y2="356" stroke="#ff7a5c" stroke-width="2"/>
               <g class="lblc" style="font-size:12px"><text x="466" y="372" fill="#ffc145">Timeline: rebuilt</text><text x="130" y="372">Asset Manager</text><text x="576" y="244">Custom attributes</text></g>
             </svg>
-            <figcaption>Schematic of the tool's layout, not a screenshot. Highlighted labels mark modules I built.</figcaption>
+            <figcaption>Schematic of the tool's layout, not a screenshot. Highlighted labels mark the parts I built: hierarchy, properties, asset manager, timeline, and the UI around them.</figcaption>
           </figure>
 
           <div class="boss-fight">
-            <p class="hp">Boss fight <i></i> <em>Defeated</em></p>
-            <h3>The year-old problem: hands that fit</h3>
-            <p>Placing fingers and hands correctly on imported rigged characters, in real time, had been <strong>open on the project for over a year</strong>. I implemented automatic real-time finger and hand placement for imported rigged characters and closed it.</p>
+            <p class="hp">Boss fight <i></i> <em>Cleared</em></p>
+            <h3>Hands that grip, from any direction</h3>
+            <p>Automatic finger and hand placement on imported rigged characters had been <strong>open on the project for over a year</strong>. I solved it with math rather than raycasts: the solver reads the object's shape from its surface tangents, spaces each finger joint's target along the surface according to the model's bone structure, and follows the object's rotation. Those computed positions and rotations drive IK through Unity's <strong>Animation Rigging</strong> package, in real time.</p>
             <svg class="hand-anim" viewBox="0 0 320 110" width="100%" style="max-width:420px;margin-top:14px;display:block" aria-hidden="true">
               <g stroke="#2e3348" stroke-width="3" fill="none" stroke-linecap="round">
                 <path d="M30 90 L80 70 L120 60"/><path d="M120 60 L160 40 L190 34"/><path d="M120 60 L166 56 L198 56"/><path d="M120 60 L164 70 L194 76"/><path d="M120 60 L156 82 L180 94"/>
@@ -611,8 +612,8 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
               <p>Rebuilt the Timeline system with a horizontal layout, finer timestep control, and a more stable sequencing model.</p>
             </article>
             <article class="ability">
-              <h3><span class="k">SYS</span>The modules underneath</h3>
-              <p>Built the Asset Manager, UI, and Graphics modules.</p>
+              <h3><span class="k">SYS</span>Core modules</h3>
+              <p>Built the Asset Manager, UI, and Graphics modules, including the in-app hierarchy panel.</p>
             </article>
             <article class="ability wide">
               <h3><span class="k">C#</span>Properties, editable</h3>
@@ -622,7 +623,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
 
           <div class="confidential">
             <span class="stamp">CONFIDENTIAL</span>
-            <p>Unreleased and confidential, so it's schematics and words. The words are accurate.</p>
+            <p>Unreleased and confidential, so this page uses schematics instead of screenshots.</p>
           </div>
           <div class="egg-slot"><button class="egg" data-egg="ms" aria-label="Hidden collectible"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 6h12v8H2zM2 6l1-4h11v4"/></svg></button></div>
         </div>
@@ -635,7 +636,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
     <div class="wrap">
       <div class="sec-head">
         <p class="eyebrow">Side quests</p>
-        <h2 id="tools-title">Small tools, big relief</h2>
+        <h2 id="tools-title">Smaller tools</h2>
       </div>
       <div class="quests">
         <article class="quest">
@@ -654,7 +655,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
   <section id="experience" class="case" aria-labelledby="exp-title">
     <div class="wrap">
       <div class="sec-head">
-        <p class="eyebrow">Save files</p>
+        <p class="eyebrow">Experience</p>
         <h2 id="exp-title">Where the years went</h2>
       </div>
       <div class="timeline">
@@ -672,7 +673,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
           <div>
             <h3>Unity Developer</h3>
             <p class="co">Live Deftsoft Informatics Pvt. Ltd. · Mohali</p>
-            <p>Character Creator (led development) and Movie Studio 3D, plus editor tooling.</p>
+            <p>Character Creator (led development) and Movie Studio 3D, plus editor tooling. About 2 years 4 months, the larger share of my experience.</p>
             <span class="dur" style="width:100%" aria-hidden="true"><i style="width:100%"></i></span>
           </div>
         </article>
@@ -689,16 +690,16 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
           <h2 id="about-title">About Gautam</h2>
         </div>
         <div class="bio">
-          <p>I'm a Unity developer who likes the unglamorous middle of a game: the architecture, the systems, and the glue that makes them talk to each other. Over 3.5+ years I've worked across gameplay, bot AI, client-side multiplayer, UI, animation, 3D tools, and performance on Android, iOS, and Windows.</p>
-          <p>I spent two years building Windows 3D tools in Unity, including a character creator I led development on, then moved to mobile and helped ship Pongz – SG Mahjong to both app stores. I work directly with artists, animators, sound engineers, and clients, and I'm happiest when a feature feels obvious to the user because the hard part is hidden.</p>
+          <p>I'm a Unity developer who works best in the systems layer: architecture, gameplay systems, and the code that connects them. Over 3.5+ years I've worked across gameplay, bot AI, client-side multiplayer, UI, animation, 3D tools, and performance on Android, iOS, and Windows.</p>
+          <p>I spent two years building Windows 3D tools in Unity, including a character creator I led development on, then moved to mobile and helped ship Pongz – SG Mahjong to both app stores. I work directly with artists, animators, sound engineers, and clients, and I like problems that need math as much as code.</p>
         </div>
       </div>
       <div class="inv">
         <div class="sec-head" style="margin-bottom:0"><p class="eyebrow">Inventory</p><h2 style="font-size:var(--step-2)">Equipped skills</h2></div>
         <div><h3>Core</h3><ul class="slots"><li class="slot rare">Unity</li><li class="slot rare">C#</li><li class="slot">Client architecture</li><li class="slot">Gameplay systems</li></ul></div>
         <div><h3>AI, multiplayer, UI</h3><ul class="slots"><li class="slot">Bot opponent AI</li><li class="slot">Socket.IO (client)</li><li class="slot">UGUI / TextMeshPro</li><li class="slot">Tutorials &amp; onboarding</li><li class="slot">Localization</li></ul></div>
-        <div><h3>3D, animation, tools</h3><ul class="slots"><li class="slot">3D math</li><li class="slot">Spine 2D</li><li class="slot">Unity Timeline</li><li class="slot">Rigged characters</li><li class="slot">Editor tooling</li><li class="slot">Custom C# attributes</li></ul></div>
-        <div><h3>Performance</h3><ul class="slots"><li class="slot">Unity Jobs System</li><li class="slot">Multithreading</li><li class="slot">Unity Profiler</li><li class="slot">Addressables</li><li class="slot">URP / HDRP</li></ul></div>
+        <div><h3>3D, animation, tools</h3><ul class="slots"><li class="slot">3D math</li><li class="slot">Spine 2D</li><li class="slot">Unity Timeline</li><li class="slot">Animation Rigging (IK)</li><li class="slot">Texture baking</li><li class="slot">Editor tooling</li><li class="slot">Custom C# attributes</li></ul></div>
+        <div><h3>Performance</h3><ul class="slots"><li class="slot">Unity Jobs System</li><li class="slot">Multithreading</li><li class="slot">NativeArray</li><li class="slot">Unity Profiler</li><li class="slot">Addressables</li><li class="slot">URP / HDRP</li></ul></div>
         <div><h3>Platforms</h3><ul class="slots"><li class="slot">Android</li><li class="slot">iOS</li><li class="slot">Windows</li></ul></div>
       </div>
     </div>
@@ -708,7 +709,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
   <section id="contact" class="contact case" aria-labelledby="contact-title">
     <div class="wrap">
       <p class="cont">Continue?</p>
-      <h2 id="contact-title">Need someone for your next boss fight? Let's talk.</h2>
+      <h2 id="contact-title">Hiring a Unity developer? Let's talk.</h2>
       <div class="contact-row">
         <span class="email-box"><code id="email">gautamc3080@gmail.com</code><button type="button" id="copy-email">Copy</button></span>
         <a class="btn btn-primary" href="mailto:gautamc3080@gmail.com">Email me</a>
@@ -721,7 +722,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
 
 <footer>
   <div class="wrap">
-    <span>Built by Gautam. No tiles, faces, or film sets were harmed.</span>
+    <span>© 2026 Gautam · Unity Game Developer</span>
     <span>One collectible hides in each project.</span>
   </div>
 </footer>
@@ -751,7 +752,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; a
       btn.classList.add("found");
       var n = Object.keys(found).length;
       counter.textContent = "★ " + n + "/3";
-      if (n === 3) say("Full set! You read all three projects. That's more than most recruiters.", true);
+      if (n === 3) say("Full set. You found one in every project.", true);
       else say("You found " + names[id] + ". " + (3 - n) + " to go.");
     });
   });
