@@ -140,13 +140,13 @@ button.tab:not(.on):hover { color: var(--text); background: #222; }
 .hero .sub { margin-top: 10px; font-size: 13px; color: var(--text); font-family: var(--f-mono); text-shadow: 0 1px 0 rgba(0,0,0,.6); }
 .hero.compact { opacity: 0; transform: translateY(-6px); }
 .hero.compact .sub, .hero.compact .eyebrow { visibility: hidden; }
-.tags { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
-.tags[hidden] { display: none; }
-.tag { position: absolute; left: 0; top: 0; pointer-events: auto; display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 7px; background: rgba(28,28,28,.88); border: 1px solid #4a4a4a; border-radius: 3px; color: var(--bright); font-family: var(--f-mono); font-size: 11px; cursor: pointer; white-space: nowrap; transition: border-color .15s; }
-.tag:hover, .tag.hot { border-color: #ff9a1f; }
-.tags.tight .tag { font-size: 10px; height: 20px; padding: 0 5px; }
-.tags.tight .badge { display: none; }
-.scene-fallback .tags { display: none; }
+.scene-tags { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.scene-tags[hidden] { display: none; }
+.stag { position: absolute; left: 0; top: 0; pointer-events: auto; display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 7px; background: rgba(28,28,28,.88); border: 1px solid #4a4a4a; border-radius: 3px; color: var(--bright); font-family: var(--f-mono); font-size: 11px; cursor: pointer; white-space: nowrap; transition: border-color .15s; }
+.stag:hover, .stag.hot { border-color: #ff9a1f; }
+.scene-tags.tight .stag { font-size: 10px; height: 20px; padding: 0 5px; }
+.scene-tags.tight .badge { display: none; }
+.scene-fallback .scene-tags { display: none; }
 .gizmo { position: absolute; right: 8px; top: 8px; width: 92px; height: 108px; pointer-events: none; z-index: 2; }
 .gizmo text { font-family: var(--f-mono); font-size: 11px; font-weight: 500; }
 .ovl { position: absolute; left: 12px; bottom: 12px; width: 280px; max-width: calc(100% - 24px); background: rgba(35,35,35,.96); border: 1px solid var(--sep); border-radius: 4px; z-index: 3; font-size: 12.5px; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
@@ -486,10 +486,10 @@ input, textarea, [contenteditable="true"] { caret-color: auto; }
           <h1><span class="c-green">A live Mahjong game.</span> <span class="c-red">Photoreal humans.</span> <span class="c-blue">Movie sets in a box.</span></h1>
           <p class="sub">3.5+ years of production C# · Mumbai · Available immediately</p>
         </div>
-        <div class="tags" id="tags" aria-hidden="true">
-          <button type="button" tabindex="-1" class="tag" data-select="pongz">Pongz_SGMahjong<span class="badge live">LIVE</span></button>
-          <button type="button" tabindex="-1" class="tag" data-select="cc">CharacterCreator<span class="badge nda">NDA</span></button>
-          <button type="button" tabindex="-1" class="tag" data-select="ms">MovieStudio3D<span class="badge nda">NDA</span></button>
+        <div class="scene-tags" id="tags" aria-hidden="true">
+          <button type="button" tabindex="-1" class="stag" data-select="pongz">Pongz_SGMahjong<span class="badge live">LIVE</span></button>
+          <button type="button" tabindex="-1" class="stag" data-select="cc">CharacterCreator<span class="badge nda">NDA</span></button>
+          <button type="button" tabindex="-1" class="stag" data-select="ms">MovieStudio3D<span class="badge nda">NDA</span></button>
         </div>
         <svg class="gizmo" id="gizmo" viewBox="-46 -46 92 108" aria-hidden="true"></svg>
         <div class="fallback" id="fallback"><div class="fallback-art" id="fallbackArt"></div></div>
