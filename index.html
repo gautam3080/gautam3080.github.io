@@ -513,7 +513,7 @@ input, textarea, [contenteditable="true"] { caret-color: auto; }
               <div class="slider live-only"><label for="sTiltZ">Bar tilt</label><input id="sTiltZ" type="range" min="-50" max="50" value="0"><output for="sTiltZ">0°</output></div>
               <div class="slider live-only"><label for="sTiltX">Bar lean</label><input id="sTiltX" type="range" min="-40" max="40" value="0"><output for="sTiltX">0°</output></div>
               <div class="slider live-only"><label for="sDiam">Bar diameter</label><input id="sDiam" type="range" min="4" max="10" value="7"><output for="sDiam">7 cm</output></div>
-              <p class="live-only">Drag the bar, tilt it, or change its diameter. Amber markers are the IK targets; the hand re-solves its grip.</p>
+              <p class="live-only">Drag the bar, tilt it, or change its diameter. Amber markers are the IK targets; the hand re-solves its grip. The camera, light and timeline around it are parts of the tool I built.</p>
               <p class="honest live-only">Web demo built for this page, not the confidential tool.</p>
             </div>
           </div>
@@ -588,7 +588,7 @@ input, textarea, [contenteditable="true"] { caret-color: auto; }
               </a>
               <a class="pick c-blue" href="#movie-studio" data-select="ms">
                 <span class="t">Movie Studio 3D <span class="badge nda">NDA</span></span>
-                <span class="m">Windows · 2022 – 24 · 3D tools</span>
+                <span class="m">Windows · 2022 – 24 · Built most of the tool</span>
                 <span class="h">Compose and preview 3D scenes: assets, lighting, cameras, a timeline.</span>
                 <span class="h"><b>DEEP DIVE</b>IK hand placement, open for over a year</span>
               </a>
@@ -753,8 +753,8 @@ input, textarea, [contenteditable="true"] { caret-color: auto; }
           <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Project <small>(Script)</small></h3></summary>
           <div class="comp-b">
             <div class="prose">
-              <p class="lead">Real-time hand placement on imported characters, solved after a year open.</p>
-              <p>A Windows tool for composing and previewing 3D scenes, built in Unity. It works like a small game editor inside the app: a scene hierarchy, a properties panel with lighting and time of day, an asset inventory, cameras, and a timeline. I built several of its core modules.</p>
+              <p class="lead">Most of this tool is my code: the timeline, the asset manager, the hierarchy and properties UI, the graphics settings, and the hand placement that had been stuck for a year.</p>
+              <p>A Windows tool for composing and previewing 3D scenes, built in Unity. It works like a small game editor inside the app: a scene hierarchy, a properties panel with lighting and time of day, an asset inventory, cameras, and a timeline. I built most of what a user touches in it, plus editor tools the team used to build it.</p>
             </div>
             <div class="field"><span>Role</span><span class="val">Unity Developer</span></div>
             <div class="field"><span>When</span><span class="val">2022 – 2024</span></div>
@@ -764,20 +764,21 @@ input, textarea, [contenteditable="true"] { caret-color: auto; }
           </div>
         </details>
         <details class="comp c-blue" open>
-          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Deep Dive <small>(Script)</small></h3></summary>
-          <div class="comp-b prose">
-            <h4>Hands that grip, from any direction</h4>
-            <p>Automatic finger and hand placement on imported rigged characters had been <strong>open on the project for over a year</strong>. I solved it with math rather than raycasts: the solver reads the object's shape from its surface tangents, spaces each finger joint's target along the surface according to the model's bone structure, and follows the object's rotation. It keeps working when the object's scale or diameter changes. Those computed positions and rotations drive IK through Unity's <strong>Animation Rigging</strong> package, in real time.</p>
-          </div>
-        </details>
-        <details class="comp c-blue" open>
           <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Modules Built <small>(Script)</small></h3></summary>
           <div class="comp-b">
             <div class="list">
               <article><span class="k">TOOL</span><div><h4>A better timeline</h4><p>Rebuilt the Timeline system with a horizontal layout, finer timestep control, and a more stable sequencing model.</p></div></article>
-              <article><span class="k">SYS</span><div><h4>Core modules</h4><p>Built the Asset Manager, UI, and Graphics modules, including the in-app hierarchy panel.</p></div></article>
+              <article><span class="k">SYS</span><div><h4>Asset Manager and scene UI</h4><p>Built the Asset Manager, the in-app hierarchy panel, the properties UI, and the Graphics module.</p></div></article>
               <article><span class="k">C#</span><div><h4>Properties, editable</h4><p>Built custom C# property attributes that expose object properties as editable fields in the application's UI.</p></div></article>
+              <article><span class="k">EDITOR</span><div><h4>Tools for the team</h4><p>Built a Unity editor tool that extracts and manages every piece of UI text in the project.</p></div></article>
             </div>
+          </div>
+        </details>
+        <details class="comp c-blue" open>
+          <summary><span class="chk" aria-hidden="true"></span><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><h3>Deep Dive <small>(Script)</small></h3></summary>
+          <div class="comp-b prose">
+            <h4>Hands that grip, from any direction</h4>
+            <p>Automatic finger and hand placement on imported rigged characters had been <strong>open on the project for over a year</strong>. I solved it with math rather than raycasts: the solver reads the object's shape from its surface tangents, spaces each finger joint's target along the surface according to the model's bone structure, and follows the object's rotation. It keeps working when the object's scale or diameter changes. Those computed positions and rotations drive IK through Unity's <strong>Animation Rigging</strong> package, in real time.</p>
           </div>
         </details>
         <details class="comp c-blue" open>
@@ -1435,20 +1436,28 @@ const FACES = [
 ];
 const pongz = new THREE.Group(); pongz.position.copy(POS.pongz); scene.add(pongz);
 const tiles = [];
-const ivory = std(0xefe7d2, { flatShading: false, roughness: 0.42 }), jade = std(0x2f8a57, { flatShading: false, roughness: 0.38 });
-const bodyGeo = new RoundedBoxGeometry(0.72, 0.98, 0.34, 3, 0.06), backGeo = new RoundedBoxGeometry(0.72, 0.98, 0.14, 3, 0.05);
+// one rounded block per tile; the jade back is a colour layer in the shader, so there is no seam between two meshes
+const TILE_D = 0.48, JADE_AT = -TILE_D / 2 + 0.15;
+const ivory = std(0xefe7d2, { flatShading: false, roughness: 0.42 });
+const uJade = { value: new THREE.Color(0x2f8a57) };
+ivory.onBeforeCompile = (sh) => {
+  sh.uniforms.uJade = uJade;
+  sh.vertexShader = "varying float vTz;\n" + sh.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\nvTz = position.z;");
+  sh.fragmentShader = "varying float vTz;\nuniform vec3 uJade;\n" + sh.fragmentShader.replace("#include <color_fragment>",
+    "#include <color_fragment>\ndiffuseColor.rgb = mix(uJade, diffuseColor.rgb, smoothstep(" + (JADE_AT - 0.004).toFixed(3) + ", " + (JADE_AT + 0.004).toFixed(3) + ", vTz));");
+};
+const bodyGeo = new RoundedBoxGeometry(0.72, 0.98, TILE_D, 4, 0.075);
 FACES.forEach((draw, i) => {
   const t = new THREE.Group();
   const face = new THREE.MeshStandardMaterial({ map: tileTexture(draw), roughness: 0.42 }); allMats.push(face);
-  const body = new THREE.Mesh(bodyGeo, [ivory, ivory, ivory, ivory, face, ivory]);
-  const back = new THREE.Mesh(backGeo, jade); back.position.z = -0.24;
-  t.add(body, back);
+  const body = new THREE.Mesh(bodyGeo, [ivory, ivory, ivory, ivory, face, ivory]); body.position.z = -0.07;
+  t.add(body);
   const flat = i === 4;
   if (flat) { t.rotation.x = -Math.PI / 2; t.position.set(0.35, 0.24, 1.35); t.rotation.z = 0.35; }
   else { const k = i - 1.5; t.position.set(k * 0.8, 0.49, -0.1 + Math.abs(k) * 0.12); t.rotation.y = -k * 0.08; }
   t.userData.baseY = t.position.y;
   t.userData.tile = true;
-  body.userData.root = t; back.userData.root = t;
+  body.userData.root = t;
   pongz.add(t); tiles.push(t);
 });
 
@@ -1525,7 +1534,8 @@ morph();
 
 /* ---------------- Movie Studio 3D: jointed hand gripping a bar, with IK targets ---------------- */
 const MS_YAW = -2.3; // turn the rig so the opening camera sees the fingers wrap, not the back of the bar
-const ms = new THREE.Group(); ms.position.copy(POS.ms); ms.rotation.y = MS_YAW; scene.add(ms);
+const msSet = new THREE.Group(); msSet.position.copy(POS.ms); scene.add(msSet); // the whole little movie set
+const ms = new THREE.Group(); ms.rotation.y = MS_YAW; msSet.add(ms);
 const PIV = new THREE.Vector3(0, 1.7, 0);
 const R_BAR0 = 0.35, R_F = 0.055;
 let R_BAR = R_BAR0, R = R_BAR + R_F; // bar radius is live: the grip re-solves for any diameter
@@ -1627,7 +1637,74 @@ function applyDiam(cm) {
   regripUntil = performance.now() + 220; lastTouch = performance.now(); kick();
 }
 sDiam.addEventListener("input", () => applyDiam(+sDiam.value));
-[pongz, ms].forEach((g) => g.traverse((o) => { if (o.isMesh && !o.material.isMeshBasicMaterial) o.castShadow = true; }));
+/* ---------------- Movie Studio set: camera, light and timeline around the grip rig ---------------- */
+const aim = new THREE.Vector3(0, 1.6, 0);
+const darkMat = std(0x3a3f47), metalMat = std(0x6b727c);
+const cine = new THREE.Group(); cine.position.set(1.75, 0, 0.75); msSet.add(cine);
+[0, 2.1, 4.2].forEach((a) => { // tripod legs
+  const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1.5, 6), metalMat);
+  const foot = new THREE.Vector3(Math.cos(a) * 0.42, 0, Math.sin(a) * 0.42), top = new THREE.Vector3(0, 1.45, 0);
+  leg.position.copy(foot).lerp(top, 0.5); leg.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), top.sub(foot).normalize()); cine.add(leg);
+});
+const camHead = new THREE.Group(); camHead.position.y = 1.55; cine.add(camHead);
+camHead.lookAt(POS.ms.clone().add(aim)); // lookAt takes a world point
+const camBody = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.32, 0.55), darkMat); camHead.add(camBody);
+const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 0.26, 14), metalMat); lens.rotation.x = Math.PI / 2; lens.position.z = 0.4; camHead.add(lens);
+[-0.12, 0.2].forEach((z) => { const r = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.06, 18), darkMat); r.rotation.z = Math.PI / 2; r.position.set(0, 0.34, z); camHead.add(r); });
+// Unity-style camera frustum gizmo
+const lineMat = (c, o) => new THREE.LineBasicMaterial({ color: c, transparent: true, opacity: o });
+{
+  const n = 0.06, f = 1.35, a = 0.2, b = 0.13, A = 0.62, B = 0.4, z0 = 0.53;
+  const P4 = (w, h, z) => [[-w, -h, z], [w, -h, z], [w, h, z], [-w, h, z]];
+  const nn = P4(a * 0.5, b * 0.5, z0 + n), ff = P4(A, B, z0 + f), seg = [];
+  for (let i = 0; i < 4; i++) { seg.push(nn[i], nn[(i + 1) % 4], ff[i], ff[(i + 1) % 4], nn[i], ff[i]); }
+  const g = new THREE.BufferGeometry().setAttribute("position", new THREE.Float32BufferAttribute(seg.flat(), 3));
+  camHead.add(new THREE.LineSegments(g, lineMat(0xdedede, 0.55)));
+}
+// spot light gizmo: bulb plus a wire cone aimed at the grip
+const lamp = new THREE.Group(); lamp.position.set(-1.35, 3.05, -1.0); msSet.add(lamp);
+lamp.add(new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffe08a })));
+{
+  const dir = aim.clone().sub(lamp.position), len = dir.length() * 0.85, rad = len * 0.36, seg = [];
+  const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), dir.normalize());
+  for (let i = 0; i < 24; i++) {
+    const a0 = (i / 24) * Math.PI * 2, a1 = ((i + 1) / 24) * Math.PI * 2;
+    seg.push([Math.cos(a0) * rad, Math.sin(a0) * rad, len], [Math.cos(a1) * rad, Math.sin(a1) * rad, len]);
+    if (i % 8 === 0) seg.push([0, 0, 0], [Math.cos(a0) * rad, Math.sin(a0) * rad, len]);
+  }
+  const g = new THREE.BufferGeometry().setAttribute("position", new THREE.Float32BufferAttribute(seg.flat(), 3));
+  const cone = new THREE.LineSegments(g, lineMat(0xffd76a, 0.42)); cone.quaternion.copy(q); lamp.add(cone);
+}
+// timeline panel: tracks with keyframes, a playhead that loops
+const TLW = 3.1, TLH = 0.92;
+const tlCanvas = document.createElement("canvas"); tlCanvas.width = 1024; tlCanvas.height = 304;
+{
+  const x = tlCanvas.getContext("2d"), L = 210;
+  x.fillStyle = "#1e1e1e"; x.fillRect(0, 0, 1024, 304);
+  x.fillStyle = "#2b2b2b"; x.fillRect(0, 0, 1024, 44);
+  x.fillStyle = "#cfcfcf"; x.font = "500 22px monospace"; x.fillText("Timeline", 14, 30);
+  x.strokeStyle = "#5a5a5a"; x.fillStyle = "#8a8a8a"; x.font = "17px monospace"; x.lineWidth = 2;
+  for (let i = 0; i <= 16; i++) { const px = L + i * (1024 - L - 16) / 16; x.beginPath(); x.moveTo(px, i % 4 ? 34 : 24); x.lineTo(px, 44); x.stroke(); if (i % 4 === 0) x.fillText(String(i / 4), px + 4, 22); }
+  const tracks = [["Hand.Grip", "#e0b341", [0.04, 0.3, 0.52, 0.78, 0.95]], ["Bar.Rotation", "#4a8ee8", [0.1, 0.42, 0.7]], ["Camera.Dolly", "#8fd14f", [0.02, 0.6, 0.98]], ["Light.Intensity", "#e8564a", [0.25, 0.85]]];
+  tracks.forEach(([name, col, keys], i) => {
+    const y = 52 + i * 63;
+    x.fillStyle = i % 2 ? "#232323" : "#262626"; x.fillRect(0, y, 1024, 59);
+    x.fillStyle = col; x.fillRect(0, y, 6, 59);
+    x.fillStyle = "#d2d2d2"; x.font = "19px monospace"; x.fillText(name, 18, y + 36);
+    x.fillStyle = col; x.globalAlpha = 0.28; x.fillRect(L + keys[0] * (1024 - L - 16), y + 14, (keys[keys.length - 1] - keys[0]) * (1024 - L - 16), 31); x.globalAlpha = 1;
+    keys.forEach((k) => { const px = L + k * (1024 - L - 16), py = y + 30; x.beginPath(); x.moveTo(px, py - 12); x.lineTo(px + 12, py); x.lineTo(px, py + 12); x.lineTo(px - 12, py); x.closePath(); x.fill(); });
+  });
+}
+const tlTex = new THREE.CanvasTexture(tlCanvas); tlTex.colorSpace = THREE.SRGBColorSpace; tlTex.anisotropy = 4;
+const timeline = new THREE.Group(); timeline.position.set(-0.75, 0.3, 1.55); timeline.rotation.set(-1.0, 0.18, 0, "YXZ"); msSet.add(timeline); // tilted up like a desk panel
+const tlPanel = new THREE.Mesh(new THREE.PlaneGeometry(TLW, TLH), new THREE.MeshBasicMaterial({ map: tlTex, side: THREE.DoubleSide }));
+timeline.add(tlPanel);
+const tlFrame = new THREE.Mesh(new THREE.BoxGeometry(TLW + 0.06, TLH + 0.06, 0.04), darkMat); tlFrame.position.z = -0.03; timeline.add(tlFrame);
+const TL_L = -TLW / 2 + TLW * 210 / 1024, TL_R = TLW / 2 - TLW * 16 / 1024;
+const playhead = new THREE.Mesh(new THREE.PlaneGeometry(0.018, TLH * 0.86), new THREE.MeshBasicMaterial({ color: 0xff6a4a }));
+playhead.position.set(TL_L, -TLH * 0.07, 0.006); timeline.add(playhead);
+
+[pongz, msSet].forEach((g) => g.traverse((o) => { if (o.isMesh && !o.material.isMeshBasicMaterial) o.castShadow = true; }));
 
 /* ---------------- move gizmo on the selected object ---------------- */
 const moveGizmo = new THREE.Group(); scene.add(moveGizmo);
@@ -1642,10 +1719,10 @@ const SHOTS = {
   overview: { t: [1.3, 2.0, 0], p: [2.9, 5.9, 11.4] },
   pongz: { t: [-5.2, 0.45, 0.35], p: [-3.9, 3.1, 5.1] },
   cc: { t: [0, 1.6, 0], p: [1.9, 2.4, 4.8] },
-  ms: { t: [5.2, 1.75, 0], p: [7.6, 4.3, -2.3] }
+  ms: { t: [5.2, 1.55, 0.2], p: [7.6, 4.3, -2.3] }
 };
 { // the Movie Studio shot turns with its rig
-  const t = new THREE.Vector3(...SHOTS.ms.t), p = new THREE.Vector3(...SHOTS.ms.p).sub(t).applyAxisAngle(new THREE.Vector3(0, 1, 0), MS_YAW).add(t);
+  const t = new THREE.Vector3(...SHOTS.ms.t), p = new THREE.Vector3(...SHOTS.ms.p).sub(t).multiplyScalar(1.4).applyAxisAngle(new THREE.Vector3(0, 1, 0), MS_YAW).add(t);
   SHOTS.ms.p = p.toArray();
 }
 let sel = window.__getSel ? window.__getSel() : "overview";
@@ -1663,9 +1740,9 @@ function pick(e, list) {
 }
 const grabbables = () => sel === "pongz" ? tiles : sel === "ms" ? [bar] : [];
 // click an object in the scene to select it, like Unity; hovering outlines it first
-const ROOTS = { pongz, cc, ms };
+const ROOTS = { pongz, cc, ms: msSet };
 function pickRoot(e) {
-  const h = pick(e, [pongz, cc, ms]); let o = h && h.object;
+  const h = pick(e, [pongz, cc, msSet]); let o = h && h.object;
   while (o) { for (const k in ROOTS) if (ROOTS[k] === o) return k; o = o.parent; }
   return null;
 }
@@ -1886,6 +1963,7 @@ function tick(now) {
     if (nv !== t.userData.spinTo) busy = true;
   });
   const ov = sel === "overview";
+  if ((ov || sel === "ms") && !reduce) playhead.position.x = TL_L + (TL_R - TL_L) * ((now / 6000) % 1);
   // overview idle: a tile hops and spins now and then
   if (ov && !reduce && now > nextHop) {
     nextHop = now + 2400 + Math.random() * 1400;
