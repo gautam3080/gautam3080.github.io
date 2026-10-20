@@ -123,18 +123,18 @@ button.tab:not(.on):hover { color: var(--text); background: #222; }
 /* ---------- scene / game ---------- */
 .center { grid-area: scene; background: var(--bg2); }
 .scene-bar { display: flex; align-items: center; gap: 4px; height: 30px; padding: 0 6px; background: var(--bg2); border-bottom: 1px solid var(--sep); flex: none; font-size: 12px; }
-.sbtn { height: 22px; display: inline-flex; align-items: center; gap: 5px; padding: 0 8px; background: var(--bg3); border: 1px solid var(--sep); border-radius: 3px; color: var(--text); font-size: 12px; cursor: pointer; }
+.sbtn { height: 24px; display: inline-flex; align-items: center; gap: 5px; padding: 0 8px; background: var(--bg3); border: 1px solid var(--sep); border-radius: 3px; color: var(--text); font-size: 12px; cursor: pointer; }
 .sbtn:hover { background: #474747; }
 .sbtn[aria-pressed="true"] { background: var(--sel); color: #fff; }
 .scene-bar .info { margin-left: auto; color: var(--dim); font-family: var(--f-mono); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .views { position: relative; flex: 1; min-height: 0; }
 .view { position: absolute; inset: 0; }
 .view[hidden] { display: none !important; }
-#sceneView { background: #2a2a2a; overflow: hidden; }
+#sceneView { background: #2a2a2a; overflow: hidden; container-type: inline-size; }
 #sceneCanvas { display: block; width: 100%; height: 100%; outline: none; }
 .hero { position: absolute; left: 16px; top: 14px; max-width: min(560px, 70%); pointer-events: none; z-index: 2; transition: transform .25s ease, opacity .25s ease; transform-origin: 0 0; }
 .hero .eyebrow { font-family: var(--f-mono); font-size: 12px; color: var(--muted); letter-spacing: .04em; margin-bottom: 8px; }
-.hero h1 { font-size: clamp(1.6rem, 2.7vw, 2.6rem); line-height: 1.12; font-weight: 600; color: var(--bright); letter-spacing: -.01em; text-shadow: 0 1px 0 rgba(0,0,0,.6); }
+.hero h1 { font-size: clamp(1.6rem, 2.7vw, 2.6rem); font-size: clamp(1.3rem, 4.4cqi, 2.6rem); line-height: 1.12; font-weight: 600; color: var(--bright); letter-spacing: -.01em; text-shadow: 0 1px 0 rgba(0,0,0,.6); }
 .hero h1 span { display: block; padding-left: 14px; position: relative; }
 .hero h1 span::before { content: ""; position: absolute; left: 0; top: .2em; bottom: .2em; width: 4px; border-radius: 1px; background: var(--c); }
 .hero .sub { margin-top: 10px; font-size: 13px; color: var(--text); font-family: var(--f-mono); text-shadow: 0 1px 0 rgba(0,0,0,.6); }
@@ -276,7 +276,7 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
 .cons { grid-area: cons; }
 .cons-bar { display: flex; align-items: center; gap: 4px; height: 28px; padding: 0 6px; border-bottom: 1px solid var(--sep); flex: none; }
 .cons-bar .grow { flex: 1; }
-.cnt { height: 22px; display: inline-flex; align-items: center; gap: 5px; padding: 0 7px; background: transparent; border: 1px solid transparent; border-radius: 3px; font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); cursor: pointer; }
+.cnt { height: 24px; display: inline-flex; align-items: center; gap: 5px; padding: 0 7px; background: transparent; border: 1px solid transparent; border-radius: 3px; font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); cursor: pointer; }
 .cnt[aria-pressed="true"] { background: var(--bg3); border-color: var(--sep); color: var(--bright); }
 .cnt svg { width: 13px; height: 13px; }
 .cnt:disabled { cursor: default; }
@@ -306,6 +306,11 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
 /* ---------- desktop, short screens ---------- */
 @media (min-width: 1024px) and (max-height: 720px) {
   .app { grid-template-rows: 44px minmax(0, 1fr) 132px 26px; }
+}
+
+/* ---------- desktop, narrow screens (tablet landscape, small laptops) ---------- */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .app { grid-template-columns: 184px minmax(0, 1fr) 330px; }
 }
 
 /* ---------- stacked layout (tablet / phone) ---------- */
@@ -360,6 +365,17 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
   .logs button { min-height: 44px; padding-block: 8px; }
   .status { flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px max(12px, env(safe-area-inset-left, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)); }
   .status .l, .status .r { white-space: normal; }
+}
+@media (max-width: 1023px) and (orientation: landscape) and (max-height: 540px) {
+  #sceneCanvas, #gameView, .fallback { height: calc(100vh - 44px); min-height: 280px; max-height: none; }
+  @supports (height: 1svh) { #sceneCanvas, #gameView, .fallback { height: calc(100svh - 44px); } }
+  .hero { max-width: 45%; }
+  .hero .eyebrow, .hero .sub { display: none; }
+  .hero h1 { font-size: 1.15rem; }
+  .toolbar { padding-block: 2px; }
+  .tabs { height: 38px; } .tab { height: 36px; }
+  .tree a, .tree .scene-row { height: 40px; }
+  .scene-bar { padding-block: 2px; }
 }
 @media (max-width: 1023px) and (min-width: 700px) {
   .gallery { grid-template-columns: repeat(3, 1fr); }
@@ -1840,6 +1856,7 @@ const SHOTS = {
 }
 let sel = window.__getSel ? window.__getSel() : "overview";
 const shotFor = (id) => SHOTS[id] || SHOTS.overview;
+const FIT = { overview: 1.85, pongz: 1.2, cc: 1.6, ms: 1.3 }; // widest aspect each shot still fits without backing off
 
 // our pointer handler is registered BEFORE OrbitControls so it can veto orbiting when grabbing an object
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
@@ -1970,12 +1987,16 @@ function placeTags() {
   const cr = canvas.getBoundingClientRect(), hr = heroEl.getBoundingClientRect();
   const hb = hr.bottom - cr.top + 4, hRight = hr.right - cr.left;
   const sizes = tagEls.map((el) => [el.offsetWidth, el.offsetHeight]);
+  const placed = [];
   tagEls.forEach((el, i) => {
     v.copy(TAG_AT[el.dataset.select]).project(camera);
     const x = (v.x * 0.5 + 0.5) * w, y = (-v.y * 0.5 + 0.5) * h;
     const [tw, th] = sizes[i];
     let left = Math.round(x - tw / 2), top = Math.round(y - th - 6);
     if (top < hb && left < hRight) top = Math.round(hb); // never sit on the headline
+    left = Math.max(2, Math.min(w - tw - 2, left));
+    for (const r of placed) if (left < r.r + 4 && left + tw > r.l - 4 && top < r.b + 3 && top + th > r.t - 3) top = r.b + 3; // stack, don't overlap
+    placed.push({ l: left, r: left + tw, t: top, b: top + th });
     const off = v.z > 1 || x < 0 || x > w || y < 0 || y > h;
     el.style.visibility = off ? "hidden" : "";
     el.style.transform = `translate(${left}px, ${top}px)`;
@@ -1986,7 +2007,8 @@ let fly = null;
 function frame(id, instant, dur = 750) {
   const s = shotFor(id);
   const to = { t: new THREE.Vector3(...s.t), p: new THREE.Vector3(...s.p) };
-  const fit = Math.max(1, (id === "overview" || !SHOTS[id] ? 1.85 : 1.15) / camera.aspect);
+  const fl = coverLeft(), aspect = (canvas.clientWidth - fl * 0.5) / (canvas.clientHeight || 1); // the panel only covers the lower part
+  const fit = Math.max(1, (FIT[id] || FIT.overview) / aspect);
   to.p.sub(to.t).multiplyScalar(fit).add(to.t);
   if (id === "overview" && canvas.clientWidth >= 520) { // when the headline fills more of a short view, back off and drop the objects below it
     const hb = (document.getElementById("hero").getBoundingClientRect().bottom - canvas.getBoundingClientRect().top) / (canvas.clientHeight || 1);
@@ -2003,7 +2025,7 @@ function placeGizmo() {
   moveGizmo.visible = !!g;
   if (g) moveGizmo.position.copy(g).add(new THREE.Vector3(0, 0.02, sel === "pongz" ? 0.9 : 0.9));
 }
-document.addEventListener("objselect", (e) => { sel = e.detail; setHover(null); updateOutline(); placeGizmo(); frame(sel); lastTouch = performance.now(); });
+document.addEventListener("objselect", (e) => { sel = e.detail; setHover(null); updateOutline(); placeGizmo(); setOffset(); frame(sel); lastTouch = performance.now(); });
 document.addEventListener("frameselected", () => frame(sel));
 document.getElementById("btnFrame").addEventListener("click", () => frame(sel));
 const btnWire = document.getElementById("btnWire");
@@ -2042,14 +2064,29 @@ const info = document.getElementById("sceneInfo");
 let running = false, visible = true, onScene = true, last = performance.now();
 let idleUntil = 0, nextHop = performance.now() + 1800, ccAmp = 0;
 function kick() { idleUntil = performance.now() + 1200; if (!running && visible && onScene && !document.hidden) { running = true; last = performance.now(); requestAnimationFrame(tick); } }
+// On narrow desktop scenes the floating panel (sliders, notes) covers the left third of a project shot,
+// so the camera centres the object in the space to its right and fits to that width.
+function coverLeft() {
+  const w = canvas.clientWidth;
+  if (sel === "overview" || w >= 900 || !matchMedia("(min-width: 1024px)").matches) return 0;
+  const o = document.getElementById("ovl");
+  return o.offsetWidth ? o.offsetLeft + o.offsetWidth : 0;
+}
+function setOffset() {
+  const w = canvas.clientWidth, h = canvas.clientHeight, fl = coverLeft();
+  const desk = matchMedia("(min-width: 1024px)").matches;
+  if (fl) camera.setViewOffset(w, h, -fl * 0.4, 0, w, h);
+  else if ((sel === "overview" || !SHOTS[sel]) && !desk && w > h * 1.8) camera.setViewOffset(w, h, 0, h * 0.18, w, h); // phone landscape: lift the objects above the fold
+  else if (w > 760 && desk) camera.setViewOffset(w, h, -w * 0.09, 0, w, h); // nudge content right of the headline on wide views
+  else camera.clearViewOffset();
+  camera.updateProjectionMatrix();
+}
 function resize() {
   const w = canvas.clientWidth, h = canvas.clientHeight;
   if (!w || !h) return;
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
-  // nudge content right of the headline on wide views
-  if (w > 760 && matchMedia("(min-width: 1024px)").matches) camera.setViewOffset(w, h, -w * 0.09, 0, w, h); else camera.clearViewOffset();
-  camera.updateProjectionMatrix();
+  setOffset();
   composer.setPixelRatio(renderer.getPixelRatio()); composer.setSize(w, h);
   kick();
 }
@@ -2140,7 +2177,7 @@ if (sel === "overview" && !reduce) { // short dolly in on arrival
 updateOutline();
 window.__sceneReady = true;
 document.dispatchEvent(new CustomEvent("sceneready"));
-statusL.textContent = "Scene view: three.js r160, procedural geometry. Drag to rotate the view, click an object to select it.";
+statusL.textContent = "Scene view: three.js r160, procedural models plus a CC BY head scan. Drag to rotate the view, click an object to select it.";
 }
 </script>
 </body>
