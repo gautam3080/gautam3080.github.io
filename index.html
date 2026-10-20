@@ -140,6 +140,13 @@ button.tab:not(.on):hover { color: var(--text); background: #222; }
 .hero .sub { margin-top: 10px; font-size: 13px; color: var(--text); font-family: var(--f-mono); text-shadow: 0 1px 0 rgba(0,0,0,.6); }
 .hero.compact { opacity: 0; transform: translateY(-6px); }
 .hero.compact .sub, .hero.compact .eyebrow { visibility: hidden; }
+.tags { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.tags[hidden] { display: none; }
+.tag { position: absolute; left: 0; top: 0; pointer-events: auto; display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 7px; background: rgba(28,28,28,.88); border: 1px solid #4a4a4a; border-radius: 3px; color: var(--bright); font-family: var(--f-mono); font-size: 11px; cursor: pointer; white-space: nowrap; transition: border-color .15s; }
+.tag:hover, .tag.hot { border-color: #ff9a1f; }
+.tags.tight .tag { font-size: 10px; height: 20px; padding: 0 5px; }
+.tags.tight .badge { display: none; }
+.scene-fallback .tags { display: none; }
 .gizmo { position: absolute; right: 8px; top: 8px; width: 92px; height: 108px; pointer-events: none; z-index: 2; }
 .gizmo text { font-family: var(--f-mono); font-size: 11px; font-weight: 500; }
 .ovl { position: absolute; left: 12px; bottom: 12px; width: 280px; max-width: calc(100% - 24px); background: rgba(35,35,35,.96); border: 1px solid var(--sep); border-radius: 4px; z-index: 3; font-size: 12.5px; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
@@ -479,13 +486,18 @@ input, textarea, [contenteditable="true"] { caret-color: auto; }
           <h1><span class="c-green">A live Mahjong game.</span> <span class="c-red">Photoreal humans.</span> <span class="c-blue">Movie sets in a box.</span></h1>
           <p class="sub">3.5+ years of production C# · Mumbai · Available immediately</p>
         </div>
+        <div class="tags" id="tags" aria-hidden="true">
+          <button type="button" tabindex="-1" class="tag" data-select="pongz">Pongz_SGMahjong<span class="badge live">LIVE</span></button>
+          <button type="button" tabindex="-1" class="tag" data-select="cc">CharacterCreator<span class="badge nda">NDA</span></button>
+          <button type="button" tabindex="-1" class="tag" data-select="ms">MovieStudio3D<span class="badge nda">NDA</span></button>
+        </div>
         <svg class="gizmo" id="gizmo" viewBox="-46 -46 92 108" aria-hidden="true"></svg>
         <div class="fallback" id="fallback"><div class="fallback-art" id="fallbackArt"></div></div>
         <div class="ovl" id="ovl">
           <div class="ovl-h"><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg><span id="ovlTitle">Scene</span></div>
           <div class="ovl-b">
             <div data-for="overview other">
-              <p class="live-only">Drag to rotate the view, scroll or pinch to zoom. Pick an object in the Hierarchy to zoom to it.</p>
+              <p class="live-only">Tap or click an object to zoom to it. Drag to rotate the view, scroll or pinch to zoom.</p>
             </div>
             <div data-for="pongz" hidden>
               <p class="live-only">Drag a tile to move it. Tap a tile to turn it. Drag empty space to rotate the view.</p>
@@ -1123,6 +1135,7 @@ public class Gautam : MonoBehaviour
     }
   }
   window.__getSel = function () { return current; };
+  window.__select = function (id) { select(id, { push: true, fromUser: true }); };
 
   document.addEventListener("click", function (e) {
     var a = e.target.closest("[data-obj], [data-select]");
@@ -1351,7 +1364,11 @@ const fail = (why) => window.__sceneFallback && window.__sceneFallback(why);
 main().catch((e) => { console.warn("Scene view:", e && e.message); fail(e && e.code === "webgl" ? "WebGL is not available" : "three.js could not be loaded"); });
 async function main() {
 const THREE = await import("three");
-const { OrbitControls } = await import("three/addons/controls/OrbitControls.js");
+const [{ OrbitControls }, { RoundedBoxGeometry }, { EffectComposer }, { RenderPass }, { OutlinePass }, { OutputPass }] = await Promise.all([
+  import("three/addons/controls/OrbitControls.js"), import("three/addons/geometries/RoundedBoxGeometry.js"),
+  import("three/addons/postprocessing/EffectComposer.js"), import("three/addons/postprocessing/RenderPass.js"),
+  import("three/addons/postprocessing/OutlinePass.js"), import("three/addons/postprocessing/OutputPass.js")
+]);
 
 const view = document.getElementById("sceneView");
 const canvas = document.getElementById("sceneCanvas");
@@ -1366,6 +1383,8 @@ try {
   if (!renderer.getContext()) throw new Error("no context");
 } catch (e) { const err = new Error("WebGL is not available"); err.code = "webgl"; throw err; }
 renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const coarse = matchMedia("(pointer: coarse)").matches;
 
 const BG = 0x2a2a2a;
 const scene = new THREE.Scene();
@@ -1375,6 +1394,12 @@ const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 120);
 camera.position.set(3, 8, 19);
 scene.add(new THREE.HemisphereLight(0xe4e9ef, 0x3a3832, 1.15));
 const sun = new THREE.DirectionalLight(0xffffff, 1.7); sun.position.set(6, 10, 7); scene.add(sun);
+sun.castShadow = true; sun.shadow.mapSize.set(coarse ? 1024 : 2048, coarse ? 1024 : 2048);
+Object.assign(sun.shadow.camera, { left: -10, right: 10, top: 7, bottom: -7, near: 2, far: 30 });
+sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.02; sun.shadow.radius = 3;
+const rim = new THREE.DirectionalLight(0xa9c8ff, 0.7); rim.position.set(-7, 5, -9); scene.add(rim); // cool back light so silhouettes read
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ color: 0x000000, opacity: 0.38 }));
+ground.rotation.x = -Math.PI / 2; ground.position.y = -0.002; ground.receiveShadow = true; scene.add(ground);
 
 // Unity-style grid: minor and major lines on XZ, fading with fog
 function grid(size, div, color, op) {
@@ -1382,8 +1407,8 @@ function grid(size, div, color, op) {
   g.material.transparent = true; g.material.opacity = op; g.material.depthWrite = false;
   return g;
 }
-scene.add(grid(96, 96, 0x5c5c5c, 0.28));
-scene.add(grid(96, 12, 0x7a7a7a, 0.55));
+const grids = [grid(96, 96, 0x5c5c5c, 0.28), grid(96, 12, 0x7a7a7a, 0.55)];
+scene.add(...grids);
 
 const POS = { pongz: new THREE.Vector3(-5.2, 0, 0), cc: new THREE.Vector3(0, 0, 0), ms: new THREE.Vector3(5.2, 0, 0) };
 const sm = (a, b, v) => { let t = (v - a) / (b - a); t = Math.min(1, Math.max(0, t)); return t * t * (3 - 2 * t); };
@@ -1410,11 +1435,11 @@ const FACES = [
 ];
 const pongz = new THREE.Group(); pongz.position.copy(POS.pongz); scene.add(pongz);
 const tiles = [];
-const ivory = std(0xefe7d2), jade = std(0x2f8a57);
-const bodyGeo = new THREE.BoxGeometry(0.72, 0.98, 0.34), backGeo = new THREE.BoxGeometry(0.72, 0.98, 0.14);
+const ivory = std(0xefe7d2, { flatShading: false, roughness: 0.42 }), jade = std(0x2f8a57, { flatShading: false, roughness: 0.38 });
+const bodyGeo = new RoundedBoxGeometry(0.72, 0.98, 0.34, 3, 0.06), backGeo = new RoundedBoxGeometry(0.72, 0.98, 0.14, 3, 0.05);
 FACES.forEach((draw, i) => {
   const t = new THREE.Group();
-  const face = new THREE.MeshStandardMaterial({ map: tileTexture(draw), roughness: 0.6, flatShading: true }); allMats.push(face);
+  const face = new THREE.MeshStandardMaterial({ map: tileTexture(draw), roughness: 0.42 }); allMats.push(face);
   const body = new THREE.Mesh(bodyGeo, [ivory, ivory, ivory, ivory, face, ivory]);
   const back = new THREE.Mesh(backGeo, jade); back.position.z = -0.24;
   t.add(body, back);
@@ -1435,17 +1460,25 @@ for (let i = 0; i < basePos.length; i += 3) { const l = Math.hypot(basePos[i], b
 const wireMat = new THREE.MeshBasicMaterial({ color: 0x9fc2ea, wireframe: true, transparent: true, opacity: 0.55 });
 const occMat = new THREE.MeshBasicMaterial({ color: 0x262626, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
 const head = new THREE.Group(); head.position.y = 1.95; head.scale.setScalar(0.85); cc.add(head);
-head.add(new THREE.Mesh(headGeo, occMat), new THREE.Mesh(headGeo, wireMat));
+// head wire carries per-vertex colour: vertices a blendshape moved glow amber, like a delta heatmap
+const headWire = new THREE.MeshBasicMaterial({ vertexColors: true, wireframe: true, transparent: true, opacity: 0.7 });
+headGeo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(headGeo.attributes.position.count * 3), 3));
+const headOcc = new THREE.Mesh(headGeo, occMat); headOcc.castShadow = true;
+head.add(headOcc, new THREE.Mesh(headGeo, headWire));
 const eyeGeo = new THREE.IcosahedronGeometry(0.085, 1);
 const eyeMat = new THREE.MeshBasicMaterial({ color: 0xe8564a, wireframe: true });
 const eyes = [new THREE.Mesh(eyeGeo, eyeMat), new THREE.Mesh(eyeGeo, eyeMat)]; head.add(...eyes);
 const neckGeo = new THREE.CylinderGeometry(0.3, 0.42, 1.05, 14, 3, true);
 const neck = new THREE.Group(); neck.position.y = 0.88;
-neck.add(new THREE.Mesh(neckGeo, occMat), new THREE.Mesh(neckGeo, wireMat)); cc.add(neck);
+const neckOcc = new THREE.Mesh(neckGeo, occMat); neckOcc.castShadow = true;
+neck.add(neckOcc, new THREE.Mesh(neckGeo, wireMat)); cc.add(neck);
 const shGeo = new THREE.SphereGeometry(1, 18, 5, 0, Math.PI * 2, Math.PI * 0.3, Math.PI * 0.2);
 const shoulders = new THREE.Group(); shoulders.position.y = -0.05; shoulders.scale.set(1.3, 1.1, 0.6);
 shoulders.add(new THREE.Mesh(shGeo, wireMat)); cc.add(shoulders);
 const P = { jaw: 0.5, cheek: 0.5, eye: 0.5 };
+const PB = { jaw: 0.5, cheek: 0.5, eye: 0.5 }; // what the sliders say; P can drift from it while the head idles
+let neutral = null;
+const cCool = new THREE.Color(0x9fc2ea), cHot = new THREE.Color(0xffa23a), cTmp = new THREE.Color();
 // Ranges stay inside what a real face does: each slider nudges one feature, never the whole head.
 function morph() {
   const a = headGeo.attributes.position.array;
@@ -1469,6 +1502,14 @@ function morph() {
     for (const s of [-1, 1]) ind += 0.07 * Math.exp(-((x0 - s * ex) ** 2 + (y0 - 0.2) ** 2) / 0.011) * sm(0.45, 0.85, z0);
     a[i] = x * (1 - ind); a[i + 1] = y * (1 - ind * 0.3); a[i + 2] = z * (1 - ind);
   }
+  if (!neutral) neutral = Float32Array.from(a);
+  const col = headGeo.attributes.color.array;
+  for (let i = 0; i < a.length; i += 3) {
+    const d = Math.hypot(a[i] - neutral[i], a[i + 1] - neutral[i + 1], a[i + 2] - neutral[i + 2]);
+    cTmp.copy(cCool).lerp(cHot, Math.min(1, d / 0.028));
+    col[i] = cTmp.r; col[i + 1] = cTmp.g; col[i + 2] = cTmp.b;
+  }
+  headGeo.attributes.color.needsUpdate = true;
   headGeo.attributes.position.needsUpdate = true;
   headGeo.computeBoundingSphere();
   const ez = Math.sqrt(Math.max(0, 1 - ex * ex - 0.04));
@@ -1479,11 +1520,12 @@ function morph() {
 morph();
 [["sJaw", "jaw"], ["sCheek", "cheek"], ["sEye", "eye"]].forEach(([id, key]) => {
   const el = document.getElementById(id), out = el.nextElementSibling;
-  el.addEventListener("input", () => { P[key] = el.value / 100; out.textContent = el.value; morph(); kick(); });
+  el.addEventListener("input", () => { PB[key] = P[key] = el.value / 100; out.textContent = el.value; morph(); kick(); });
 });
 
 /* ---------------- Movie Studio 3D: jointed hand gripping a bar, with IK targets ---------------- */
-const ms = new THREE.Group(); ms.position.copy(POS.ms); scene.add(ms);
+const MS_YAW = -2.3; // turn the rig so the opening camera sees the fingers wrap, not the back of the bar
+const ms = new THREE.Group(); ms.position.copy(POS.ms); ms.rotation.y = MS_YAW; scene.add(ms);
 const PIV = new THREE.Vector3(0, 1.7, 0);
 const R_BAR0 = 0.35, R_F = 0.055;
 let R_BAR = R_BAR0, R = R_BAR + R_F; // bar radius is live: the grip re-solves for any diameter
@@ -1585,6 +1627,7 @@ function applyDiam(cm) {
   regripUntil = performance.now() + 220; lastTouch = performance.now(); kick();
 }
 sDiam.addEventListener("input", () => applyDiam(+sDiam.value));
+[pongz, ms].forEach((g) => g.traverse((o) => { if (o.isMesh && !o.material.isMeshBasicMaterial) o.castShadow = true; }));
 
 /* ---------------- move gizmo on the selected object ---------------- */
 const moveGizmo = new THREE.Group(); scene.add(moveGizmo);
@@ -1596,11 +1639,15 @@ const moveGizmo = new THREE.Group(); scene.add(moveGizmo);
 
 /* ---------------- camera, controls, interaction ---------------- */
 const SHOTS = {
-  overview: { t: [0, 2.1, 0], p: [1.6, 6.0, 11.4] },
+  overview: { t: [1.3, 2.0, 0], p: [2.9, 5.9, 11.4] },
   pongz: { t: [-5.2, 0.45, 0.35], p: [-3.9, 3.1, 5.1] },
   cc: { t: [0, 1.6, 0], p: [1.9, 2.4, 4.8] },
   ms: { t: [5.2, 1.75, 0], p: [7.6, 4.3, -2.3] }
 };
+{ // the Movie Studio shot turns with its rig
+  const t = new THREE.Vector3(...SHOTS.ms.t), p = new THREE.Vector3(...SHOTS.ms.p).sub(t).applyAxisAngle(new THREE.Vector3(0, 1, 0), MS_YAW).add(t);
+  SHOTS.ms.p = p.toArray();
+}
 let sel = window.__getSel ? window.__getSel() : "overview";
 const shotFor = (id) => SHOTS[id] || SHOTS.overview;
 
@@ -1615,6 +1662,27 @@ function pick(e, list) {
   return ray.intersectObjects(list, true)[0];
 }
 const grabbables = () => sel === "pongz" ? tiles : sel === "ms" ? [bar] : [];
+// click an object in the scene to select it, like Unity; hovering outlines it first
+const ROOTS = { pongz, cc, ms };
+function pickRoot(e) {
+  const h = pick(e, [pongz, cc, ms]); let o = h && h.object;
+  while (o) { for (const k in ROOTS) if (ROOTS[k] === o) return k; o = o.parent; }
+  return null;
+}
+let hover = null, press = null;
+function setHover(id) {
+  if (id === hover) return;
+  hover = id; updateOutline();
+  tagEls.forEach((el) => el.classList.toggle("hot", el.dataset.select === hover));
+}
+canvas.addEventListener("pointerdown", (e) => { press = { x: e.clientX, y: e.clientY, t: performance.now() }; });
+canvas.addEventListener("pointerup", (e) => {
+  const p0 = press; press = null;
+  if (!p0 || Math.abs(e.clientX - p0.x) + Math.abs(e.clientY - p0.y) > 6 || performance.now() - p0.t > 700) return;
+  const id = pickRoot(e);
+  if (id && id !== sel && window.__select) { setHover(null); window.__select(id); }
+});
+canvas.addEventListener("pointerleave", () => { if (!drag) { setHover(null); canvas.style.cursor = ""; } });
 canvas.addEventListener("pointerdown", (e) => {
   const list = grabbables(); if (!list.length) return;
   const hit = pick(e, list); if (!hit) return;
@@ -1632,7 +1700,11 @@ canvas.addEventListener("pointerdown", (e) => {
 });
 canvas.addEventListener("pointermove", (e) => {
   if (!drag) {
-    if (e.pointerType === "mouse" && !e.buttons) { const list = grabbables(); canvas.style.cursor = list.length && pick(e, list) ? "grab" : ""; }
+    if (e.pointerType === "mouse" && !e.buttons) {
+      const list = grabbables();
+      if (list.length && pick(e, list)) { setHover(null); canvas.style.cursor = "grab"; }
+      else { const id = pickRoot(e); setHover(id && id !== sel ? id : null); canvas.style.cursor = hover ? "pointer" : ""; }
+    }
     return;
   }
   const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
@@ -1673,14 +1745,67 @@ controls.target.set(...SHOTS.overview.t);
 if (matchMedia("(pointer: coarse)").matches) canvas.style.touchAction = "pan-y"; // vertical swipes keep scrolling the page
 controls.addEventListener("change", kick);
 
+/* ---------------- Unity-style orange selection outline ---------------- */
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
+composer.addPass(new RenderPass(scene, camera));
+const outline = new OutlinePass(new THREE.Vector2(1, 1), scene, camera);
+Object.assign(outline, { edgeStrength: 5, edgeGlow: 0, edgeThickness: 1, pulsePeriod: 0 });
+outline.visibleEdgeColor.set(0xff9a1f); outline.hiddenEdgeColor.set(0x5a3a12);
+const outlineRender = outline.render.bind(outline);
+outline.render = (...a) => { // lines are not maskable, so keep the grid and move gizmo out of the outline masks
+  const gv = moveGizmo.visible; grids.forEach((g) => { g.visible = false; }); moveGizmo.visible = false;
+  outlineRender(...a);
+  grids.forEach((g) => { g.visible = true; }); moveGizmo.visible = gv;
+};
+composer.addPass(outline); composer.addPass(new OutputPass());
+function updateOutline() {
+  const l = []; if (ROOTS[sel]) l.push(ROOTS[sel]); if (hover && hover !== sel) l.push(ROOTS[hover]);
+  outline.selectedObjects = l; kick();
+}
+
+/* ---------------- name tags over each object in the overview ---------------- */
+const tagBox = document.getElementById("tags"), heroEl = document.getElementById("hero");
+const tagEls = [...tagBox.querySelectorAll("[data-select]")];
+const TAG_AT = { pongz: new THREE.Vector3(-5.2, 1.35, 0), cc: new THREE.Vector3(0, 3.0, 0), ms: new THREE.Vector3(5.2, 3.35, 0) };
+tagEls.forEach((el) => {
+  el.addEventListener("pointerenter", () => setHover(el.dataset.select));
+  el.addEventListener("pointerleave", () => setHover(null));
+});
+function placeTags() {
+  tagBox.hidden = sel !== "overview";
+  if (tagBox.hidden) return;
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  tagBox.classList.toggle("tight", w < 720);
+  // read layout first, then write, so the browser lays out once per frame
+  const cr = canvas.getBoundingClientRect(), hr = heroEl.getBoundingClientRect();
+  const hb = hr.bottom - cr.top + 4, hRight = hr.right - cr.left;
+  const sizes = tagEls.map((el) => [el.offsetWidth, el.offsetHeight]);
+  tagEls.forEach((el, i) => {
+    v.copy(TAG_AT[el.dataset.select]).project(camera);
+    const x = (v.x * 0.5 + 0.5) * w, y = (-v.y * 0.5 + 0.5) * h;
+    const [tw, th] = sizes[i];
+    let left = Math.round(x - tw / 2), top = Math.round(y - th - 6);
+    if (top < hb && left < hRight) top = Math.round(hb); // never sit on the headline
+    const off = v.z > 1 || x < 0 || x > w || y < 0 || y > h;
+    el.style.visibility = off ? "hidden" : "";
+    el.style.transform = `translate(${left}px, ${top}px)`;
+  });
+}
+
 let fly = null;
-function frame(id, instant) {
+function frame(id, instant, dur = 750) {
   const s = shotFor(id);
   const to = { t: new THREE.Vector3(...s.t), p: new THREE.Vector3(...s.p) };
-  const fit = Math.max(1, (id === "overview" || !SHOTS[id] ? 1.75 : 1.15) / camera.aspect);
+  const fit = Math.max(1, (id === "overview" || !SHOTS[id] ? 1.85 : 1.15) / camera.aspect);
   to.p.sub(to.t).multiplyScalar(fit).add(to.t);
+  if (id === "overview" && canvas.clientWidth >= 520) { // when the headline fills more of a short view, back off and drop the objects below it
+    const hb = (document.getElementById("hero").getBoundingClientRect().bottom - canvas.getBoundingClientRect().top) / (canvas.clientHeight || 1);
+    const ex = Math.min(0.2, Math.max(0, hb - 0.34));
+    to.p.sub(to.t).multiplyScalar(1 + ex * 1.4).add(to.t);
+    to.t.y += ex * 7; to.p.y += ex * 7;
+  }
   if (instant || reduce) { controls.target.copy(to.t); camera.position.copy(to.p); controls.update(); fly = null; kick(); return; }
-  fly = { from: { t: controls.target.clone(), p: camera.position.clone() }, to, t0: performance.now(), dur: 750 };
+  fly = { from: { t: controls.target.clone(), p: camera.position.clone() }, to, t0: performance.now(), dur };
   kick();
 }
 function placeGizmo() {
@@ -1688,7 +1813,7 @@ function placeGizmo() {
   moveGizmo.visible = !!g;
   if (g) moveGizmo.position.copy(g).add(new THREE.Vector3(0, 0.02, sel === "pongz" ? 0.9 : 0.9));
 }
-document.addEventListener("objselect", (e) => { sel = e.detail; placeGizmo(); frame(sel); lastTouch = performance.now(); });
+document.addEventListener("objselect", (e) => { sel = e.detail; setHover(null); updateOutline(); placeGizmo(); frame(sel); lastTouch = performance.now(); });
 document.addEventListener("frameselected", () => frame(sel));
 document.getElementById("btnFrame").addEventListener("click", () => frame(sel));
 const btnWire = document.getElementById("btnWire");
@@ -1725,7 +1850,7 @@ function drawGizmo() {
 /* ---------------- render loop (only runs while something changes) ---------------- */
 const info = document.getElementById("sceneInfo");
 let running = false, visible = true, onScene = true, last = performance.now();
-let idleUntil = 0;
+let idleUntil = 0, nextHop = performance.now() + 1800, ccAmp = 0;
 function kick() { idleUntil = performance.now() + 1200; if (!running && visible && onScene && !document.hidden) { running = true; last = performance.now(); requestAnimationFrame(tick); } }
 function resize() {
   const w = canvas.clientWidth, h = canvas.clientHeight;
@@ -1735,6 +1860,7 @@ function resize() {
   // nudge content right of the headline on wide views
   if (w > 760 && matchMedia("(min-width: 1024px)").matches) camera.setViewOffset(w, h, -w * 0.09, 0, w, h); else camera.clearViewOffset();
   camera.updateProjectionMatrix();
+  composer.setPixelRatio(renderer.getPixelRatio()); composer.setSize(w, h);
   kick();
 }
 new ResizeObserver(resize).observe(canvas);
@@ -1759,8 +1885,32 @@ function tick(now) {
     if (flat) t.rotation.z = nv; else t.rotation.y = nv;
     if (nv !== t.userData.spinTo) busy = true;
   });
+  const ov = sel === "overview";
+  // overview idle: a tile hops and spins now and then
+  if (ov && !reduce && now > nextHop) {
+    nextHop = now + 2400 + Math.random() * 1400;
+    const c = tiles.filter((t) => t.userData.hop == null && !(drag && drag.obj === t));
+    const t = c[Math.floor(Math.random() * c.length)];
+    if (t) { t.userData.hop = now; t.userData.spinTo = (t.userData.spinTo ?? (t.rotation.x < -1 ? t.rotation.z : t.rotation.y)) + Math.PI * 2; }
+  }
+  tiles.forEach((t) => {
+    if (t.userData.hop == null) return;
+    const k = (now - t.userData.hop) / 900;
+    if (k >= 1 || (drag && drag.obj === t)) { t.userData.hop = null; if (!(drag && drag.obj === t)) t.position.y = t.userData.baseY; }
+    else { t.position.y = t.userData.baseY + 0.5 * Math.sin(Math.PI * k); busy = true; }
+  });
+  // overview idle: the head turns and cycles its blendshapes; it eases back to the slider values when selected
+  ccAmp += ((ov && !reduce ? 1 : 0) - ccAmp) * Math.min(1, dt * 2.5);
+  if (ccAmp > 0.002) {
+    const t = now / 1000, cl = (x) => Math.min(1, Math.max(0, x));
+    P.jaw = cl(PB.jaw + ccAmp * 0.4 * Math.sin(t * 0.9));
+    P.cheek = cl(PB.cheek + ccAmp * 0.4 * Math.sin(t * 0.7 + 2));
+    P.eye = cl(PB.eye + ccAmp * 0.4 * Math.sin(t * 1.1 + 4));
+    head.rotation.y = ccAmp * 0.5 * Math.sin(t * 0.45);
+    morph(); busy = true;
+  } else if (ccAmp !== 0) { ccAmp = 0; Object.assign(P, PB); head.rotation.y = 0; morph(); }
   // hand: follow the bar's orientation with lag; loosen the fingers while re-gripping
-  if (sel === "ms" && !reduce && !drag && now - lastTouch > 5200) {
+  if ((sel === "ms" || ov) && !reduce && !drag && now - lastTouch > (ov ? 3400 : 5200)) {
     tilt.z = THREE.MathUtils.degToRad((Math.random() * 2 - 1) * 38); tilt.x = THREE.MathUtils.degToRad((Math.random() * 2 - 1) * 26);
     applyTilt(false);
     if (Math.random() < 0.5) applyDiam(4 + Math.round(Math.random() * 6));
@@ -1775,21 +1925,29 @@ function tick(now) {
     if (Math.abs(curl - want) > 0.002) { curl += (want - curl) * Math.min(1, dt * 7); busy = true; } else curl = want;
   }
   poseHand();
-  if (sel === "ms" && !reduce) busy = true; // keeps the idle re-grip demo ticking while the hand is on screen
+  if ((sel === "ms" || ov) && !reduce) busy = true; // keeps the idle demos ticking while they are on screen
   if (controls.update()) busy = true;
-  renderer.render(scene, camera);
-  drawGizmo();
   const d = camera.position.distanceTo(controls.target);
+  scene.fog.near = Math.max(14, d * 0.9); scene.fog.far = Math.max(34, d * 2.6); // pulled-back views keep their objects out of the fog
+  if (outline.selectedObjects.length) composer.render(); else renderer.render(scene, camera);
+  placeTags();
+  drawGizmo();
   info.textContent = `Persp · dist ${d.toFixed(1)} · ${renderer.info.render.triangles} tris`;
   if ((busy || now < idleUntil) && visible && onScene && !document.hidden) requestAnimationFrame(tick); else running = false;
 }
 
 placeGizmo();
-frame(sel, true);
 resize();
+frame(sel, true);
+if (sel === "overview" && !reduce) { // short dolly in on arrival
+  const t = controls.target, o = camera.position.clone().sub(t);
+  camera.position.copy(t).addScaledVector(o.applyAxisAngle(new THREE.Vector3(0, 1, 0), 0.35), 1.45);
+  frame(sel, false, 1700);
+}
+updateOutline();
 window.__sceneReady = true;
 document.dispatchEvent(new CustomEvent("sceneready"));
-statusL.textContent = "Scene view: three.js r160, procedural geometry. Drag to rotate the view, select objects in the Hierarchy.";
+statusL.textContent = "Scene view: three.js r160, procedural geometry. Drag to rotate the view, click an object to select it.";
 }
 </script>
 </body>
