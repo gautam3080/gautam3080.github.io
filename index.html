@@ -506,8 +506,8 @@ input, textarea, [contenteditable="true"] { caret-color: auto; }
             </div>
             <div data-for="cc" hidden>
               <div class="slider live-only"><label for="sJaw">Jaw width</label><input id="sJaw" type="range" min="0" max="100" value="50"><output for="sJaw">50</output></div>
-              <div class="slider live-only"><label for="sCheek">Cheekbone height</label><input id="sCheek" type="range" min="0" max="100" value="50"><output for="sCheek">50</output></div>
-              <div class="slider live-only"><label for="sEye">Eye spacing</label><input id="sEye" type="range" min="0" max="100" value="50"><output for="sEye">50</output></div>
+              <div class="slider live-only"><label for="sChin">Chin length</label><input id="sChin" type="range" min="0" max="100" value="50"><output for="sChin">50</output></div>
+              <div class="slider live-only"><label for="sNose">Nose width</label><input id="sNose" type="range" min="0" max="100" value="50"><output for="sNose">50</output></div>
               <p class="live-only">The card stack beside the head is the export I rebuilt: layered 4K maps merged into one by parallel jobs (the strips filling at once).</p>
               <p class="honest live-only">Web demo built for this page, not the confidential tool. Head scan by Lee Perry-Smith (Infinite-Realities), <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener">CC BY 3.0</a>; the slider math is mine.</p>
             </div>
@@ -1529,29 +1529,30 @@ const cc = new THREE.Group(); cc.position.copy(POS.cc); scene.add(cc);
 const head = new THREE.Group(); head.position.y = 1.59; head.scale.setScalar(0.4); cc.add(head);
 const headMat = new THREE.MeshStandardMaterial({ roughness: 0.6, metalness: 0, vertexColors: true }); allMats.push(headMat);
 let headGeo = null, basePos = null, neutral = null;
-const P = { jaw: 0.5, cheek: 0.5, eye: 0.5 };
-const PB = { jaw: 0.5, cheek: 0.5, eye: 0.5 }; // what the sliders say; P can drift from it while the head idles
+const P = { jaw: 0.5, chin: 0.5, nose: 0.5 };
+const PB = { jaw: 0.5, chin: 0.5, nose: 0.5 }; // what the sliders say; P can drift from it while the head idles
 // vertices a blendshape moved are tinted amber, like a delta heatmap over the skin
 const cCool = new THREE.Color(0xffffff), cHot = new THREE.Color(0xffa23a), cTmp = new THREE.Color();
 // Ranges stay inside what a real face does: each slider nudges one feature, never the whole head. Units are the scan's own.
 function morph() {
   if (!headGeo) return;
   const a = headGeo.attributes.position.array;
-  const jaw = (P.jaw - 0.5) * 0.24;           // lower-face width
-  const cy = 0.75 + (P.cheek - 0.5) * 0.7;     // cheekbone height
-  const eye = (P.eye - 0.5) * 0.32;            // how far each eye region slides sideways
+  const jaw = (P.jaw - 0.5) * 0.34;           // lower-face width
+  const chin = (P.chin - 0.5) * 0.3;          // chin drops and pushes forward
+  const nose = (P.nose - 0.5) * 0.7;          // nose and nostril width
   for (let i = 0; i < a.length; i += 3) {
-    const x0 = basePos[i], y0 = basePos[i + 1], z0 = basePos[i + 2], s = Math.sign(x0) || 1;
-    let x = x0;
-    x *= 1 + jaw * sm(0.4, -0.3, y0) * sm(-1.35, -0.85, y0) * sm(-0.8, 0.6, z0);
-    x += s * 0.12 * sm(0.7, 1.2, Math.abs(x0)) * sm(0.2, 1.2, z0) * Math.exp(-(((y0 - cy) / 0.35) ** 2));
-    x += s * eye * Math.exp(-(((Math.abs(x0) - 0.62) ** 2) + (y0 - 1.67) ** 2) / 0.16) * sm(1.1, 1.8, z0);
-    a[i] = x; a[i + 1] = y0; a[i + 2] = z0;
+    const x0 = basePos[i], y0 = basePos[i + 1], z0 = basePos[i + 2];
+    let x = x0, y = y0, z = z0;
+    x *= 1 + jaw * sm(0.4, -0.25, y0) * sm(-1.0, -0.6, y0) * sm(-0.3, 0.8, z0); // stops at the jawline, so the neck stays put
+    const gc = Math.exp(-((x0 / 0.65) ** 2) - (((y0 + 0.55) / 0.42) ** 2)) * sm(0.9, 1.7, z0);
+    y -= chin * gc; z += chin * 0.45 * gc;
+    x *= 1 + nose * Math.exp(-((x0 / 0.42) ** 2) - (((y0 - 0.95) / 0.3) ** 2)) * sm(1.85, 2.2, z0); // nose only, cheeks stay
+    a[i] = x; a[i + 1] = y; a[i + 2] = z;
   }
   if (!neutral) neutral = Float32Array.from(a);
   const col = headGeo.attributes.color.array;
   for (let i = 0; i < a.length; i += 3) {
-    const d = Math.abs(a[i] - neutral[i]);
+    const d = Math.hypot(a[i] - neutral[i], a[i + 1] - neutral[i + 1], a[i + 2] - neutral[i + 2]);
     cTmp.copy(cCool).lerp(cHot, 0.6 * Math.min(1, d / 0.06)); // a tint, not paint, so the skin still reads
     col[i] = cTmp.r; col[i + 1] = cTmp.g; col[i + 2] = cTmp.b;
   }
@@ -1572,7 +1573,7 @@ function morph() {
     morph(); kick();
   }, undefined, () => { statusL.textContent = "The head scan did not load; the rest of the scene still works."; });
 }
-[["sJaw", "jaw"], ["sCheek", "cheek"], ["sEye", "eye"]].forEach(([id, key]) => {
+[["sJaw", "jaw"], ["sChin", "chin"], ["sNose", "nose"]].forEach(([id, key]) => {
   const el = document.getElementById(id), out = el.nextElementSibling;
   el.addEventListener("input", () => { PB[key] = P[key] = el.value / 100; out.textContent = el.value; morph(); kick(); });
 });
@@ -2096,8 +2097,8 @@ function tick(now) {
   if (ccAmp > 0.002) {
     const t = now / 1000, cl = (x) => Math.min(1, Math.max(0, x));
     P.jaw = cl(PB.jaw + ccAmp * 0.4 * Math.sin(t * 0.9));
-    P.cheek = cl(PB.cheek + ccAmp * 0.4 * Math.sin(t * 0.7 + 2));
-    P.eye = cl(PB.eye + ccAmp * 0.4 * Math.sin(t * 1.1 + 4));
+    P.chin = cl(PB.chin + ccAmp * 0.4 * Math.sin(t * 0.7 + 2));
+    P.nose = cl(PB.nose + ccAmp * 0.4 * Math.sin(t * 1.1 + 4));
     head.rotation.y = ccAmp * 0.5 * Math.sin(t * 0.45);
     morph(); busy = true;
   } else if (ccAmp !== 0) { ccAmp = 0; Object.assign(P, PB); head.rotation.y = 0; morph(); }
