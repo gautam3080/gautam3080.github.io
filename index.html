@@ -509,7 +509,7 @@ input, textarea, [contenteditable="true"] { caret-color: auto; }
               <div class="slider live-only"><label for="sCheek">Cheekbone height</label><input id="sCheek" type="range" min="0" max="100" value="50"><output for="sCheek">50</output></div>
               <div class="slider live-only"><label for="sEye">Eye spacing</label><input id="sEye" type="range" min="0" max="100" value="50"><output for="sEye">50</output></div>
               <p class="live-only">The card stack beside the head is the export I rebuilt: layered 4K maps merged into one by parallel jobs (the strips filling at once).</p>
-              <p class="honest live-only">Wireframe demo built for this page, not the confidential tool.</p>
+              <p class="honest live-only">Web demo built for this page, not the confidential tool. Head scan by Lee Perry-Smith (Infinite-Realities), <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener">CC BY 3.0</a>; the slider math is mine.</p>
             </div>
             <div data-for="ms" hidden>
               <div class="slider live-only"><label for="sTiltZ">Bar tilt</label><input id="sTiltZ" type="range" min="-50" max="50" value="0"><output for="sTiltZ">0°</output></div>
@@ -1367,8 +1367,8 @@ const fail = (why) => window.__sceneFallback && window.__sceneFallback(why);
 main().catch((e) => { console.warn("Scene view:", e && e.message); fail(e && e.code === "webgl" ? "WebGL is not available" : "three.js could not be loaded"); });
 async function main() {
 const THREE = await import("three");
-const [{ OrbitControls }, { RoundedBoxGeometry }, { EffectComposer }, { RenderPass }, { OutlinePass }, { OutputPass }] = await Promise.all([
-  import("three/addons/controls/OrbitControls.js"), import("three/addons/geometries/RoundedBoxGeometry.js"),
+const [{ OrbitControls }, { RoundedBoxGeometry }, { GLTFLoader }, { EffectComposer }, { RenderPass }, { OutlinePass }, { OutputPass }] = await Promise.all([
+  import("three/addons/controls/OrbitControls.js"), import("three/addons/geometries/RoundedBoxGeometry.js"), import("three/addons/loaders/GLTFLoader.js"),
   import("three/addons/postprocessing/EffectComposer.js"), import("three/addons/postprocessing/RenderPass.js"),
   import("three/addons/postprocessing/OutlinePass.js"), import("three/addons/postprocessing/OutputPass.js")
 ]);
@@ -1523,72 +1523,55 @@ function poseTable(now) {
 }
 if (reduce) pile.slice(0, 7).forEach((m, i) => { m.visible = true; m.position.copy(pileSlot(i)); m.rotation.set(-Math.PI / 2, SEATS[i % 4].a + Math.PI, 0, "YXZ"); }); // still frame of a game in progress
 
-/* ---------------- Character Creator: wireframe head with live blend sliders ---------------- */
+/* ---------------- Character Creator: scanned head with live blend sliders ---------------- */
+// Head scan: Lee Perry-Smith / Infinite-Realities, CC BY 3.0 (credited on the page). The blendshape math below is ours.
 const cc = new THREE.Group(); cc.position.copy(POS.cc); scene.add(cc);
-const headGeo = new THREE.IcosahedronGeometry(1, 5);
-const basePos = Float32Array.from(headGeo.attributes.position.array);
-for (let i = 0; i < basePos.length; i += 3) { const l = Math.hypot(basePos[i], basePos[i + 1], basePos[i + 2]); basePos[i] /= l; basePos[i + 1] /= l; basePos[i + 2] /= l; }
-const wireMat = new THREE.MeshBasicMaterial({ color: 0x9fc2ea, wireframe: true, transparent: true, opacity: 0.55 });
-const occMat = new THREE.MeshBasicMaterial({ color: 0x262626, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
-const head = new THREE.Group(); head.position.y = 1.95; head.scale.setScalar(0.85); cc.add(head);
-// head wire carries per-vertex colour: vertices a blendshape moved glow amber, like a delta heatmap
-const headWire = new THREE.MeshBasicMaterial({ vertexColors: true, wireframe: true, transparent: true, opacity: 0.7 });
-headGeo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(headGeo.attributes.position.count * 3), 3));
-const headOcc = new THREE.Mesh(headGeo, occMat); headOcc.castShadow = true;
-head.add(headOcc, new THREE.Mesh(headGeo, headWire));
-const eyeGeo = new THREE.IcosahedronGeometry(0.085, 1);
-const eyeMat = new THREE.MeshBasicMaterial({ color: 0xe8564a, wireframe: true });
-const eyes = [new THREE.Mesh(eyeGeo, eyeMat), new THREE.Mesh(eyeGeo, eyeMat)]; head.add(...eyes);
-const neckGeo = new THREE.CylinderGeometry(0.3, 0.42, 1.05, 14, 3, true);
-const neck = new THREE.Group(); neck.position.y = 0.88;
-const neckOcc = new THREE.Mesh(neckGeo, occMat); neckOcc.castShadow = true;
-neck.add(neckOcc, new THREE.Mesh(neckGeo, wireMat)); cc.add(neck);
-const shGeo = new THREE.SphereGeometry(1, 18, 5, 0, Math.PI * 2, Math.PI * 0.3, Math.PI * 0.2);
-const shoulders = new THREE.Group(); shoulders.position.y = -0.05; shoulders.scale.set(1.3, 1.1, 0.6);
-shoulders.add(new THREE.Mesh(shGeo, wireMat)); cc.add(shoulders);
+const head = new THREE.Group(); head.position.y = 1.59; head.scale.setScalar(0.4); cc.add(head);
+const headMat = new THREE.MeshStandardMaterial({ roughness: 0.6, metalness: 0, vertexColors: true }); allMats.push(headMat);
+let headGeo = null, basePos = null, neutral = null;
 const P = { jaw: 0.5, cheek: 0.5, eye: 0.5 };
 const PB = { jaw: 0.5, cheek: 0.5, eye: 0.5 }; // what the sliders say; P can drift from it while the head idles
-let neutral = null;
-const cCool = new THREE.Color(0x9fc2ea), cHot = new THREE.Color(0xffa23a), cTmp = new THREE.Color();
-// Ranges stay inside what a real face does: each slider nudges one feature, never the whole head.
+// vertices a blendshape moved are tinted amber, like a delta heatmap over the skin
+const cCool = new THREE.Color(0xffffff), cHot = new THREE.Color(0xffa23a), cTmp = new THREE.Color();
+// Ranges stay inside what a real face does: each slider nudges one feature, never the whole head. Units are the scan's own.
 function morph() {
+  if (!headGeo) return;
   const a = headGeo.attributes.position.array;
-  const taper = 0.3 - 0.18 * P.jaw;   // how much the lower face narrows toward the chin
-  const cy = -0.04 + 0.16 * P.cheek;  // cheekbone height
-  const ex = 0.27 + 0.08 * P.eye;     // half the distance between the eyes
+  const jaw = (P.jaw - 0.5) * 0.24;           // lower-face width
+  const cy = 0.75 + (P.cheek - 0.5) * 0.7;     // cheekbone height
+  const eye = (P.eye - 0.5) * 0.32;            // how far each eye region slides sideways
   for (let i = 0; i < a.length; i += 3) {
-    const x0 = basePos[i], y0 = basePos[i + 1], z0 = basePos[i + 2];
-    let x = x0 * 0.8, y = y0 * 1.06, z = z0 * 0.92;
-    const low = sm(-0.15, -0.95, y0);
-    x *= 1 - taper * low;
-    z *= 1 - 0.12 * low * sm(0, -0.8, z0);
-    z += 0.06 * low * Math.max(z0, 0);
-    if (z0 < 0) z *= 1 + 0.14 * sm(0, -0.9, z0) * sm(-0.4, 0.2, y0);
-    const side = sm(0.3, 0.75, Math.abs(x0)) * sm(-0.35, 0.35, z0);
-    x *= 1 + 0.07 * side * Math.exp(-(((y0 - cy) / 0.12) ** 2));
-    const front = sm(0.55, 0.95, z0);
-    z += 0.22 * front * Math.exp(-(x0 * x0) / 0.01) * Math.exp(-((y0 + 0.08) ** 2) / 0.03);
-    z += 0.05 * front * Math.exp(-((y0 - 0.33) ** 2) / 0.006);
-    let ind = 0;
-    for (const s of [-1, 1]) ind += 0.07 * Math.exp(-((x0 - s * ex) ** 2 + (y0 - 0.2) ** 2) / 0.011) * sm(0.45, 0.85, z0);
-    a[i] = x * (1 - ind); a[i + 1] = y * (1 - ind * 0.3); a[i + 2] = z * (1 - ind);
+    const x0 = basePos[i], y0 = basePos[i + 1], z0 = basePos[i + 2], s = Math.sign(x0) || 1;
+    let x = x0;
+    x *= 1 + jaw * sm(0.4, -0.3, y0) * sm(-1.35, -0.85, y0) * sm(-0.8, 0.6, z0);
+    x += s * 0.12 * sm(0.7, 1.2, Math.abs(x0)) * sm(0.2, 1.2, z0) * Math.exp(-(((y0 - cy) / 0.35) ** 2));
+    x += s * eye * Math.exp(-(((Math.abs(x0) - 0.62) ** 2) + (y0 - 1.67) ** 2) / 0.16) * sm(1.1, 1.8, z0);
+    a[i] = x; a[i + 1] = y0; a[i + 2] = z0;
   }
   if (!neutral) neutral = Float32Array.from(a);
   const col = headGeo.attributes.color.array;
   for (let i = 0; i < a.length; i += 3) {
-    const d = Math.hypot(a[i] - neutral[i], a[i + 1] - neutral[i + 1], a[i + 2] - neutral[i + 2]);
-    cTmp.copy(cCool).lerp(cHot, Math.min(1, d / 0.028));
+    const d = Math.abs(a[i] - neutral[i]);
+    cTmp.copy(cCool).lerp(cHot, 0.6 * Math.min(1, d / 0.06)); // a tint, not paint, so the skin still reads
     col[i] = cTmp.r; col[i + 1] = cTmp.g; col[i + 2] = cTmp.b;
   }
   headGeo.attributes.color.needsUpdate = true;
   headGeo.attributes.position.needsUpdate = true;
   headGeo.computeBoundingSphere();
-  const ez = Math.sqrt(Math.max(0, 1 - ex * ex - 0.04));
-  // sit each eye just inside its socket so it stays visible at every slider value
-  eyes[0].position.set(-ex * 0.8 * 0.93, 0.2 * 1.06 * 0.98, ez * 0.92 * 0.93 - 0.03);
-  eyes[1].position.set(ex * 0.8 * 0.93, 0.2 * 1.06 * 0.98, ez * 0.92 * 0.93 - 0.03);
 }
-morph();
+{
+  const tl = new THREE.TextureLoader();
+  headMat.map = tl.load("assets/head/head-albedo.jpg", () => kick()); headMat.map.colorSpace = THREE.SRGBColorSpace;
+  headMat.normalMap = tl.load("assets/head/head-normal.jpg", () => kick());
+  new GLTFLoader().load("assets/head/head.glb", (g) => {
+    let src = null; g.scene.traverse((o) => { if (o.isMesh && !src) src = o; });
+    if (!src) return;
+    headGeo = src.geometry; basePos = Float32Array.from(headGeo.attributes.position.array);
+    headGeo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(headGeo.attributes.position.count * 3).fill(1), 3));
+    const m = new THREE.Mesh(headGeo, headMat); m.castShadow = true; head.add(m);
+    morph(); kick();
+  }, undefined, () => { statusL.textContent = "The head scan did not load; the rest of the scene still works."; });
+}
 [["sJaw", "jaw"], ["sCheek", "cheek"], ["sEye", "eye"]].forEach(([id, key]) => {
   const el = document.getElementById(id), out = el.nextElementSibling;
   el.addEventListener("input", () => { PB[key] = P[key] = el.value / 100; out.textContent = el.value; morph(); kick(); });
@@ -1972,7 +1955,7 @@ function updateOutline() {
 /* ---------------- name tags over each object in the overview ---------------- */
 const tagBox = document.getElementById("tags"), heroEl = document.getElementById("hero");
 const tagEls = [...tagBox.querySelectorAll("[data-select]")];
-const TAG_AT = { pongz: new THREE.Vector3(-5.2, 2.55, -2.0), cc: new THREE.Vector3(0, 3.0, 0), ms: new THREE.Vector3(5.2, 3.35, 0) };
+const TAG_AT = { pongz: new THREE.Vector3(-5.2, 2.55, -2.0), cc: new THREE.Vector3(0, 3.45, 0), ms: new THREE.Vector3(5.2, 3.35, 0) };
 tagEls.forEach((el) => {
   el.addEventListener("pointerenter", () => setHover(el.dataset.select));
   el.addEventListener("pointerleave", () => setHover(null));
