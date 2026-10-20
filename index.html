@@ -357,6 +357,11 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
 @media (max-width: 1023px) and (min-width: 700px) {
   .gallery { grid-template-columns: repeat(3, 1fr); }
 }
+/* ---------- editor chrome is UI, not text: no selection, no text caret (e.g. with caret browsing on) ---------- */
+button, .btn, .tbtn, .gbtn, .sbtn, .tab, .tabs, .tree, .menu, .logo, .cnt, .cons-bar, .logs button, .objref, .comp > summary, .slider label, .slider output, .game-bar, .scene-bar, .status, .cw-bar, .cw-status, .badge { -webkit-user-select: none; user-select: none; }
+body { caret-color: transparent; }
+input, textarea, [contenteditable="true"] { caret-color: auto; }
+
 /* ---------- script window (Gautam.cs) ---------- */
 .objref { display: inline-flex; align-items: center; gap: 7px; min-height: 30px; padding: 3px 10px 3px 7px; background: var(--bg1); border: 1px solid #3f3f3f; border-radius: 3px; color: var(--bright); font-family: var(--f-mono); font-size: 12.5px; cursor: pointer; text-align: left; }
 .objref:hover { border-color: var(--blue, #4a8ee8); background: #2e2e2e; }
