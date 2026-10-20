@@ -165,6 +165,14 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
 .fallback-art p { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); }
 #gameView { background: #000; display: flex; flex-direction: column; }
 #gameView video { flex: 1; min-height: 0; width: 100%; height: 100%; object-fit: contain; background: #000; display: block; }
+.game-bar { display: flex; align-items: center; gap: 14px; min-height: 34px; padding: 2px 6px 2px 10px; background: var(--bg1); border-bottom: 1px solid var(--sep); font-size: 12px; color: var(--muted); flex: none; }
+.game-bar .grow { flex: 1; }
+.gbtn { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 10px; background: transparent; border: 1px solid transparent; border-radius: 3px; color: var(--text); font-size: 12px; cursor: pointer; }
+.gbtn:hover { background: var(--bg3); }
+.gbtn svg { width: 16px; height: 16px; }
+.gbtn .xx { display: none; }
+.gbtn[aria-pressed="true"] { background: var(--sel); color: #fff; border-color: #1c3d5a; }
+.gbtn[aria-pressed="true"] .xx { display: inline; } .gbtn[aria-pressed="true"] .wave { display: none; }
 .game-cap { display: flex; gap: 12px; align-items: center; padding: 6px 10px; background: var(--bg1); font-size: 12px; color: var(--muted); border-top: 1px solid var(--sep); }
 .game-cap b { color: var(--bright); font-weight: 500; }
 .game-cap .rec { width: 8px; height: 8px; border-radius: 50%; background: var(--red); flex: none; }
@@ -495,7 +503,12 @@ input[type="range"]:hover::-webkit-slider-thumb { background: #fff; }
         </div>
       </div>
       <div class="view" id="gameView" role="tabpanel" aria-labelledby="tabGame" hidden>
-        <video id="gameVideo" src="assets/pongz-gameplay.mp4" poster="assets/pongz-gameplay-poster.jpg" muted loop playsinline preload="none" aria-label="Pongz gameplay: the final turns of a ranked hand through to the win screen"></video>
+        <div class="game-bar">
+          <span>Display 1</span><span>Free Aspect</span>
+          <span class="grow"></span>
+          <button class="gbtn" type="button" id="btnMute" aria-pressed="false" title="Mute the gameplay audio"><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M2.5 6h2.5l3.5-3v10L5 10H2.5Z" fill="currentColor"/><path class="wave" d="M10.6 5.6a3.4 3.4 0 0 1 0 4.8M12.4 3.9a5.8 5.8 0 0 1 0 8.2" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path class="xx" d="M10.5 6l4 4M14.5 6l-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Mute Audio</button>
+        </div>
+        <video id="gameVideo" src="assets/pongz-gameplay.mp4" poster="assets/pongz-gameplay-poster.jpg" loop playsinline preload="none" aria-label="Pongz gameplay: the final turns of a ranked hand through to the win screen"></video>
         <p class="game-cap"><span class="rec" aria-hidden="true"></span><span><b>Pongz – SG Mahjong</b> · Ranked match, final turns of the hand through to the win screen.</span></p>
       </div>
     </div>
@@ -1134,13 +1147,24 @@ public class Gautam : MonoBehaviour
     gameView.hidden = !game; sceneView.hidden = game;
     tabGame.classList.toggle("on", game); tabScene.classList.toggle("on", !game);
     tabGame.setAttribute("aria-selected", game); tabScene.setAttribute("aria-selected", !game);
-    document.getElementById("sceneBar").style.visibility = game ? "hidden" : "";
+    document.getElementById("sceneBar").style.display = game ? "none" : "";
     document.dispatchEvent(new CustomEvent("viewtab", { detail: game ? "game" : "scene" }));
   }
+  // Mute Audio, like the toggle in Unity's Game view; the choice is remembered on this browser
+  var btnMute = document.getElementById("btnMute");
+  function setMute(on, save) {
+    video.muted = on; btnMute.setAttribute("aria-pressed", on);
+    if (save) { try { localStorage.setItem("gameMuted", on ? "1" : "0"); } catch (e) {} }
+  }
+  var savedMute = null; try { savedMute = localStorage.getItem("gameMuted"); } catch (e) {}
+  setMute(savedMute === "1", false);
+  btnMute.addEventListener("click", function () { setMute(!video.muted, true); });
   function enterPlay() {
     playing = true; btnPlay.setAttribute("aria-pressed", "true"); btnPause.setAttribute("aria-pressed", "false");
     showTab(true);
-    var p = video.play(); if (p && p.catch) p.catch(function () {});
+    var p = video.play();
+    // if a browser refuses sound, fall back to muted playback instead of not playing at all
+    if (p && p.catch) p.catch(function (err) { if (err && err.name === "NotAllowedError" && !video.muted) { setMute(true, false); video.play().catch(function () {}); } });
   }
   function exitPlay() {
     playing = false; btnPlay.setAttribute("aria-pressed", "false"); btnPause.setAttribute("aria-pressed", "false");
