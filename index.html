@@ -501,6 +501,7 @@ input, textarea, [contenteditable="true"] { caret-color: auto; }
             </div>
             <div data-for="pongz" hidden>
               <p class="live-only">Drag a tile to move it. Tap a tile to turn it. Drag empty space to rotate the view.</p>
+              <p class="live-only">Behind them, four bots take turns (the AI Practice Mode I built). After each discard the server pushes the new state to every player's client, the green dots, which is the sync work I did on the client side.</p>
               <button class="btn primary" type="button" data-play><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg>Play gameplay capture</button>
             </div>
             <div data-for="cc" hidden>
@@ -1436,7 +1437,7 @@ const FACES = [
   (x) => { dot(x, 38, 42, 15, "#2f63b8"); dot(x, 90, 42, 15, "#2c8a52"); dot(x, 64, 88, 15, "#c8372b"); dot(x, 38, 134, 15, "#2c8a52"); dot(x, 90, 134, 15, "#2f63b8"); } // 5 dots
 ];
 const pongz = new THREE.Group(); pongz.position.copy(POS.pongz); scene.add(pongz);
-const tiles = [];
+const tiles = [], faceMats = [];
 // one rounded block per tile; the jade back is a colour layer in the shader, so there is no seam between two meshes
 const TILE_D = 0.48, JADE_AT = -TILE_D / 2 + 0.15;
 const ivory = std(0xefe7d2, { flatShading: false, roughness: 0.42 });
@@ -1450,7 +1451,7 @@ ivory.onBeforeCompile = (sh) => {
 const bodyGeo = new RoundedBoxGeometry(0.72, 0.98, TILE_D, 4, 0.075);
 FACES.forEach((draw, i) => {
   const t = new THREE.Group();
-  const face = new THREE.MeshStandardMaterial({ map: tileTexture(draw), roughness: 0.42 }); allMats.push(face);
+  const face = new THREE.MeshStandardMaterial({ map: tileTexture(draw), roughness: 0.42 }); allMats.push(face); faceMats.push(face);
   const body = new THREE.Mesh(bodyGeo, [ivory, ivory, ivory, ivory, face, ivory]); body.position.z = -0.07;
   t.add(body);
   const flat = i === 4;
@@ -1461,6 +1462,66 @@ FACES.forEach((draw, i) => {
   body.userData.root = t;
   pongz.add(t); tiles.push(t);
 });
+
+/* ---------------- Pongz table: four bot seats take turns, each discard is synced to every client ---------------- */
+const table = new THREE.Group(); table.position.set(0, 0, -2.0); pongz.add(table);
+const felt = new THREE.Mesh(new RoundedBoxGeometry(2.7, 0.08, 2.7, 3, 0.03), std(0x1d5a3b, { flatShading: false, roughness: 0.9 }));
+felt.position.y = 0.04; felt.receiveShadow = true; table.add(felt);
+const MINI = 0.27, TOP = 0.08;
+const miniBody = (faceMat) => new THREE.Mesh(bodyGeo, [ivory, ivory, ivory, ivory, faceMat || ivory, ivory]);
+const SEATS = [0, 1, 2, 3].map((k) => { // seat k sits on one edge, facing the centre
+  const a = k * Math.PI / 2, dir = new THREE.Vector3(Math.sin(a), 0, Math.cos(a)), side = new THREE.Vector3(dir.z, 0, -dir.x);
+  const hand = [];
+  for (let i = 0; i < 7; i++) {
+    const m = miniBody(); m.scale.setScalar(MINI);
+    m.position.copy(dir).multiplyScalar(1.12).addScaledVector(side, (i - 3) * 0.21); m.position.y = TOP + 0.98 * MINI / 2;
+    m.rotation.y = a + Math.PI; // jade back faces outwards, so the player sees the tile faces
+    m.castShadow = true; table.add(m); hand.push(m);
+  }
+  return { dir, side, hand, a };
+});
+const turnRing = new THREE.Mesh(new THREE.TorusGeometry(0.85, 0.018, 6, 48, Math.PI * 0.55), new THREE.MeshBasicMaterial({ color: 0xe0b341 }));
+turnRing.rotation.x = -Math.PI / 2; turnRing.position.y = TOP + 0.01; table.add(turnRing);
+const server = new THREE.Group(); server.position.set(0, 2.05, 0); table.add(server);
+server.add(new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.2, 0.26), std(0x3a3f47)));
+const led = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.03, 0.01), new THREE.MeshBasicMaterial({ color: 0x8fd14f })); led.position.set(-0.1, 0.04, 0.131); server.add(led);
+const pktMat = new THREE.MeshBasicMaterial({ color: 0x8fd14f, transparent: true });
+const packets = SEATS.map(() => { const m = new THREE.Mesh(new THREE.SphereGeometry(0.045, 10, 8), pktMat); m.visible = false; table.add(m); return m; });
+const syncLine = new THREE.LineSegments(new THREE.BufferGeometry().setAttribute("position", new THREE.Float32BufferAttribute(SEATS.flatMap((st) => [0, 1.95, 0, st.dir.x * 1.12, 0.35, st.dir.z * 1.12]), 3)),
+  new THREE.LineDashedMaterial({ color: 0x5f8f4a, dashSize: 0.06, gapSize: 0.05, transparent: true, opacity: 0.6 }));
+syncLine.computeLineDistances(); table.add(syncLine);
+const pile = []; // discards lie face up in the centre
+const PILE_MAX = 12;
+for (let i = 0; i < PILE_MAX; i++) { const m = miniBody(faceMats[i % faceMats.length]); m.scale.setScalar(MINI); m.visible = false; m.castShadow = true; table.add(m); pile.push(m); }
+const pileSlot = (i) => new THREE.Vector3(((i % 4) - 1.5) * 0.24, TOP + 0.48 * MINI * 0.5 + 0.005, (Math.floor(i / 4) - 1) * 0.31);
+let game = { turn: 0, n: 0, t0: -1 };
+const TURN_MS = 1250;
+// a turn: the seated bot lifts a tile, arcs it into the pile; on landing the server pushes the new state to all four clients
+function poseTable(now) {
+  if (game.t0 < 0) game.t0 = now;
+  let k = (now - game.t0) / TURN_MS;
+  while (k >= 1) { // turn finished: commit it
+    game.n++; game.turn = (game.turn + 1) % 4; game.t0 += TURN_MS; k -= 1;
+    if (game.n > PILE_MAX) { game.n = 0; pile.forEach((m) => { m.visible = false; }); }
+  }
+  const seat = SEATS[game.turn], idx = game.n % PILE_MAX;
+  turnRing.rotation.z = seat.a - Math.PI * 0.275 - Math.PI / 2;
+  turnRing.position.set(0, TOP + 0.01, 0);
+  const m = pile[idx];
+  if (game.n < PILE_MAX) {
+    const from = seat.dir.clone().multiplyScalar(0.92); from.y = TOP + 0.2;
+    const to = pileSlot(idx), f = Math.min(1, k / 0.45), e = ease(f);
+    m.visible = true; m.position.lerpVectors(from, to, e); m.position.y += Math.sin(Math.PI * f) * 0.35;
+    m.rotation.set(-Math.PI / 2 * e, seat.a + Math.PI, 0, "YXZ");
+  }
+  const pk = k > 0.45 && k < 0.95 ? (k - 0.45) / 0.5 : -1;
+  packets.forEach((p, i) => {
+    p.visible = pk >= 0;
+    if (pk >= 0) { const d = SEATS[i].dir; p.position.set(d.x * 1.12 * pk, 1.95 + (0.35 - 1.95) * pk, d.z * 1.12 * pk); pktMat.opacity = 1 - Math.max(0, pk - 0.8) * 5; }
+  });
+  led.material.color.setHex(pk >= 0 && pk < 0.3 ? 0xd8ff9a : 0x8fd14f);
+}
+if (reduce) pile.slice(0, 7).forEach((m, i) => { m.visible = true; m.position.copy(pileSlot(i)); m.rotation.set(-Math.PI / 2, SEATS[i % 4].a + Math.PI, 0, "YXZ"); }); // still frame of a game in progress
 
 /* ---------------- Character Creator: wireframe head with live blend sliders ---------------- */
 const cc = new THREE.Group(); cc.position.copy(POS.cc); scene.add(cc);
@@ -1785,7 +1846,7 @@ const moveGizmo = new THREE.Group(); scene.add(moveGizmo);
 /* ---------------- camera, controls, interaction ---------------- */
 const SHOTS = {
   overview: { t: [1.3, 2.0, 0], p: [2.9, 5.9, 11.4] },
-  pongz: { t: [-5.2, 0.45, 0.35], p: [-3.9, 3.1, 5.1] },
+  pongz: { t: [-5.2, 0.35, -1.0], p: [-4.1, 5.4, 3.9] },
   cc: { t: [0.95, 1.75, 0.1], p: [2.0, 2.7, 6.6] },
   ms: { t: [5.2, 1.55, 0.2], p: [7.6, 4.3, -2.3] }
 };
@@ -1861,7 +1922,7 @@ canvas.addEventListener("pointermove", (e) => {
     if (ray.ray.intersectPlane(floor, p) && drag.moved) {
       const local = pongz.worldToLocal(p).add(drag.off);
       local.y = drag.obj.userData.baseY + 0.18;
-      local.x = Math.max(-3.5, Math.min(3.5, local.x)); local.z = Math.max(-2.5, Math.min(3, local.z));
+      local.x = Math.max(-3.5, Math.min(3.5, local.x)); local.z = Math.max(-0.5, Math.min(3, local.z)); // keep dragged tiles off the table behind
       drag.obj.position.copy(local);
     }
   } else {
@@ -1911,7 +1972,7 @@ function updateOutline() {
 /* ---------------- name tags over each object in the overview ---------------- */
 const tagBox = document.getElementById("tags"), heroEl = document.getElementById("hero");
 const tagEls = [...tagBox.querySelectorAll("[data-select]")];
-const TAG_AT = { pongz: new THREE.Vector3(-5.2, 1.35, 0), cc: new THREE.Vector3(0, 3.0, 0), ms: new THREE.Vector3(5.2, 3.35, 0) };
+const TAG_AT = { pongz: new THREE.Vector3(-5.2, 2.55, -2.0), cc: new THREE.Vector3(0, 3.0, 0), ms: new THREE.Vector3(5.2, 3.35, 0) };
 tagEls.forEach((el) => {
   el.addEventListener("pointerenter", () => setHover(el.dataset.select));
   el.addEventListener("pointerleave", () => setHover(null));
@@ -2032,6 +2093,7 @@ function tick(now) {
   });
   const ov = sel === "overview";
   if ((ov || sel === "cc") && !reduce) { poseExport(now / 1000); busy = true; }
+  if ((ov || sel === "pongz") && !reduce) { poseTable(now); busy = true; }
   if ((ov || sel === "ms") && !reduce) playhead.position.x = TL_L + (TL_R - TL_L) * ((now / 6000) % 1);
   // overview idle: a tile hops and spins now and then
   if (ov && !reduce && now > nextHop) {
