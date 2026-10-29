@@ -2007,8 +2007,15 @@ function placeTags() {
   });
 }
 
-let fly = null;
+let fly = null, framePending = false;
+// The canvas has no size while the Game tab is showing. Framing then would divide by a zero aspect
+// and leave the camera at NaN, so the shot waits until the Scene tab is back.
+const sceneShown = () => onScene && canvas.clientWidth > 0 && canvas.clientHeight > 0;
+const camOk = () => [camera.position.x, camera.position.y, camera.position.z, controls.target.x, controls.target.y, controls.target.z].every(Number.isFinite);
 function frame(id, instant, dur = 750) {
+  if (!sceneShown()) { framePending = true; fly = null; return; }
+  framePending = false;
+  if (!camOk()) instant = true; // never animate from a broken camera
   const s = shotFor(id);
   const to = { t: new THREE.Vector3(...s.t), p: new THREE.Vector3(...s.p) };
   const fl = coverLeft(), aspect = (canvas.clientWidth - fl * 0.5) / (canvas.clientHeight || 1); // the panel only covers the lower part
@@ -2077,7 +2084,9 @@ function coverLeft() {
   return o.offsetWidth ? o.offsetLeft + o.offsetWidth : 0;
 }
 function setOffset() {
-  const w = canvas.clientWidth, h = canvas.clientHeight, fl = coverLeft();
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  if (!w || !h) return;
+  const fl = coverLeft();
   const desk = matchMedia("(min-width: 1024px)").matches;
   if (fl) camera.setViewOffset(w, h, -fl * 0.4, 0, w, h);
   else if ((sel === "overview" || !SHOTS[sel]) && !desk && w > h * 1.8) camera.setViewOffset(w, h, 0, h * 0.18, w, h); // phone landscape: lift the objects above the fold
@@ -2097,7 +2106,13 @@ function resize() {
 new ResizeObserver(resize).observe(canvas);
 new IntersectionObserver((en) => { visible = en[0].isIntersecting; if (visible) kick(); }).observe(view);
 document.addEventListener("visibilitychange", () => { if (!document.hidden) kick(); });
-document.addEventListener("viewtab", (e) => { onScene = e.detail === "scene"; if (onScene) { resize(); kick(); } });
+document.addEventListener("viewtab", (e) => {
+  onScene = e.detail === "scene";
+  if (!onScene) { fly = null; return; }
+  resize();
+  if (framePending || !camOk()) frame(sel, true); // a selection made from the Game tab lands here
+  kick();
+});
 
 function tick(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
@@ -2161,6 +2176,7 @@ function tick(now) {
   poseHand();
   if ((sel === "ms" || ov) && !reduce) busy = true; // keeps the idle demos ticking while they are on screen
   if (controls.update()) busy = true;
+  if (!camOk()) frame(sel, true); // self-heal rather than render nothing
   const d = camera.position.distanceTo(controls.target);
   scene.fog.near = Math.max(14, d * 0.9); scene.fog.far = Math.max(34, d * 2.6); // pulled-back views keep their objects out of the fog
   if (outline.selectedObjects.length) composer.render(); else { renderer.render(scene, camera); sceneTris = renderer.info.render.triangles; }
