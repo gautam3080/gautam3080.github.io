@@ -500,7 +500,7 @@ input, textarea, [contenteditable="true"] { caret-color: auto; }
         <div class="hero" id="hero">
           <p class="eyebrow">Gautam · Unity Game Developer</p>
           <h1><span class="c-green">A live Mahjong game.</span> <span class="c-red">Photoreal humans.</span> <span class="c-blue">Movie sets in a box.</span></h1>
-          <p class="sub">3.5+ years of production C# · Mumbai · Available immediately</p>
+          <p class="sub">3.5+ years of production C# · Remote or relocation · Available now</p>
         </div>
         <div class="scene-tags" id="tags" aria-hidden="true">
           <button type="button" tabindex="-1" class="stag" data-select="pongz">Pongz_SGMahjong<span class="badge live">LIVE</span></button>
@@ -567,7 +567,7 @@ input, textarea, [contenteditable="true"] { caret-color: auto; }
             <div class="field"><span>Script</span><span><button class="objref" type="button" data-open-script><svg class="ic" aria-hidden="true"><use href="#i-script"/></svg>Gautam.cs <small>my resume, as C#</small></button></span></div>
             <div class="field"><span>Role</span><span class="val">Unity Game Developer</span></div>
             <div class="field"><span>Experience</span><span class="val">3.5+ years of production C#</span></div>
-            <div class="field"><span>Based in</span><span class="val">Mumbai, India</span></div>
+            <div class="field"><span>Based in</span><span class="val">Amritsar, Punjab · open to relocation or remote</span></div>
             <div class="field"><span>Status</span><span class="val live">Available immediately</span></div>
             <div class="prose"><p>I designed and built the client architecture of a live multiplayer game, led development of a photorealistic character creator, and solved real-time hand placement for a 3D scene tool.</p></div>
             <div class="btn-row">
@@ -900,7 +900,7 @@ input, textarea, [contenteditable="true"] { caret-color: auto; }
           <div class="comp-b">
             <p class="contact-h">Hiring a Unity developer? Let's talk.</p>
             <div class="field"><span>Email</span><span class="email-box"><code id="email">gautamc3080@gmail.com</code><button type="button" id="copy-email">Copy</button></span></div>
-            <div class="field"><span>Location</span><span class="val">Mumbai, India</span></div>
+            <div class="field"><span>Location</span><span class="val">Amritsar, Punjab · open to relocation or remote</span></div>
             <div class="field"><span>Availability</span><span class="val live">Available immediately</span></div>
             <div class="btn-row">
               <a class="btn primary" href="mailto:gautamc3080@gmail.com"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg>Email me</a>
@@ -933,7 +933,7 @@ input, textarea, [contenteditable="true"] { caret-color: auto; }
         <li class="info"><button type="button" data-select="ms"><svg aria-hidden="true"><use href="#i-info"/></svg><span class="src">MovieStudio3D</span><span class="msg">Timeline rebuilt: horizontal layout, finer timestep control, more stable sequencing.</span></button></li>
         <li class="warn"><button type="button" data-select="cc"><svg aria-hidden="true"><use href="#i-warn"/></svg><span class="src">NDA</span><span class="msg">CharacterCreator and MovieStudio3D are unreleased and confidential, so they are shown as schematics, not screenshots.</span></button></li>
         <li class="info"><button type="button" data-select="about"><svg aria-hidden="true"><use href="#i-info"/></svg><span class="src">Gautam</span><span class="msg">3.5+ years of production Unity and C# across Android, iOS and Windows.</span></button></li>
-        <li class="info"><button type="button" data-select="contact"><svg aria-hidden="true"><use href="#i-info"/></svg><span class="src">Gautam</span><span class="msg">Based in Mumbai, India. Available immediately.</span></button></li>
+        <li class="info"><button type="button" data-select="contact"><svg aria-hidden="true"><use href="#i-info"/></svg><span class="src">Gautam</span><span class="msg">Based in Amritsar, Punjab. Open to relocation or remote. Available immediately.</span></button></li>
       </ul>
     </div>
   </section>
@@ -969,10 +969,11 @@ public class Gautam : MonoBehaviour
 {
     [Header("Contact")]
     public string role      = "Unity Game Developer";
-    public string location  = "Mumbai, India";
+    public string location  = "Amritsar, Punjab";
     public string email     = "gautamc3080@gmail.com";
     public string linkedIn  = "linkedin.com/in/gautam-chaudhary-g3080";
     public string portfolio = "gautam3080.github.io";
+    public bool   openToRelocation = true; // or remote
     public bool   availableImmediately = true;
 
     [Header("Summary")]
